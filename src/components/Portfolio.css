@@ -16,14 +16,14 @@
 
 .portfolio-header h1 {
   font-size: 48px;
-  color: #ffffff;
+  color: var(--site-text-color);
   font-weight: 700;
   margin-bottom: 15px;
 }
 
 .portfolio-header p {
   font-size: 18px;
-  color: #B0B0B0;
+  color: var(--site-sidebar-muted-text-color);
 }
 
 .portfolio-filters {
@@ -36,9 +36,9 @@
 
 .filter-btn {
   padding: 12px 24px;
-  border: 2px solid #2A3B3E;
+  border: 2px solid var(--site-surface-color);
   background-color: transparent;
-  color: #B0B0B0;
+  color: var(--site-sidebar-muted-text-color);
   border-radius: 25px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -48,9 +48,9 @@
 
 .filter-btn:hover,
 .filter-btn.active {
-  border-color: #00CED1;
-  background-color: #00CED1;
-  color: #ffffff;
+  border-color: var(--site-accent-color);
+  background-color: var(--site-accent-color);
+  color: var(--site-text-color);
 }
 
 .portfolio-grid {
@@ -62,24 +62,24 @@
 }
 
 .portfolio-item {
-  background-color: #2A3B3E;
+  background-color: var(--site-surface-color);
   border-radius: 12px;
   overflow: hidden;
-  border: 1px solid #3A4B4E;
+  border: 1px solid var(--site-sidebar-border-color);
   transition: all 0.3s ease;
 }
 
 .portfolio-item:hover {
   transform: translateY(-5px);
-  border-color: #00CED1;
-  box-shadow: 0 10px 30px rgba(0, 206, 209, 0.1);
+  border-color: var(--site-accent-color);
+  box-shadow: 0 10px 30px rgba(var(--site-accent-rgb, 0, 206, 209), 0.1);
 }
 
 .portfolio-image {
   position: relative;
   height: 280px;
   overflow: hidden;
-  background-color: #1A2B2E;
+  background-color: var(--site-bg-color);
 }
 
 .portfolio-img {
@@ -100,7 +100,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(0, 206, 209, 0.95), rgba(0, 150, 150, 0.95));
+  background: linear-gradient(135deg, rgba(var(--site-accent-rgb, 0, 206, 209), 0.95), rgba(0, 150, 150, 0.95));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -124,7 +124,7 @@
   width: 60px;
   height: 60px;
   background: linear-gradient(135deg, #ffffff, #f0f0f0);
-  color: #00CED1;
+  color: var(--site-accent-color);
   border-radius: 50%;
   display: flex;
   flex-direction: column;
@@ -139,10 +139,10 @@
 }
 
 .action-btn:hover {
-  background: linear-gradient(135deg, #00CED1, #00B8BA);
+  background: linear-gradient(135deg, var(--site-accent-color), var(--site-accent-color));
   color: #ffffff;
   transform: scale(1.1) translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 206, 209, 0.4);
+  box-shadow: 0 8px 25px rgba(var(--site-accent-rgb, 0, 206, 209), 0.4);
   border-color: #ffffff;
 }
 
@@ -164,7 +164,7 @@
 
 .portfolio-category {
   font-size: 12px;
-  color: #00CED1;
+  color: var(--site-accent-color);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -173,14 +173,14 @@
 
 .portfolio-title {
   font-size: 20px;
-  color: #ffffff;
+  color: var(--site-text-color);
   font-weight: 600;
   margin-bottom: 10px;
 }
 
 .portfolio-description {
   font-size: 14px;
-  color: #B0B0B0;
+  color: var(--site-sidebar-muted-text-color);
   line-height: 1.6;
   margin-bottom: 20px;
 }
@@ -193,31 +193,31 @@
 
 .tech-tag {
   font-size: 12px;
-  color: #00CED1;
-  background-color: rgba(0, 206, 209, 0.1);
+  color: var(--site-accent-color);
+  background-color: rgba(var(--site-accent-rgb, 0, 206, 209), 0.1);
   padding: 4px 12px;
   border-radius: 12px;
-  border: 1px solid rgba(0, 206, 209, 0.3);
+  border: 1px solid rgba(var(--site-accent-rgb, 0, 206, 209), 0.3);
 }
 
 .portfolio-cta {
   text-align: center;
-  background-color: #2A3B3E;
+  background-color: var(--site-surface-color);
   padding: 60px 40px;
   border-radius: 12px;
-  border: 1px solid #3A4B4E;
+  border: 1px solid var(--site-sidebar-border-color);
 }
 
 .portfolio-cta h2 {
   font-size: 32px;
-  color: #ffffff;
+  color: var(--site-text-color);
   font-weight: 600;
   margin-bottom: 15px;
 }
 
 .portfolio-cta p {
   font-size: 18px;
-  color: #B0B0B0;
+  color: var(--site-sidebar-muted-text-color);
   margin-bottom: 30px;
 }
 
@@ -236,12 +236,12 @@
 }
 
 .btn-primary {
-  background-color: #00CED1;
-  color: #ffffff;
+  background-color: var(--site-accent-color);
+  color: var(--site-text-color);
 }
 
 .btn-primary:hover {
-  background-color: #00B8BA;
+  background-color: var(--site-accent-color);
   transform: translateY(-2px);
 }
 
@@ -309,4 +309,5 @@
     font-size: 24px;
   }
 }
+
 

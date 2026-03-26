@@ -16,14 +16,14 @@
 
 .about-header h1 {
   font-size: 48px;
-  color: #ffffff;
+  color: var(--site-text-color);
   font-weight: 700;
   margin-bottom: 15px;
 }
 
 .about-header p {
   font-size: 18px;
-  color: #B0B0B0;
+  color: var(--site-sidebar-muted-text-color);
 }
 
 .about-content {
@@ -35,14 +35,14 @@
 
 .about-text h2 {
   font-size: 32px;
-  color: #00CED1;
+  color: var(--site-accent-color);
   margin-bottom: 20px;
   font-weight: 600;
 }
 
 .about-summary {
   font-size: 18px;
-  color: #B0B0B0;
+  color: var(--site-sidebar-muted-text-color);
   line-height: 1.6;
   margin-bottom: 40px;
 }
@@ -55,14 +55,14 @@
 
 .detail-item h3 {
   font-size: 24px;
-  color: #ffffff;
+  color: var(--site-text-color);
   margin-bottom: 15px;
   font-weight: 600;
 }
 
 .detail-item p {
   font-size: 16px;
-  color: #B0B0B0;
+  color: var(--site-sidebar-muted-text-color);
   line-height: 1.6;
   margin-bottom: 20px;
 }
@@ -81,21 +81,21 @@
 
 .skill-name {
   font-size: 16px;
-  color: #ffffff;
+  color: var(--site-text-color);
   font-weight: 500;
 }
 
 .skill-bar {
   width: 100%;
   height: 8px;
-  background-color: #2A3B3E;
+  background-color: var(--site-surface-color);
   border-radius: 4px;
   overflow: hidden;
 }
 
 .skill-progress {
   height: 100%;
-  background: linear-gradient(90deg, #00CED1, #008B8B);
+  background: linear-gradient(90deg, var(--site-accent-color), var(--site-accent-color));
   border-radius: 4px;
   transition: width 0.3s ease;
 }
@@ -111,21 +111,21 @@
   height: 300px;
   border-radius: 50%;
   object-fit: cover;
-  border: 4px solid #00CED1;
+  border: 4px solid var(--site-accent-color);
 }
 
 .default-about-avatar {
   width: 300px;
   height: 300px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #00CED1, #008B8B);
+  background: linear-gradient(135deg, var(--site-accent-color), var(--site-accent-color));
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 72px;
   font-weight: bold;
   color: white;
-  border: 4px solid #00CED1;
+  border: 4px solid var(--site-accent-color);
 }
 
 /* Responsive Design */
@@ -181,4 +181,5 @@
     font-size: 36px;
   }
 }
+
 
