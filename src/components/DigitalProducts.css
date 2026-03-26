@@ -191,8 +191,37 @@
   color: var(--site-sidebar-muted-text-color);
   font-size: 0.95rem;
   line-height: 1.6;
-  margin-bottom: 20px;
-  flex-grow: 1;
+  margin-bottom: 16px;
+}
+
+.expand-btn {
+  width: 100%;
+  border: 1px solid rgba(var(--site-accent-rgb, 0, 206, 209), 0.35);
+  background: rgba(var(--site-accent-rgb, 0, 206, 209), 0.08);
+  color: var(--site-accent-color);
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.expand-btn:hover {
+  background: rgba(var(--site-accent-rgb, 0, 206, 209), 0.18);
+}
+
+.product-expandable {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.35s ease, opacity 0.25s ease, margin-top 0.25s ease;
+}
+
+.product-expandable.open {
+  max-height: 380px;
+  opacity: 1;
+  margin-top: 14px;
 }
 
 .buy-btn {

@@ -8,6 +8,7 @@ const DigitalProducts = ({ userData }) => {
   const [activeFilter, setActiveFilter] = useState('All');
   const [productsData, setProductsData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [expandedProductId, setExpandedProductId] = useState(null);
 
   useEffect(() => {
     const loadProductsData = async () => {
@@ -40,6 +41,15 @@ const DigitalProducts = ({ userData }) => {
     
     // Redirect to WhatsApp
     window.open(`https://wa.me/${phone}?text=${encodedMessage}`, '_blank');
+  };
+
+  const handleFilterClick = (category) => {
+    setActiveFilter(category);
+    setExpandedProductId(null);
+  };
+
+  const handleToggleExpand = (productId) => {
+    setExpandedProductId((prev) => (prev === productId ? null : productId));
   };
 
   if (loading) {
@@ -107,6 +117,7 @@ const DigitalProducts = ({ userData }) => {
                 const isHot = index === 0; // The first product gets a "HOT" badge
                 const isPremiumPrice = Boolean(formattedPrice && /\d/.test(formattedPrice));
                 const isPremium = index === 1 || isPremiumPrice; // Others might get Premium
+                const isExpanded = expandedProductId === product.id;
                 
                 return (
                 <div key={product.id} className="product-card" style={{ position: 'relative' }}>
@@ -143,10 +154,20 @@ const DigitalProducts = ({ userData }) => {
                       <h3 className="product-title">{product.title}</h3>
                       {product.showPrice !== false && <div className="product-price">{formattedPrice}</div>}
                     </div>
-                    <p className="product-description">{product.description}</p>
-                    <button className="buy-btn" onClick={(e) => handleBuyClick(product, e)}>
-                      <FaWhatsapp className="btn-icon" /> Buy Now
+                    <button
+                      className="expand-btn"
+                      onClick={() => handleToggleExpand(product.id)}
+                      type="button"
+                    >
+                      {isExpanded ? 'Hide Details' : 'View Details'}
                     </button>
+
+                    <div className={`product-expandable ${isExpanded ? 'open' : ''}`}>
+                      <p className="product-description">{product.description}</p>
+                      <button className="buy-btn" onClick={(e) => handleBuyClick(product, e)}>
+                        <FaWhatsapp className="btn-icon" /> Buy Now
+                      </button>
+                    </div>
                   </div>
                 </div>
                 );
