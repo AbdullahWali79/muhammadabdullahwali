@@ -6,7 +6,8 @@ import {
   FaArrowDown,
   FaEye,
   FaEyeSlash,
-  FaPalette
+  FaPalette,
+  FaCopy
 } from 'react-icons/fa';
 import './MakePrompts.css';
 import './MakeSettings.css';
@@ -190,6 +191,24 @@ const MakeSettings = () => {
     setTimeout(() => setMessage(''), 3000);
   };
 
+  const handleCopySettings = async () => {
+    try {
+      const settingsJson = JSON.stringify(settings, null, 2);
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(settingsJson);
+      } else {
+        throw new Error('Clipboard not supported');
+      }
+      setError('');
+      setMessage('Settings JSON copied to clipboard.');
+      setTimeout(() => setMessage(''), 3000);
+    } catch (copyError) {
+      setMessage('');
+      setError('Unable to copy settings JSON. Please copy manually from browser devtools.');
+      setTimeout(() => setError(''), 3000);
+    }
+  };
+
   const handleReset = () => {
     const defaults = getDefaultSiteSettings();
     setSettings(defaults);
@@ -206,6 +225,9 @@ const MakeSettings = () => {
       <div className="editor-header">
         <h1>Site Settings</h1>
         <div className="editor-actions">
+          <button type="button" className="btn btn-secondary" onClick={handleCopySettings}>
+            <FaCopy /> Copy Settings JSON
+          </button>
           <button type="button" className="btn btn-secondary" onClick={handleReset}>
             <FaUndo /> Reset
           </button>
