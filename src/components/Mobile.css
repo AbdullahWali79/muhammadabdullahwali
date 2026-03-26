@@ -25,8 +25,8 @@
     position: relative !important;
     padding: 16px 14px !important;
     border-right: none !important;
-    border-bottom: 1px solid #2A3B3E !important;
-    background: linear-gradient(135deg, #1A2B2E, #2A3B3E) !important;
+    border-bottom: 1px solid var(--site-sidebar-border-color) !important;
+    background: linear-gradient(135deg, var(--site-sidebar-bg-color), var(--site-sidebar-item-bg-color)) !important;
     overflow-x: hidden !important;
     display: block !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
@@ -63,7 +63,7 @@
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
-    color: #B0B0B0 !important;
+    color: var(--site-sidebar-muted-text-color) !important;
   }
   
   .sidebar-nav {
