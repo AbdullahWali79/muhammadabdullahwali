@@ -33,6 +33,9 @@
   --site-base-font-size: 16px;
   --site-max-content-width: 1200px;
   --site-font-family: 'Sora', 'Inter', 'Segoe UI', sans-serif;
+  --site-success-color: #25d366;
+  --site-success-color-hover: #179c57;
+  --site-success-contrast-color: #042d17;
 }
 
 body {
@@ -43,6 +46,24 @@ body {
   background-color: var(--site-bg-color);
   color: var(--site-text-color);
   overflow-x: hidden;
+}
+
+a,
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+a,
+button {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid rgba(var(--site-accent-rgb, 0, 206, 209), 0.8);
+  outline-offset: 2px;
 }
 
 code {
@@ -71,5 +92,16 @@ html {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--site-accent-color);
   filter: brightness(0.9);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 

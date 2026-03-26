@@ -2,11 +2,11 @@
   padding: 40px;
   min-height: 100vh;
   background-color: var(--site-bg-color);
-  color: #fff;
+  color: var(--site-text-color);
 }
 
 .products-container {
-  max-width: 1200px;
+  max-width: var(--site-max-content-width);
   margin: 0 auto;
 }
 
@@ -20,7 +20,13 @@
   margin-bottom: 15px;
   font-family: inherit;
   font-weight: 800;
-  background: linear-gradient(-45deg, var(--site-accent-color), var(--site-accent-color), var(--site-accent-color), #25D366);
+  background: linear-gradient(
+    -45deg,
+    var(--site-accent-color),
+    var(--site-accent-color),
+    rgba(var(--site-accent-rgb, 0, 206, 209), 0.75),
+    var(--site-success-color)
+  );
   background-size: 300% auto;
   color: transparent;
   -webkit-background-clip: text;
@@ -50,7 +56,7 @@
 .filter-btn {
   background: transparent;
   border: 1px solid var(--site-accent-color);
-  color: #fff;
+  color: var(--site-text-color);
   padding: 8px 20px;
   border-radius: 20px;
   cursor: pointer;
@@ -61,7 +67,7 @@
 .filter-btn:hover,
 .filter-btn.active {
   background: var(--site-accent-color);
-  color: #1a1a1a;
+  color: var(--site-sidebar-bg-color);
 }
 
 .products-grid {
@@ -71,10 +77,16 @@
 }
 
 .product-card {
-  background: rgba(42, 42, 42, 0.6);
+  background:
+    linear-gradient(
+      160deg,
+      rgba(var(--site-accent-rgb, 0, 206, 209), 0.06),
+      rgba(var(--site-bg-overlay-rgb, 0, 0, 0), 0.16)
+    ),
+    var(--site-surface-color);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(var(--site-accent-rgb, 0, 206, 209), 0.1);
+  border: 1px solid var(--site-sidebar-border-color);
   border-radius: 12px;
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -92,15 +104,21 @@
   position: absolute;
   top: 15px;
   right: -30px;
-  background: linear-gradient(135deg, #ff416c, #ff4b2b);
-  color: white;
+  background: linear-gradient(135deg, var(--site-accent-color), #ff7f50);
+  color: var(--site-sidebar-bg-color);
   padding: 5px 30px;
   font-size: 0.8rem;
   font-weight: bold;
   transform: rotate(45deg);
   z-index: 10;
-  box-shadow: 0 2px 10px rgba(255, 65, 108, 0.4);
+  box-shadow: 0 2px 10px rgba(var(--site-accent-rgb, 0, 206, 209), 0.4);
   letter-spacing: 1px;
+}
+
+.product-badge.premium {
+  background: linear-gradient(135deg, #ffd700, #fdb931);
+  color: #201100;
+  box-shadow: 0 2px 10px rgba(253, 185, 49, 0.4);
 }
 
 .product-image {
@@ -108,7 +126,7 @@
   width: 100%;
   padding-top: 56.25%; /* 16:9 ratio */
   overflow: hidden;
-  background: #1a1a1a;
+  background: var(--site-bg-color);
 }
 
 .product-img {
@@ -131,7 +149,7 @@
   justify-content: center;
   align-items: center;
   background-color: var(--site-bg-color);
-  color: #fff;
+  color: var(--site-text-color);
   text-align: center;
   padding: 20px;
 }
@@ -170,7 +188,7 @@
 }
 
 .product-title {
-  color: #fff;
+  color: var(--site-text-color);
   font-size: 1.2rem;
   margin: 0;
   line-height: 1.4;
@@ -178,12 +196,13 @@
 }
 
 .product-price {
-  color: #25D366; /* WhatsApp Green */
+  color: var(--site-accent-color);
   font-weight: bold;
   font-size: 1.1rem;
   margin-left: 10px;
   padding: 4px 8px;
-  background: rgba(37, 211, 102, 0.1);
+  background: rgba(var(--site-accent-rgb, 0, 206, 209), 0.12);
+  border: 1px solid rgba(var(--site-accent-rgb, 0, 206, 209), 0.2);
   border-radius: 4px;
 }
 
@@ -225,8 +244,8 @@
 }
 
 .buy-btn {
-  background-color: #25D366;
-  color: white;
+  background-color: var(--site-success-color);
+  color: var(--site-success-contrast-color);
   border: none;
   padding: 12px 20px;
   border-radius: 5px;
@@ -244,10 +263,10 @@
 
 @keyframes pulseBtn {
   0% {
-    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7);
+    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.5);
   }
   70% {
-    box-shadow: 0 0 0 15px rgba(37, 211, 102, 0);
+    box-shadow: 0 0 0 14px rgba(37, 211, 102, 0);
   }
   100% {
     box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
@@ -255,7 +274,8 @@
 }
 
 .buy-btn:hover {
-  background-color: #128C7E;
+  background-color: var(--site-success-color-hover);
+  color: #ffffff;
   transform: translateY(-2px);
 }
 

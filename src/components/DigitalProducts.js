@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getDigitalProductsData } from '../services/supabaseService';
-import { FaShoppingCart, FaWhatsapp } from 'react-icons/fa';
+import { FaWhatsapp } from 'react-icons/fa';
 import { formatCurrency } from '../utils/currency';
 import './DigitalProducts.css';
 
@@ -114,15 +114,16 @@ const DigitalProducts = ({ userData }) => {
               {filteredProducts.map((product, index) => {
                 const embedUrl = getYouTubeEmbedUrl(product.videoUrl);
                 const formattedPrice = formatCurrency(product.price, 'digital-products', '');
+                const productKey = product.id || `${product.title}-${index}`;
                 const isHot = index === 0; // The first product gets a "HOT" badge
                 const isPremiumPrice = Boolean(formattedPrice && /\d/.test(formattedPrice));
                 const isPremium = index === 1 || isPremiumPrice; // Others might get Premium
-                const isExpanded = expandedProductId === product.id;
+                const isExpanded = expandedProductId === productKey;
                 
                 return (
-                <div key={product.id} className="product-card" style={{ position: 'relative' }}>
-                  {isHot && <div className="product-badge">HOT 🔥</div>}
-                  {!isHot && isPremium && <div className="product-badge" style={{ background: 'linear-gradient(135deg, #FFD700, #FDB931)' }}>PREMIUM 💎</div>}
+                <div key={productKey} className="product-card" style={{ position: 'relative' }}>
+                  {isHot && <div className="product-badge">HOT</div>}
+                  {!isHot && isPremium && <div className="product-badge premium">PREMIUM</div>}
                   <div className="product-image">
                     {embedUrl ? (
                       <iframe
@@ -139,6 +140,8 @@ const DigitalProducts = ({ userData }) => {
                       <img 
                         src={product.imageUrl} 
                         alt={product.title}
+                        loading="lazy"
+                        decoding="async"
                         className="product-img"
                       />
                     ) : (
@@ -156,8 +159,9 @@ const DigitalProducts = ({ userData }) => {
                     </div>
                     <button
                       className="expand-btn"
-                      onClick={() => handleToggleExpand(product.id)}
+                      onClick={() => handleToggleExpand(productKey)}
                       type="button"
+                      aria-expanded={isExpanded}
                     >
                       {isExpanded ? 'Hide Details' : 'View Details'}
                     </button>
@@ -185,4 +189,5 @@ const DigitalProducts = ({ userData }) => {
 };
 
 export default DigitalProducts;
+
 
