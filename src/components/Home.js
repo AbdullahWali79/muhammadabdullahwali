@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaDownload, FaEnvelope } from 'react-icons/fa';
+import { FaDownload, FaEnvelope, FaPalette, FaUndo } from 'react-icons/fa';
 import { generatePDF } from '../utils/pdfGenerator';
 import { getPortfolioData, getAboutData } from '../services/supabaseService';
+import { THEME_PRESETS, applyThemeSettings, getSiteSettings } from '../utils/siteSettings';
 import './Home.css';
 
 const Home = ({ userData }) => {
@@ -11,6 +12,8 @@ const Home = ({ userData }) => {
   const [displayedText, setDisplayedText] = useState('');
   const [isTyping, setIsTyping] = useState(true);
   const [localUserData, setLocalUserData] = useState(userData);
+  const [temporaryThemeKey, setTemporaryThemeKey] = useState('');
+  const [baseThemeSettings] = useState(() => getSiteSettings());
 
   const handleDownloadCV = async () => {
     setIsGenerating(true);
@@ -40,6 +43,33 @@ const Home = ({ userData }) => {
     const whatsappNumber = '923046983794';
     const whatsappUrl = `https://wa.me/${whatsappNumber}`;
     window.open(whatsappUrl, '_blank');
+  };
+
+  const handleTemporaryThemeApply = (presetKey) => {
+    const preset = THEME_PRESETS[presetKey];
+    if (!preset) {
+      return;
+    }
+
+    const temporarySettings = {
+      ...baseThemeSettings,
+      theme: {
+        ...baseThemeSettings.theme,
+        ...preset.theme
+      },
+      sidebar: {
+        ...baseThemeSettings.sidebar,
+        ...preset.sidebar
+      }
+    };
+
+    applyThemeSettings(temporarySettings);
+    setTemporaryThemeKey(presetKey);
+  };
+
+  const handleTemporaryThemeReset = () => {
+    applyThemeSettings(baseThemeSettings);
+    setTemporaryThemeKey('');
   };
 
   // Load social links from localStorage on mount and when storage changes
@@ -116,6 +146,32 @@ const Home = ({ userData }) => {
     <div className="home">
       <div className="home-container">
         <div className="hero-section">
+          <div className="theme-preview-switcher">
+            <div className="theme-preview-header">
+              <FaPalette />
+              <span>Try Theme (Temporary)</span>
+            </div>
+            <div className="theme-preview-buttons">
+              {Object.entries(THEME_PRESETS).map(([presetKey, preset]) => (
+                <button
+                  key={presetKey}
+                  type="button"
+                  className={`theme-preview-btn ${temporaryThemeKey === presetKey ? 'active' : ''}`}
+                  onClick={() => handleTemporaryThemeApply(presetKey)}
+                >
+                  {preset.label}
+                </button>
+              ))}
+              <button
+                type="button"
+                className="theme-preview-btn reset"
+                onClick={handleTemporaryThemeReset}
+              >
+                <FaUndo /> Default
+              </button>
+            </div>
+          </div>
+
           <div className="hello-badge">{localUserData.helloText || 'AsslamuAlikum'}</div>
           <div className="hero-content">
             <div className="hero-image">
