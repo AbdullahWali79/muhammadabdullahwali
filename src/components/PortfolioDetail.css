@@ -1,7 +1,7 @@
 .portfolio-detail {
   padding: 40px;
   min-height: 100vh;
-  background-color: #1A2B2E;
+  background-color: var(--site-bg-color);
 }
 
 .portfolio-detail-container {
