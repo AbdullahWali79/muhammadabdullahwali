@@ -3,6 +3,7 @@ import PasswordProtection from './PasswordProtection';
 import GitHubImagePicker from './GitHubImagePicker';
 import { FaSave, FaEye, FaPlus, FaTrash, FaTimes } from 'react-icons/fa';
 import { saveServiceData, getServiceData } from '../services/supabaseService';
+import { formatCurrencyToRupees } from '../utils/currency';
 import './MakeService.css';
 
 // Pre-defined categories for services
@@ -43,7 +44,7 @@ const MakeService = () => {
         image: 'https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Protfolio.jpeg',
         category: 'UI/UX Design',
         icon: '🎨',
-        price: '$50/hour',
+        price: 'Rs 50/hour',
         technologies: ['Figma', 'Adobe XD', 'Sketch']
       },
       {
@@ -53,7 +54,7 @@ const MakeService = () => {
         image: 'https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Protfolio.jpeg',
         category: 'Web Development',
         icon: '💻',
-        price: '$60/hour',
+        price: 'Rs 60/hour',
         technologies: ['React', 'Node.js', 'MongoDB']
       },
       {
@@ -63,7 +64,7 @@ const MakeService = () => {
         image: 'https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Protfolio.jpeg',
         category: 'Mobile App Development',
         icon: '📱',
-        price: '$55/hour',
+        price: 'Rs 55/hour',
         technologies: ['Flutter', 'React Native', 'Swift']
       }
     ]
@@ -79,7 +80,7 @@ const MakeService = () => {
     image: 'https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Protfolio.jpeg',
     category: '',
     icon: '⭐',
-    price: '$0/hour',
+    price: 'Rs 0/hour',
     technologies: []
   });
   const [showCustomCategory, setShowCustomCategory] = useState(false);
@@ -102,7 +103,7 @@ const MakeService = () => {
               image: 'https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Protfolio.jpeg',
               category: 'UI/UX Design',
               icon: '🎨',
-              price: '$50/hour',
+              price: 'Rs 50/hour',
               technologies: ['Figma', 'Adobe XD', 'Sketch']
             },
             {
@@ -112,7 +113,7 @@ const MakeService = () => {
               image: 'https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Protfolio.jpeg',
               category: 'Web Development',
               icon: '💻',
-              price: '$60/hour',
+              price: 'Rs 60/hour',
               technologies: ['React', 'Node.js', 'MongoDB']
             },
             {
@@ -122,14 +123,17 @@ const MakeService = () => {
               image: 'https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Protfolio.jpeg',
               category: 'Mobile App Development',
               icon: '📱',
-              price: '$55/hour',
+              price: 'Rs 55/hour',
               technologies: ['Flutter', 'React Native', 'Swift']
             }
           ];
           setServiceData({
             title: result.data.title || 'My Services',
             subtitle: result.data.subtitle || 'What I can do for you',
-            services: result.data.services || defaultServices
+            services: (result.data.services || defaultServices).map((service) => ({
+              ...service,
+              price: formatCurrencyToRupees(service.price, '')
+            }))
           });
         }
       } catch (error) {
@@ -178,7 +182,7 @@ const MakeService = () => {
       image: 'https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Protfolio.jpeg',
       category: '',
       icon: '⭐',
-      price: '$0/hour',
+      price: 'Rs 0/hour',
       technologies: []
     });
     setShowCustomCategory(false);
@@ -195,7 +199,7 @@ const MakeService = () => {
       image: 'https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Protfolio.jpeg',
       category: '',
       icon: '⭐',
-      price: '$0/hour',
+      price: 'Rs 0/hour',
       technologies: []
     });
     setShowCustomCategory(false);
@@ -561,7 +565,7 @@ const MakeService = () => {
                     value={newService.price}
                     onChange={(e) => handleNewServiceChange('price', e.target.value)}
                     className="form-input"
-                    placeholder="$50/hour"
+                    placeholder="Rs 50/hour"
                   />
                 </div>
               </div>

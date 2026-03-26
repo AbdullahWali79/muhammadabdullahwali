@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getDigitalProductsData, saveDigitalProductsData } from '../services/supabaseService';
+import { formatCurrencyToRupees } from '../utils/currency';
 import './MakePrompts.css'; // We can reuse the styling from MakePrompts for simplicity
 import './MakeDigitalProducts.css'; // Specific styling for modal
 
@@ -351,7 +352,7 @@ const MakeDigitalProducts = () => {
                           name="price"
                           value={newProduct.price}
                           onChange={handleProductChange}
-                          placeholder="e.g. $49.00 or PKR 2000"
+                          placeholder="e.g. Rs 14000 or Rs 2000"
                           className="form-control"
                           style={{ flex: 1 }}
                         />
@@ -453,7 +454,7 @@ const MakeDigitalProducts = () => {
                       </div>
                     </div>
                     <div className="item-details">
-                      <p><strong>Price:</strong> {product.price}</p>
+                      <p><strong>Price:</strong> {formatCurrencyToRupees(product.price)}</p>
                       <p className="item-desc">{product.description && product.description.substring(0, 100)}...</p>
                     </div>
                   </div>

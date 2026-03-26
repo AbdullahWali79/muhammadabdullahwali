@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getDigitalProductsData } from '../services/supabaseService';
 import { FaShoppingCart, FaWhatsapp } from 'react-icons/fa';
+import { formatCurrencyToRupees } from '../utils/currency';
 import './DigitalProducts.css';
 
 const DigitalProducts = ({ userData }) => {
@@ -31,9 +32,10 @@ const DigitalProducts = ({ userData }) => {
     
     // Format the phone number (remove +, spaces, hyphens)
     const phone = (userData?.phone || '+923046983794').replace(/[^0-9]/g, '');
+    const formattedPrice = formatCurrencyToRupees(product.price, 'price not listed');
     
     // Construct the message
-    const message = `Hello, I'm interested in buying your digital product: "${product.title}" listed for ${product.price}.`;
+    const message = `Hello, I'm interested in buying your digital product: "${product.title}" listed for ${formattedPrice}.`;
     const encodedMessage = encodeURIComponent(message);
     
     // Redirect to WhatsApp
@@ -101,8 +103,10 @@ const DigitalProducts = ({ userData }) => {
             <div className="products-grid">
               {filteredProducts.map((product, index) => {
                 const embedUrl = getYouTubeEmbedUrl(product.videoUrl);
+                const formattedPrice = formatCurrencyToRupees(product.price, '');
                 const isHot = index === 0; // The first product gets a "HOT" badge
-                const isPremium = index === 1 || product.price?.includes('$'); // Others might get Premium
+                const isPremiumPrice = /^\s*Rs\b/i.test(formattedPrice);
+                const isPremium = index === 1 || isPremiumPrice; // Others might get Premium
                 
                 return (
                 <div key={product.id} className="product-card" style={{ position: 'relative' }}>
@@ -137,7 +141,7 @@ const DigitalProducts = ({ userData }) => {
                     <div className="product-category">{product.category}</div>
                     <div className="product-header-row">
                       <h3 className="product-title">{product.title}</h3>
-                      {product.showPrice !== false && <div className="product-price">{product.price}</div>}
+                      {product.showPrice !== false && <div className="product-price">{formattedPrice}</div>}
                     </div>
                     <p className="product-description">{product.description}</p>
                     <button className="buy-btn" onClick={(e) => handleBuyClick(product, e)}>

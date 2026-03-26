@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaPalette, FaCode, FaMobile, FaSearch, FaRocket, FaUsers } from 'react-icons/fa';
 import { getServiceData } from '../services/supabaseService';
+import { formatCurrencyToRupees } from '../utils/currency';
 import './Service.css';
 
 const Service = () => {
@@ -100,7 +101,7 @@ const Service = () => {
                 <h3 className="service-title">{service.title}</h3>
                 <p className="service-description">{service.description}</p>
                 {service.price && (
-                  <div className="service-price">{service.price}</div>
+                  <div className="service-price">{formatCurrencyToRupees(service.price, '')}</div>
                 )}
                 {service.features && service.features.length > 0 && (
                   <ul className="service-features">
