@@ -166,6 +166,59 @@ const MakeSettings = () => {
               />
             </div>
           </div>
+
+          <h2 style={{ marginTop: '10px' }}>Sidebar Colors</h2>
+          <div className="form-row">
+            <div className="form-group">
+              <label>Sidebar Background</label>
+              <input
+                type="color"
+                value={settings.theme.sidebarBackgroundColor}
+                onChange={(e) => handleThemeChange('sidebarBackgroundColor', e.target.value)}
+                className="form-input color-input"
+              />
+            </div>
+            <div className="form-group">
+              <label>Sidebar Border</label>
+              <input
+                type="color"
+                value={settings.theme.sidebarBorderColor}
+                onChange={(e) => handleThemeChange('sidebarBorderColor', e.target.value)}
+                className="form-input color-input"
+              />
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label>Sidebar Text</label>
+              <input
+                type="color"
+                value={settings.theme.sidebarTextColor}
+                onChange={(e) => handleThemeChange('sidebarTextColor', e.target.value)}
+                className="form-input color-input"
+              />
+            </div>
+            <div className="form-group">
+              <label>Sidebar Muted Text</label>
+              <input
+                type="color"
+                value={settings.theme.sidebarMutedTextColor}
+                onChange={(e) => handleThemeChange('sidebarMutedTextColor', e.target.value)}
+                className="form-input color-input"
+              />
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label>Sidebar Item Background</label>
+              <input
+                type="color"
+                value={settings.theme.sidebarItemBackgroundColor}
+                onChange={(e) => handleThemeChange('sidebarItemBackgroundColor', e.target.value)}
+                className="form-input color-input"
+              />
+            </div>
+          </div>
         </div>
 
         <div className="form-section">

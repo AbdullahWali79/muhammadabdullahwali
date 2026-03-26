@@ -31,6 +31,11 @@ export const getDefaultSiteSettings = () => ({
     surfaceColor: '#2A3B3E',
     textColor: '#FFFFFF',
     accentColor: '#00CED1',
+    sidebarBackgroundColor: '#1A2B2E',
+    sidebarBorderColor: '#2A3B3E',
+    sidebarTextColor: '#FFFFFF',
+    sidebarMutedTextColor: '#B0B0B0',
+    sidebarItemBackgroundColor: '#2A3B3E',
     baseFontSize: 16,
     maxContentWidth: 1200
   },
@@ -55,6 +60,11 @@ const sanitizeSettings = (rawSettings) => {
       surfaceColor: theme.surfaceColor || defaults.theme.surfaceColor,
       textColor: theme.textColor || defaults.theme.textColor,
       accentColor: theme.accentColor || defaults.theme.accentColor,
+      sidebarBackgroundColor: theme.sidebarBackgroundColor || defaults.theme.sidebarBackgroundColor,
+      sidebarBorderColor: theme.sidebarBorderColor || defaults.theme.sidebarBorderColor,
+      sidebarTextColor: theme.sidebarTextColor || defaults.theme.sidebarTextColor,
+      sidebarMutedTextColor: theme.sidebarMutedTextColor || defaults.theme.sidebarMutedTextColor,
+      sidebarItemBackgroundColor: theme.sidebarItemBackgroundColor || defaults.theme.sidebarItemBackgroundColor,
       baseFontSize: Number.isFinite(Number(theme.baseFontSize))
         ? Number(theme.baseFontSize)
         : defaults.theme.baseFontSize,
@@ -124,6 +134,11 @@ export const applyThemeSettings = (settings) => {
   root.style.setProperty('--site-surface-color', safeSettings.theme.surfaceColor);
   root.style.setProperty('--site-text-color', safeSettings.theme.textColor);
   root.style.setProperty('--site-accent-color', safeSettings.theme.accentColor);
+  root.style.setProperty('--site-sidebar-bg-color', safeSettings.theme.sidebarBackgroundColor);
+  root.style.setProperty('--site-sidebar-border-color', safeSettings.theme.sidebarBorderColor);
+  root.style.setProperty('--site-sidebar-text-color', safeSettings.theme.sidebarTextColor);
+  root.style.setProperty('--site-sidebar-muted-text-color', safeSettings.theme.sidebarMutedTextColor);
+  root.style.setProperty('--site-sidebar-item-bg-color', safeSettings.theme.sidebarItemBackgroundColor);
   root.style.setProperty('--site-base-font-size', `${safeSettings.theme.baseFontSize}px`);
   root.style.setProperty('--site-max-content-width', `${safeSettings.theme.maxContentWidth}px`);
 };
@@ -138,4 +153,3 @@ export const getCurrencyForPage = (pageKey = 'default') => {
 
   return CURRENCY_CONFIG[currencyCode] ? currencyCode : 'PKR';
 };
-

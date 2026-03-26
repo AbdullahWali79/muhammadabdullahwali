@@ -9,6 +9,11 @@
   --site-surface-color: #2A3B3E;
   --site-text-color: #FFFFFF;
   --site-accent-color: #00CED1;
+  --site-sidebar-bg-color: #1A2B2E;
+  --site-sidebar-border-color: #2A3B3E;
+  --site-sidebar-text-color: #FFFFFF;
+  --site-sidebar-muted-text-color: #B0B0B0;
+  --site-sidebar-item-bg-color: #2A3B3E;
   --site-base-font-size: 16px;
   --site-max-content-width: 1200px;
 }
