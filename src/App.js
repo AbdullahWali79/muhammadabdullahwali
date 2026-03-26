@@ -22,6 +22,7 @@ import MakeService from './components/MakeService';
 import MakePortfolio from './components/MakePortfolio';
 import MakeNews from './components/MakeNews';
 import MakeContact from './components/MakeContact';
+import MakeFreelancingTasks from './components/MakeFreelancingTasks';
 import SecurityManager from './components/SecurityManager';
 import FreelancingTasks from './components/FreelancingTasks';
 import './components/Mobile.css';
@@ -225,6 +226,11 @@ function AppContent() {
           <Route path="/makedigital-products" element={
             <PasswordProtection pageName="Digital Products Editor">
               <MakeDigitalProducts />
+            </PasswordProtection>
+          } />
+          <Route path="/makefreelancing-tasks" element={
+            <PasswordProtection pageName="Freelancing Tasks Editor">
+              <MakeFreelancingTasks />
             </PasswordProtection>
           } />
           <Route path="/security" element={
