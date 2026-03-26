@@ -169,6 +169,8 @@ function AppContent() {
       case '/security':
         return 'security';
       case '/makesettings':
+      case '/make-settings':
+      case '/settings':
         return 'make-settings';
       default:
         return 'home';
@@ -259,6 +261,16 @@ function AppContent() {
               </PasswordProtection>
             } />
             <Route path="/makesettings" element={
+              <PasswordProtection pageName="Site Settings">
+                <MakeSettings />
+              </PasswordProtection>
+            } />
+            <Route path="/make-settings" element={
+              <PasswordProtection pageName="Site Settings">
+                <MakeSettings />
+              </PasswordProtection>
+            } />
+            <Route path="/settings" element={
               <PasswordProtection pageName="Site Settings">
                 <MakeSettings />
               </PasswordProtection>
