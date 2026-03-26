@@ -650,19 +650,6 @@ const MakeSettings = () => {
                 {settings.sidebar.showProfile ? 'Visible' : 'Hidden'}
               </button>
             </div>
-            <div className="form-group toggle-group">
-              <label>Show Quick Actions</label>
-              <button
-                type="button"
-                className={`toggle-chip ${settings.sidebar.showQuickActions ? 'enabled' : 'disabled'}`}
-                onClick={() =>
-                  handleSidebarChange('showQuickActions', !settings.sidebar.showQuickActions)
-                }
-              >
-                {settings.sidebar.showQuickActions ? <FaEye /> : <FaEyeSlash />}
-                {settings.sidebar.showQuickActions ? 'Visible' : 'Hidden'}
-              </button>
-            </div>
           </div>
         </div>
 

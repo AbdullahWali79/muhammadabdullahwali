@@ -11,8 +11,7 @@ import {
   FaBars,
   FaTimes,
   FaRobot,
-  FaShoppingCart,
-  FaPhone
+  FaShoppingCart
 } from 'react-icons/fa';
 import { getSidebarMenuOrder, getSiteSettings } from '../utils/siteSettings';
 import './Sidebar.css';
@@ -28,13 +27,10 @@ const Sidebar = ({ userData, collapsed, setCollapsed }) => {
   const labelBehavior = sidebarSettings.labelBehavior || 'hide-collapsed';
   const mobileMode = sidebarSettings.mobileMode || 'rail';
   const showProfile = sidebarSettings.showProfile !== false;
-  const showQuickActions = sidebarSettings.showQuickActions !== false;
   const menuVisibility = sidebarSettings.menuVisibility || {};
   const shouldShowLabel =
     labelBehavior === 'always' || (labelBehavior === 'hide-collapsed' && !collapsed);
   const showTooltipOnly = labelBehavior === 'tooltip-only';
-  const phoneHref = userData.phone ? `tel:${userData.phone.replace(/\s+/g, '')}` : null;
-  const emailHref = userData.email ? `mailto:${userData.email}` : null;
   const initials = `${userData.firstName?.charAt(0) || 'U'}${userData.lastName?.charAt(0) || ''}`;
   
   const allMenuItems = [
@@ -119,41 +115,6 @@ const Sidebar = ({ userData, collapsed, setCollapsed }) => {
           );
         })}
       </nav>
-
-      {showQuickActions && (
-        <div className="sidebar-footer">
-          <a
-            className={`quick-action ${emailHref ? '' : 'disabled'}`}
-            href={emailHref || '#'}
-            onClick={(event) => {
-              if (!emailHref) {
-                event.preventDefault();
-              }
-            }}
-            title="Email"
-          >
-            <FaEnvelope className="quick-action-icon" />
-            {!collapsed && <span>Email</span>}
-          </a>
-          <a
-            className={`quick-action ${phoneHref ? '' : 'disabled'}`}
-            href={phoneHref || '#'}
-            onClick={(event) => {
-              if (!phoneHref) {
-                event.preventDefault();
-              }
-            }}
-            title="Call"
-          >
-            <FaPhone className="quick-action-icon" />
-            {!collapsed && <span>Call</span>}
-          </a>
-          <Link className="quick-action" to="/makecv" title="Make CV">
-            <FaFileAlt className="quick-action-icon" />
-            {!collapsed && <span>CV</span>}
-          </Link>
-        </div>
-      )}
     </aside>
   );
 };
