@@ -352,6 +352,66 @@ export const saveDigitalProductsData = async (digitalProductsData) => {
   }
 }
 
+// Freelancing Tasks Data
+export const getFreelancingTasks = async () => {
+  try {
+    const { data, error } = await supabase
+      .from(TABLES.FREELANCING_TASKS)
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+    return { success: true, data: data || [] }
+  } catch (error) {
+    console.error('Error fetching freelancing tasks:', error)
+    return { success: false, error: error.message }
+  }
+}
+
+export const saveFreelancingTask = async (taskData) => {
+  try {
+    const { data, error } = await supabase
+      .from(TABLES.FREELANCING_TASKS)
+      .insert([taskData])
+
+    if (error) throw error
+    return { success: true, data }
+  } catch (error) {
+    console.error('Error saving freelancing task:', error)
+    return { success: false, error: error.message }
+  }
+}
+
+export const updateFreelancingTask = async (id, taskData) => {
+  try {
+    const { data, error } = await supabase
+      .from(TABLES.FREELANCING_TASKS)
+      .update(taskData)
+      .eq('id', id)
+
+    if (error) throw error
+    return { success: true, data }
+  } catch (error) {
+    console.error('Error updating freelancing task:', error)
+    return { success: false, error: error.message }
+  }
+}
+
+export const deleteFreelancingTask = async (id) => {
+  try {
+    const { data, error } = await supabase
+      .from(TABLES.FREELANCING_TASKS)
+      .delete()
+      .eq('id', id)
+
+    if (error) throw error
+    return { success: true, data }
+  } catch (error) {
+    console.error('Error deleting freelancing task:', error)
+    return { success: false, error: error.message }
+  }
+}
+
 export const getDigitalProductsData = async () => {
   try {
     const { data, error } = await supabase

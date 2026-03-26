@@ -23,6 +23,7 @@ import MakePortfolio from './components/MakePortfolio';
 import MakeNews from './components/MakeNews';
 import MakeContact from './components/MakeContact';
 import SecurityManager from './components/SecurityManager';
+import FreelancingTasks from './components/FreelancingTasks';
 import './components/Mobile.css';
 import './components/MobileTable.css';
 import PasswordProtection from './components/PasswordProtection';
@@ -205,6 +206,7 @@ function AppContent() {
               <MakeNews />
             </PasswordProtection>
           } />
+          <Route path="/freelancing-tasks" element={<FreelancingTasks />} />
           <Route path="/makecontact" element={
             <PasswordProtection pageName="Contact Editor">
               <MakeContact />

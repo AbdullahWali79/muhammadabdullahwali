@@ -14,6 +14,7 @@ const Sidebar = ({ userData, collapsed, setCollapsed }) => {
     { id: 'service', label: 'Service', icon: FaBriefcase, path: '/service' },
     { id: 'portfolio', label: 'Portfolio', icon: FaFolder, path: '/portfolio' },
     { id: 'news', label: 'News', icon: FaNewspaper, path: '/news' },
+    { id: 'freelancing-tasks', label: 'Freelancing Tasks', icon: FaBriefcase, path: '/freelancing-tasks' },
     { id: 'contact', label: 'Contact', icon: FaEnvelope, path: '/contact' },
     { id: 'make-cv', label: 'Make CV', icon: FaFileAlt, path: '/makecv' }
   ];
