@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FaHome, FaUser, FaBriefcase, FaFolder, FaNewspaper, FaEnvelope, FaFileAlt, FaBars, FaTimes, FaRobot, FaShoppingCart } from 'react-icons/fa';
+import { getSidebarMenuOrder } from '../utils/siteSettings';
 import './Sidebar.css';
 
 const Sidebar = ({ userData, collapsed, setCollapsed }) => {
@@ -19,10 +20,24 @@ const Sidebar = ({ userData, collapsed, setCollapsed }) => {
     { id: 'make-cv', label: 'Make CV', icon: FaFileAlt, path: '/makecv' }
   ];
 
-  // Only show "Make CV" option when on the makecv page
-  const menuItems = location.pathname === '/makecv'
-    ? allMenuItems
-    : allMenuItems.filter(item => item.id !== 'make-cv');
+  const menuItems = useMemo(() => {
+    const order = getSidebarMenuOrder();
+    const positionMap = order.reduce((acc, id, index) => {
+      acc[id] = index;
+      return acc;
+    }, {});
+
+    const orderedItems = [...allMenuItems].sort((a, b) => {
+      const aPos = Number.isFinite(positionMap[a.id]) ? positionMap[a.id] : Number.MAX_SAFE_INTEGER;
+      const bPos = Number.isFinite(positionMap[b.id]) ? positionMap[b.id] : Number.MAX_SAFE_INTEGER;
+      return aPos - bPos;
+    });
+
+    // Only show "Make CV" option when on the makecv page
+    return location.pathname === '/makecv'
+      ? orderedItems
+      : orderedItems.filter((item) => item.id !== 'make-cv');
+  }, [location.pathname]);
 
   return (
     <aside className={`sidebar ${collapsed ? 'collapsed' : ''}`}>

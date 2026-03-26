@@ -1,10 +1,12 @@
 import React, { useMemo, useState } from 'react';
-import { FaSave, FaUndo } from 'react-icons/fa';
+import { FaSave, FaUndo, FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import './MakePrompts.css';
 import './MakeSettings.css';
 import {
   CURRENCY_CONFIG,
   SITE_PAGES,
+  SIDEBAR_MENU_DEFAULT_ORDER,
+  SIDEBAR_MENU_ITEMS,
   applyThemeSettings,
   getDefaultSiteSettings,
   getSiteSettings,
@@ -17,6 +19,14 @@ const MakeSettings = () => {
   const [error, setError] = useState('');
 
   const currencyOptions = useMemo(() => Object.values(CURRENCY_CONFIG), []);
+  const sidebarLabelById = useMemo(
+    () =>
+      SIDEBAR_MENU_ITEMS.reduce((acc, item) => {
+        acc[item.id] = item.label;
+        return acc;
+      }, {}),
+    []
+  );
 
   const handleThemeChange = (field, value) => {
     setSettings((prev) => ({
@@ -49,6 +59,33 @@ const MakeSettings = () => {
         }
       }
     }));
+  };
+
+  const handleSidebarPositionChange = (itemId, direction) => {
+    setSettings((prev) => {
+      const currentOrder = Array.isArray(prev.sidebar?.menuOrder) && prev.sidebar.menuOrder.length > 0
+        ? [...prev.sidebar.menuOrder]
+        : [...SIDEBAR_MENU_DEFAULT_ORDER];
+      const currentIndex = currentOrder.indexOf(itemId);
+      if (currentIndex === -1) {
+        return prev;
+      }
+
+      const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+      if (targetIndex < 0 || targetIndex >= currentOrder.length) {
+        return prev;
+      }
+
+      [currentOrder[currentIndex], currentOrder[targetIndex]] = [currentOrder[targetIndex], currentOrder[currentIndex]];
+
+      return {
+        ...prev,
+        sidebar: {
+          ...(prev.sidebar || {}),
+          menuOrder: currentOrder
+        }
+      };
+    });
   };
 
   const handleSave = () => {
@@ -218,6 +255,36 @@ const MakeSettings = () => {
                 className="form-input color-input"
               />
             </div>
+          </div>
+        </div>
+
+        <div className="form-section">
+          <h2>Sidebar Menu Order</h2>
+          <p className="settings-note">Use arrows to change sidebar menu item positions.</p>
+          <div className="sidebar-order-list">
+            {(settings.sidebar?.menuOrder || SIDEBAR_MENU_DEFAULT_ORDER).map((menuId, index, arr) => (
+              <div key={menuId} className="sidebar-order-item">
+                <span className="sidebar-order-label">{sidebarLabelById[menuId] || menuId}</span>
+                <div className="sidebar-order-actions">
+                  <button
+                    type="button"
+                    className="btn btn-secondary small-btn"
+                    onClick={() => handleSidebarPositionChange(menuId, 'up')}
+                    disabled={index === 0}
+                  >
+                    <FaArrowUp />
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-secondary small-btn"
+                    onClick={() => handleSidebarPositionChange(menuId, 'down')}
+                    disabled={index === arr.length - 1}
+                  >
+                    <FaArrowDown />
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 

@@ -19,6 +19,21 @@ export const SITE_PAGES = [
   { key: 'freelancing-tasks', label: 'Freelancing Tasks' }
 ];
 
+export const SIDEBAR_MENU_ITEMS = [
+  { id: 'home', label: 'Home' },
+  { id: 'digital-products', label: 'Digital Products' },
+  { id: 'prompts', label: 'Prompts' },
+  { id: 'about', label: 'About' },
+  { id: 'service', label: 'Service' },
+  { id: 'portfolio', label: 'Portfolio' },
+  { id: 'news', label: 'News' },
+  { id: 'freelancing-tasks', label: 'Freelancing Tasks' },
+  { id: 'contact', label: 'Contact' },
+  { id: 'make-cv', label: 'Make CV' }
+];
+
+export const SIDEBAR_MENU_DEFAULT_ORDER = SIDEBAR_MENU_ITEMS.map((item) => item.id);
+
 const buildDefaultPageCurrencyMap = () =>
   SITE_PAGES.reduce((acc, page) => {
     acc[page.key] = 'default';
@@ -42,6 +57,9 @@ export const getDefaultSiteSettings = () => ({
   currency: {
     default: 'PKR',
     byPage: buildDefaultPageCurrencyMap()
+  },
+  sidebar: {
+    menuOrder: [...SIDEBAR_MENU_DEFAULT_ORDER]
   }
 });
 
@@ -53,6 +71,16 @@ const sanitizeSettings = (rawSettings) => {
 
   const theme = rawSettings.theme || {};
   const currency = rawSettings.currency || {};
+  const sidebar = rawSettings.sidebar || {};
+  const validSidebarIds = new Set(SIDEBAR_MENU_DEFAULT_ORDER);
+  const customMenuOrder = Array.isArray(sidebar.menuOrder)
+    ? sidebar.menuOrder.filter((id) => validSidebarIds.has(id))
+    : [];
+  const uniqueMenuOrder = [...new Set(customMenuOrder)];
+  const normalizedMenuOrder = [
+    ...uniqueMenuOrder,
+    ...SIDEBAR_MENU_DEFAULT_ORDER.filter((id) => !uniqueMenuOrder.includes(id))
+  ];
 
   const sanitized = {
     theme: {
@@ -75,6 +103,9 @@ const sanitizeSettings = (rawSettings) => {
     currency: {
       default: CURRENCY_CONFIG[currency.default] ? currency.default : defaults.currency.default,
       byPage: { ...defaults.currency.byPage }
+    },
+    sidebar: {
+      menuOrder: normalizedMenuOrder
     }
   };
 
@@ -152,4 +183,15 @@ export const getCurrencyForPage = (pageKey = 'default') => {
       : settings.currency.default;
 
   return CURRENCY_CONFIG[currencyCode] ? currencyCode : 'PKR';
+};
+
+export const getSidebarMenuOrder = () => {
+  const settings = getSiteSettings();
+  const order = settings.sidebar?.menuOrder;
+
+  if (!Array.isArray(order) || order.length === 0) {
+    return [...SIDEBAR_MENU_DEFAULT_ORDER];
+  }
+
+  return order;
 };
