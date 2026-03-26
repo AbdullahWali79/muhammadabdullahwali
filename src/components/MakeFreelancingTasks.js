@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import PasswordProtection from './PasswordProtection';
 import { FaSave, FaPlus, FaTrash, FaEdit } from 'react-icons/fa';
 import { getFreelancingTasks, saveFreelancingTask, updateFreelancingTask, deleteFreelancingTask } from '../services/supabaseService';
-import { formatCurrencyToRupees } from '../utils/currency';
+import { formatCurrency } from '../utils/currency';
 import './MakePrompts.css';
 
 const MakeFreelancingTasks = () => {
@@ -66,7 +66,7 @@ const MakeFreelancingTasks = () => {
     let response;
     const normalizedTaskForm = {
       ...taskForm,
-      budget: formatCurrencyToRupees(taskForm.budget, '')
+      budget: formatCurrency(taskForm.budget, 'freelancing-tasks', '')
     };
 
     if (editingTaskId) {
@@ -92,7 +92,7 @@ const MakeFreelancingTasks = () => {
     setTaskForm({
       title: task.title || '',
       description: task.description || '',
-      budget: formatCurrencyToRupees(task.budget, ''),
+      budget: formatCurrency(task.budget, 'freelancing-tasks', ''),
       deadline: task.deadline || '',
       contact_whatsapp: task.contact_whatsapp || '+923046983794',
       contact_email: task.contact_email || 'abdullahwale@gmail.com'
@@ -179,7 +179,7 @@ const MakeFreelancingTasks = () => {
                       </div>
                     </div>
                     <p>{task.description}</p>
-                    <small>Budget: {formatCurrencyToRupees(task.budget)} | Deadline: {task.deadline || 'N/A'}</small>
+                    <small>Budget: {formatCurrency(task.budget, 'freelancing-tasks')} | Deadline: {task.deadline || 'N/A'}</small>
                   </div>
                 ))}
               </div>

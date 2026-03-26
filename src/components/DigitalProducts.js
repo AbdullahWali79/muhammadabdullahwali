@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getDigitalProductsData } from '../services/supabaseService';
 import { FaShoppingCart, FaWhatsapp } from 'react-icons/fa';
-import { formatCurrencyToRupees } from '../utils/currency';
+import { formatCurrency } from '../utils/currency';
 import './DigitalProducts.css';
 
 const DigitalProducts = ({ userData }) => {
@@ -32,7 +32,7 @@ const DigitalProducts = ({ userData }) => {
     
     // Format the phone number (remove +, spaces, hyphens)
     const phone = (userData?.phone || '+923046983794').replace(/[^0-9]/g, '');
-    const formattedPrice = formatCurrencyToRupees(product.price, 'price not listed');
+    const formattedPrice = formatCurrency(product.price, 'digital-products', 'price not listed');
     
     // Construct the message
     const message = `Hello, I'm interested in buying your digital product: "${product.title}" listed for ${formattedPrice}.`;
@@ -103,9 +103,9 @@ const DigitalProducts = ({ userData }) => {
             <div className="products-grid">
               {filteredProducts.map((product, index) => {
                 const embedUrl = getYouTubeEmbedUrl(product.videoUrl);
-                const formattedPrice = formatCurrencyToRupees(product.price, '');
+                const formattedPrice = formatCurrency(product.price, 'digital-products', '');
                 const isHot = index === 0; // The first product gets a "HOT" badge
-                const isPremiumPrice = /^\s*Rs\b/i.test(formattedPrice);
+                const isPremiumPrice = Boolean(formattedPrice && /\d/.test(formattedPrice));
                 const isPremium = index === 1 || isPremiumPrice; // Others might get Premium
                 
                 return (

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getFreelancingTasks } from '../services/supabaseService';
-import { formatCurrencyToRupees } from '../utils/currency';
+import { formatCurrency } from '../utils/currency';
 import './FreelancingTasks.css';
 
 const defaultWhatsApp = '+923046983794';
@@ -52,7 +52,7 @@ const FreelancingTasks = () => {
               <h2>{task.title}</h2>
               <p>{task.description}</p>
               <div className="task-meta">
-                <span>Budget: {formatCurrencyToRupees(task.budget)}</span>
+                <span>Budget: {formatCurrency(task.budget, 'freelancing-tasks')}</span>
                 <span>Deadline: {task.deadline || 'N/A'}</span>
               </div>
               <div className="task-actions">

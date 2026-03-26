@@ -1,0 +1,36 @@
+.make-settings-page .settings-editor-content {
+  max-width: 980px;
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.settings-grid-item label {
+  display: block;
+  margin-bottom: 8px;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.color-input {
+  min-height: 46px;
+  padding: 6px;
+}
+
+.settings-note {
+  color: #d7e7ea;
+  margin-bottom: 10px;
+}
+
+.settings-route {
+  display: inline-block;
+  background: #1a2b2e;
+  border: 1px solid #3a4b4e;
+  color: #00ced1;
+  padding: 6px 10px;
+  border-radius: 8px;
+}

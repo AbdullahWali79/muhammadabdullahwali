@@ -1,4 +1,11 @@
-export const formatCurrencyToRupees = (value, fallback = 'N/A') => {
+import { CURRENCY_CONFIG, getCurrencyForPage } from './siteSettings';
+
+const CURRENCY_TOKEN_REGEX = /\b(?:PKR|USD|EUR|GBP|US\$|dollars?)\b|Rs\.?|[$€£]/gi;
+
+const prefixWithSymbol = (symbol, value, spaceAfterSymbol) =>
+  `${symbol}${spaceAfterSymbol ? ' ' : ''}${value}`.replace(/\s{2,}/g, ' ').trim();
+
+export const formatCurrencyByCode = (value, currencyCode = 'PKR', fallback = 'N/A') => {
   if (value === null || value === undefined) {
     return fallback;
   }
@@ -8,18 +15,24 @@ export const formatCurrencyToRupees = (value, fallback = 'N/A') => {
     return fallback;
   }
 
-  let normalized = raw
-    .replace(/\bUSD\b/gi, 'Rs')
-    .replace(/\bdollars?\b/gi, 'Rs')
-    .replace(/\$/g, 'Rs ')
-    .replace(/\bPKR\b/gi, 'Rs')
-    .replace(/\bRS\.?\b/gi, 'Rs')
-    .replace(/\s{2,}/g, ' ')
-    .trim();
-
-  if (!/^Rs\b/i.test(normalized) && /^\d/.test(normalized)) {
-    normalized = `Rs ${normalized}`;
+  const config = CURRENCY_CONFIG[currencyCode] || CURRENCY_CONFIG.PKR;
+  const hasDigits = /\d/.test(raw);
+  if (!hasDigits) {
+    return raw;
   }
 
-  return normalized.replace(/^Rs\.?\s*/i, 'Rs ').trim();
+  let cleaned = raw.replace(CURRENCY_TOKEN_REGEX, '').replace(/\s{2,}/g, ' ').trim();
+  if (!cleaned) {
+    cleaned = '0';
+  }
+
+  return prefixWithSymbol(config.symbol, cleaned, config.spaceAfterSymbol);
 };
+
+export const formatCurrency = (value, pageKey = 'default', fallback = 'N/A') => {
+  const currencyCode = getCurrencyForPage(pageKey);
+  return formatCurrencyByCode(value, currencyCode, fallback);
+};
+
+export const formatCurrencyToRupees = (value, fallback = 'N/A') =>
+  formatCurrencyByCode(value, 'PKR', fallback);
