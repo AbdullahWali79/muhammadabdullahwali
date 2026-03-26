@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Personal CV</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#05c7c7",
+                        "background-light": "#f5f8f8",
+                        "background-dark": "#0f2323",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-dark font-display">
+<div class="flex min-h-screen">
+<!-- Sidebar Navigation -->
+<aside class="w-64 bg-[#102323] p-4 flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-3 mb-8">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-12" data-alt="A portrait of a smiling person with short, dark hair, wearing a casual shirt. The background is a soft, blurred gradient of warm colors." style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBJhrCA1tMF7VLV8Nw7Mrr3JcKTUcK-bMBrACvQKpr1yovelwKNtPZcbuFYbUpucPw292zeHdGrigRpgrRcK3_4pghIZtZdqKGm7tow7aAuOdY6pmb3nAeAGgGnuGpm8jOR0ktVB4y3mIhBtxH_g0vyyIpFpzqSrfJKwTZAnWpAWhgiiIajssG-Cyd7dHkbPcwkdsocfGkAmmjc-eauMDrtShyrUhTTC1L4PXfK8qFLcSmPoC_ShYJwuvwyHKjZWHFlViZH5OvJHQ");'></div>
+<div>
+<h1 class="text-white text-lg font-medium">Alex Doe</h1>
+<p class="text-[#8ecccc] text-sm">UI/UX Designer</p>
+</div>
+</div>
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg bg-[#214a4a] text-white" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-sm font-medium">Home</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-white hover:bg-[#214a4a]/60" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-sm font-medium">About</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-white hover:bg-[#214a4a]/60" href="#">
+<span class="material-symbols-outlined">work</span>
+<span class="text-sm font-medium">Service</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-white hover:bg-[#214a4a]/60" href="#">
+<span class="material-symbols-outlined">folder</span>
+<span class="text-sm font-medium">Portfolio</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-white hover:bg-[#214a4a]/60" href="#">
+<span class="material-symbols-outlined">article</span>
+<span class="text-sm font-medium">News</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-white hover:bg-[#214a4a]/60" href="#">
+<span class="material-symbols-outlined">email</span>
+<span class="text-sm font-medium">Contact</span>
+</a>
+</nav>
+</div>
+<div class="text-center text-xs text-[#8ecccc]">
+<p>© 2024 Alex Doe. All Rights Reserved.</p>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 p-10 bg-background-dark">
+<div class="max-w-4xl mx-auto">
+<div class="flex items-center gap-8">
+<div class="relative">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-48 ring-4 ring-primary/50" data-alt="A detailed, professional headshot of a person with a neutral expression. The lighting is soft and even, highlighting their features against a plain, dark background." style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAKPwwOjpZTjQJnrH6G-XvW5FYdvkH5KOcVwBWQDEcmyemj8oD74QAOhVZURXU9i1kdCtmW_IIRLO_5tXRccZkSeIfzpwL6DkcOvb8yHhCwhSaXF3WS8OsR7rEcxranN1glfEEYJXOGFzDGVSkfv6TavN-8i_NRROPPviWm2WgGgJSrtJnZw6LvIyHBlhz-4PI7d_6_Hs_NmezPrYQ1lKAg3kfrB_2xtFPBe7YNNXmhTNFcT8iKweLI1BkD2AXVZdzRYKIdVen3Cw");'></div>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-3 mb-2">
+<div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-[#F44336] pl-4 pr-4">
+<p class="text-white text-sm font-medium leading-normal">HELLO</p>
+</div>
+</div>
+<h1 class="text-white tracking-light text-5xl font-bold leading-tight">Author Name</h1>
+<p class="text-[#bdbdbd] text-lg font-normal leading-normal mt-2">
+                            I am a passionate and creative UI/UX Designer with a knack for building elegant and functional user experiences. I specialize in user-centered design and have a strong command of modern design tools.
+                        </p>
+</div>
+</div>
+<div class="mt-12 p-8 bg-[#102323] rounded-xl shadow-lg">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+<div class="flex items-start gap-4 py-3 border-b border-solid border-b-[#2f6a6a]">
+<span class="material-symbols-outlined text-primary mt-1">badge</span>
+<div class="flex flex-col">
+<p class="text-[#8ecccc] text-sm font-normal">First Name:</p>
+<p class="text-white text-base font-normal">Author</p>
+</div>
+</div>
+<div class="flex items-start gap-4 py-3 border-b border-solid border-b-[#2f6a6a]">
+<span class="material-symbols-outlined text-primary mt-1">badge</span>
+<div class="flex flex-col">
+<p class="text-[#8ecccc] text-sm font-normal">Last Name:</p>
+<p class="text-white text-base font-normal">Name</p>
+</div>
+</div>
+<div class="flex items-start gap-4 py-3 border-b border-solid border-b-[#2f6a6a]">
+<span class="material-symbols-outlined text-primary mt-1">cake</span>
+<div class="flex flex-col">
+<p class="text-[#8ecccc] text-sm font-normal">Date of Birth:</p>
+<p class="text-white text-base font-normal">October 26, 1995</p>
+</div>
+</div>
+<div class="flex items-start gap-4 py-3 border-b border-solid border-b-[#2f6a6a]">
+<span class="material-symbols-outlined text-primary mt-1">flag</span>
+<div class="flex flex-col">
+<p class="text-[#8ecccc] text-sm font-normal">Nationality:</p>
+<p class="text-white text-base font-normal">CreativeLand</p>
+</div>
+</div>
+<div class="flex items-start gap-4 py-3 border-b border-solid border-b-[#2f6a6a]">
+<span class="material-symbols-outlined text-primary mt-1">phone</span>
+<div class="flex flex-col">
+<p class="text-[#8ecccc] text-sm font-normal">Phone:</p>
+<p class="text-white text-base font-normal">+123 456 7890</p>
+</div>
+</div>
+<div class="flex items-start gap-4 py-3 border-b border-solid border-b-[#2f6a6a]">
+<span class="material-symbols-outlined text-primary mt-1">email</span>
+<div class="flex flex-col">
+<p class="text-[#8ecccc] text-sm font-normal">Email:</p>
+<p class="text-white text-base font-normal">author.name@example.com</p>
+</div>
+</div>
+<div class="flex items-start gap-4 py-3 border-b border-solid border-b-[#2f6a6a] md:border-b-0">
+<span class="material-symbols-outlined text-primary mt-1">home_pin</span>
+<div class="flex flex-col">
+<p class="text-[#8ecccc] text-sm font-normal">Address:</p>
+<p class="text-white text-base font-normal">123 Design St, Anytown, USA</p>
+</div>
+</div>
+<div class="flex items-start gap-4 py-3 border-b border-solid border-b-[#2f6a6a] md:border-b-0">
+<span class="material-symbols-outlined text-primary mt-1">language</span>
+<div class="flex flex-col">
+<p class="text-[#8ecccc] text-sm font-normal">Languages:</p>
+<p class="text-white text-base font-normal">English, Designish</p>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-12 flex justify-start gap-4">
+<button class="px-8 py-3 rounded-lg bg-[#214a4a] text-white font-medium hover:bg-[#2f6a6a] transition-colors shadow-md">
+                        Download Resume
+                    </button>
+<button class="px-8 py-3 rounded-lg bg-primary text-background-dark font-medium hover:bg-primary/80 transition-colors shadow-lg shadow-primary/20">
+                        Contact Me
+                    </button>
+</div>
+</div>
+</main>
+</div>
+</body></html>

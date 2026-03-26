@@ -1,0 +1,204 @@
+/* Mobile Table Layout - Separate CSS for proper column structure */
+/* Mobile par table ko card-based layout mein convert karte hain */
+
+@media (max-width: 768px) {
+  /* Container styling */
+  .info-tables-container {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    margin: 0 !important;
+    width: 100% !important;
+    overflow-x: hidden !important;
+  }
+  
+  /* Table ko card container bana do */
+  .info-table {
+    display: block !important;
+    width: 100% !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    margin-bottom: 0 !important;
+  }
+  
+  /* Table body ko flex container bana do */
+  .info-table tbody {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    width: 100% !important;
+  }
+  
+  /* Har row ko ek separate card bana do */
+  .info-row {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    background-color: #2A3B3E !important;
+    border: 1px solid #3A4B4E !important;
+    border-radius: 12px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+    transition: all 0.2s ease !important;
+  }
+  
+  .info-row:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3) !important;
+  }
+  
+  /* Pehla cell (icon + label) ko horizontal flex bana do */
+  .info-row .info-cell:first-child {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 14px !important;
+    padding: 16px 16px 8px 16px !important;
+    width: 100% !important;
+    background: transparent !important;
+    border: none !important;
+    border-right: none !important;
+    min-width: auto !important;
+  }
+  
+  /* Doosra cell (value) ko separate row mein display karo */
+  .info-row .info-cell:last-child {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-start !important;
+    padding: 0 16px 16px 16px !important;
+    width: 100% !important;
+    background: transparent !important;
+    border: none !important;
+    padding-left: 70px !important; /* Icon + gap ke liye space */
+  }
+  
+  /* Icon styling */
+  .info-icon {
+    width: 48px !important;
+    height: 48px !important;
+    font-size: 20px !important;
+    flex-shrink: 0 !important;
+    background: linear-gradient(135deg, #00CED1, #00B8BA) !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 8px rgba(0, 206, 209, 0.3) !important;
+    margin: 0 !important;
+  }
+  
+  /* Label styling - pehle cell mein */
+  .info-cell:first-child .info-label {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #B0B0B0 !important;
+    letter-spacing: 0.3px !important;
+    margin: 0 !important;
+    flex: 1 !important;
+    min-width: auto !important;
+    width: auto !important;
+  }
+  
+  /* Value styling - doosre cell mein */
+  .info-cell:last-child .info-value {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    color: #ffffff !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    line-height: 1.5 !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+  
+  /* Remove default table cell borders */
+  .info-cell {
+    border: none !important;
+    border-bottom: none !important;
+  }
+  
+  .info-row:first-child {
+    border-top: none !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .info-tables-container {
+    gap: 14px !important;
+  }
+  
+  .info-table tbody {
+    gap: 10px !important;
+  }
+  
+  .info-row {
+    border-radius: 10px !important;
+  }
+  
+  .info-row .info-cell:first-child {
+    padding: 14px 14px 6px 14px !important;
+    gap: 12px !important;
+  }
+  
+  .info-row .info-cell:last-child {
+    padding: 0 14px 14px 14px !important;
+    padding-left: 66px !important; /* Icon + gap */
+  }
+  
+  .info-icon {
+    width: 44px !important;
+    height: 44px !important;
+    font-size: 18px !important;
+  }
+  
+  .info-cell:first-child .info-label {
+    font-size: 12px !important;
+  }
+  
+  .info-cell:last-child .info-value {
+    font-size: 15px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .info-tables-container {
+    gap: 12px !important;
+  }
+  
+  .info-table tbody {
+    gap: 10px !important;
+  }
+  
+  .info-row {
+    border-radius: 10px !important;
+  }
+  
+  .info-row .info-cell:first-child {
+    padding: 12px 12px 6px 12px !important;
+    gap: 10px !important;
+  }
+  
+  .info-row .info-cell:last-child {
+    padding: 0 12px 12px 12px !important;
+    padding-left: 58px !important; /* Icon + gap */
+  }
+  
+  .info-icon {
+    width: 40px !important;
+    height: 40px !important;
+    font-size: 16px !important;
+  }
+  
+  .info-cell:first-child .info-label {
+    font-size: 11px !important;
+  }
+  
+  .info-cell:last-child .info-value {
+    font-size: 14px !important;
+  }
+}
