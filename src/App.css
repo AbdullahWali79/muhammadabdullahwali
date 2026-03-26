@@ -2,19 +2,115 @@
   display: flex;
   min-height: 100vh;
   background-color: var(--site-bg-color);
+  position: relative;
+  isolation: isolate;
+}
+
+.app::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background: var(--site-bg-color);
+  transition: background 0.45s ease, opacity 0.45s ease;
+}
+
+.app::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      0deg,
+      rgba(var(--site-bg-overlay-rgb, 0, 0, 0), var(--site-bg-overlay-opacity, 0.2)),
+      rgba(var(--site-bg-overlay-rgb, 0, 0, 0), var(--site-bg-overlay-opacity, 0.2))
+    ),
+    radial-gradient(
+      circle at 1px 1px,
+      rgba(255, 255, 255, var(--site-bg-texture-intensity, 0.08)) 1px,
+      transparent 0
+    );
+  background-size: auto, 4px 4px;
+}
+
+.app.app-bg-gradient::before {
+  background: linear-gradient(
+    var(--site-bg-gradient-angle, 135deg),
+    var(--site-bg-gradient-color-one, #102128),
+    var(--site-bg-gradient-color-two, #1a3943),
+    var(--site-bg-gradient-color-three, #245463)
+  );
+  background-size: 220% 220%;
+}
+
+.app.app-bg-mesh::before {
+  background:
+    radial-gradient(circle at 20% 20%, var(--site-bg-gradient-color-one, #102128), transparent 45%),
+    radial-gradient(circle at 80% 25%, var(--site-bg-gradient-color-two, #1a3943), transparent 40%),
+    radial-gradient(circle at 50% 85%, var(--site-bg-gradient-color-three, #245463), transparent 46%),
+    var(--site-bg-color);
+  background-size: 180% 180%;
+}
+
+.app.app-bg-pattern::before {
+  background:
+    linear-gradient(
+      var(--site-bg-gradient-angle, 135deg),
+      var(--site-bg-gradient-color-one, #102128),
+      var(--site-bg-gradient-color-two, #1a3943),
+      var(--site-bg-gradient-color-three, #245463)
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(255, 255, 255, var(--site-bg-pattern-opacity, 0.12)) 0,
+      rgba(255, 255, 255, var(--site-bg-pattern-opacity, 0.12)) 1px,
+      transparent 1px,
+      transparent 18px
+    );
+  background-blend-mode: overlay, normal;
+}
+
+.app.app-bg-solid::before {
+  background: var(--site-bg-color);
+}
+
+.app.app-bg-motion::before {
+  animation: appBackgroundDrift var(--site-bg-motion-duration, 24s) ease-in-out infinite;
+}
+
+.app.app-bg-static::before {
+  animation: none;
+}
+
+@keyframes appBackgroundDrift {
+  0% {
+    background-position: 0% 0%;
+    transform: scale(1);
+  }
+  50% {
+    background-position: 100% 100%;
+    transform: scale(1.03);
+  }
+  100% {
+    background-position: 0% 0%;
+    transform: scale(1);
+  }
 }
 
 .main-content {
   flex: 1;
   padding: 0;
   overflow-y: auto;
-  background-color: var(--site-bg-color);
-  margin-left: 280px;
+  background-color: transparent;
+  margin-left: var(--site-main-content-offset, 280px);
   transition: margin-left 0.3s ease;
 }
 
 .main-content.sidebar-collapsed {
-  margin-left: 80px;
+  margin-left: var(--site-main-content-offset-collapsed, 80px);
 }
 
 .route-shell {

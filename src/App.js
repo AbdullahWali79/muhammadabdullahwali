@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { getUserData } from './services/supabaseService';
 import Sidebar from './components/Sidebar';
@@ -34,7 +34,7 @@ import './App.css';
 
 function AppContent() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [, setSettingsVersion] = useState(0);
+  const [settingsVersion, setSettingsVersion] = useState(0);
   const [userData, setUserData] = useState({
     firstName: 'Muhammad',
     lastName: 'Abdullah',
@@ -123,6 +123,9 @@ function AppContent() {
   }, []);
 
   const location = useLocation();
+  const currentSettings = useMemo(() => getSiteSettings(), [settingsVersion]);
+  const backgroundModeClass = `app-bg-${currentSettings.theme.backgroundMode || 'solid'}`;
+  const backgroundMotionClass = currentSettings.theme.motionEnabled ? 'app-bg-motion' : 'app-bg-static';
   const getActiveSection = () => {
     const path = location.pathname;
     switch (path) {
@@ -178,7 +181,7 @@ function AppContent() {
   };
 
   return (
-    <div className="app">
+    <div className={`app ${backgroundModeClass} ${backgroundMotionClass}`}>
       <Sidebar 
         activeSection={getActiveSection()} 
         userData={userData}

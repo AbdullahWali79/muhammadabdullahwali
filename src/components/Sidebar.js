@@ -1,11 +1,41 @@
 import React, { useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FaHome, FaUser, FaBriefcase, FaFolder, FaNewspaper, FaEnvelope, FaFileAlt, FaBars, FaTimes, FaRobot, FaShoppingCart } from 'react-icons/fa';
-import { getSidebarMenuOrder } from '../utils/siteSettings';
+import {
+  FaHome,
+  FaUser,
+  FaBriefcase,
+  FaFolder,
+  FaNewspaper,
+  FaEnvelope,
+  FaFileAlt,
+  FaBars,
+  FaTimes,
+  FaRobot,
+  FaShoppingCart,
+  FaPhone
+} from 'react-icons/fa';
+import { getSidebarMenuOrder, getSiteSettings } from '../utils/siteSettings';
 import './Sidebar.css';
 
 const Sidebar = ({ userData, collapsed, setCollapsed }) => {
   const location = useLocation();
+  const siteSettings = getSiteSettings();
+  const sidebarSettings = siteSettings.sidebar || {};
+
+  const sidebarStyle = sidebarSettings.style || 'solid';
+  const activeItemStyle = sidebarSettings.activeItemStyle || 'pill';
+  const hoverAnimation = sidebarSettings.hoverAnimation || 'lift';
+  const labelBehavior = sidebarSettings.labelBehavior || 'hide-collapsed';
+  const mobileMode = sidebarSettings.mobileMode || 'rail';
+  const showProfile = sidebarSettings.showProfile !== false;
+  const showQuickActions = sidebarSettings.showQuickActions !== false;
+  const menuVisibility = sidebarSettings.menuVisibility || {};
+  const shouldShowLabel =
+    labelBehavior === 'always' || (labelBehavior === 'hide-collapsed' && !collapsed);
+  const showTooltipOnly = labelBehavior === 'tooltip-only';
+  const phoneHref = userData.phone ? `tel:${userData.phone.replace(/\s+/g, '')}` : null;
+  const emailHref = userData.email ? `mailto:${userData.email}` : null;
+  const initials = `${userData.firstName?.charAt(0) || 'U'}${userData.lastName?.charAt(0) || ''}`;
   
   const allMenuItems = [
     { id: 'home', label: 'Home', icon: FaHome, path: '/' },
@@ -34,13 +64,17 @@ const Sidebar = ({ userData, collapsed, setCollapsed }) => {
     });
 
     // Only show "Make CV" option when on the makecv page
-    return location.pathname === '/makecv'
+    const routeFilteredItems = location.pathname === '/makecv'
       ? orderedItems
       : orderedItems.filter((item) => item.id !== 'make-cv');
-  }, [location.pathname]);
+
+    return routeFilteredItems.filter((item) => menuVisibility[item.id] !== false);
+  }, [location.pathname, menuVisibility]);
 
   return (
-    <aside className={`sidebar ${collapsed ? 'collapsed' : ''}`}>
+    <aside
+      className={`sidebar ${collapsed ? 'collapsed' : ''} sidebar-style-${sidebarStyle} sidebar-active-${activeItemStyle} sidebar-hover-${hoverAnimation} sidebar-mobile-${mobileMode} sidebar-label-${labelBehavior}`}
+    >
       <div className="sidebar-toggle">
         <button 
           className="toggle-btn"
@@ -50,23 +84,23 @@ const Sidebar = ({ userData, collapsed, setCollapsed }) => {
         </button>
       </div>
       
-      <div className="sidebar-header">
-        <div className="profile-image">
-          {userData.profileImage ? (
-            <img src={userData.profileImage} alt="Profile" />
-          ) : (
-            <div className="default-avatar">
-              {userData.firstName.charAt(0)}{userData.lastName.charAt(0)}
+      {showProfile && (
+        <div className="sidebar-header">
+          <div className="profile-image">
+            {userData.profileImage ? (
+              <img src={userData.profileImage} alt="Profile" />
+            ) : (
+              <div className="default-avatar">{initials}</div>
+            )}
+          </div>
+          {!collapsed && (
+            <div className="profile-info">
+              <h2 className="name">{userData.firstName} {userData.lastName}</h2>
+              <p className="title">{userData.title}</p>
             </div>
           )}
         </div>
-        {!collapsed && (
-          <div className="profile-info">
-            <h2 className="name">{userData.firstName} {userData.lastName}</h2>
-            <p className="title">{userData.title}</p>
-          </div>
-        )}
-      </div>
+      )}
       
       <nav className="sidebar-nav">
         {menuItems.map((item) => {
@@ -77,14 +111,49 @@ const Sidebar = ({ userData, collapsed, setCollapsed }) => {
               key={item.id}
               to={item.path}
               className={`nav-item ${isActive ? 'active' : ''}`}
-              title={collapsed ? item.label : ''}
+              title={showTooltipOnly || !shouldShowLabel ? item.label : ''}
             >
               <IconComponent className="nav-icon" />
-              {!collapsed && <span className="nav-label">{item.label}</span>}
+              {shouldShowLabel && !showTooltipOnly && <span className="nav-label">{item.label}</span>}
             </Link>
           );
         })}
       </nav>
+
+      {showQuickActions && (
+        <div className="sidebar-footer">
+          <a
+            className={`quick-action ${emailHref ? '' : 'disabled'}`}
+            href={emailHref || '#'}
+            onClick={(event) => {
+              if (!emailHref) {
+                event.preventDefault();
+              }
+            }}
+            title="Email"
+          >
+            <FaEnvelope className="quick-action-icon" />
+            {!collapsed && <span>Email</span>}
+          </a>
+          <a
+            className={`quick-action ${phoneHref ? '' : 'disabled'}`}
+            href={phoneHref || '#'}
+            onClick={(event) => {
+              if (!phoneHref) {
+                event.preventDefault();
+              }
+            }}
+            title="Call"
+          >
+            <FaPhone className="quick-action-icon" />
+            {!collapsed && <span>Call</span>}
+          </a>
+          <Link className="quick-action" to="/makecv" title="Make CV">
+            <FaFileAlt className="quick-action-icon" />
+            {!collapsed && <span>CV</span>}
+          </Link>
+        </div>
+      )}
     </aside>
   );
 };

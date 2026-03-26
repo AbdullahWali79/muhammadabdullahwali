@@ -9,19 +9,34 @@
   --site-surface-color: #2A3B3E;
   --site-text-color: #FFFFFF;
   --site-accent-color: #00CED1;
+  --site-accent-rgb: 0, 206, 209;
   --site-sidebar-bg-color: #1A2B2E;
   --site-sidebar-border-color: #2A3B3E;
   --site-sidebar-text-color: #FFFFFF;
   --site-sidebar-muted-text-color: #B0B0B0;
   --site-sidebar-item-bg-color: #2A3B3E;
+  --site-sidebar-expanded-width: 280px;
+  --site-sidebar-collapsed-width: 80px;
+  --site-main-content-offset: 280px;
+  --site-main-content-offset-collapsed: 80px;
+  --site-sidebar-item-radius: 10px;
+  --site-sidebar-shadow-opacity: 0.24;
+  --site-bg-gradient-angle: 135deg;
+  --site-bg-gradient-color-one: #102128;
+  --site-bg-gradient-color-two: #1A3943;
+  --site-bg-gradient-color-three: #245463;
+  --site-bg-pattern-opacity: 0.12;
+  --site-bg-overlay-opacity: 0.22;
+  --site-bg-overlay-rgb: 0, 0, 0;
+  --site-bg-texture-intensity: 0.08;
+  --site-bg-motion-duration: 24s;
   --site-base-font-size: 16px;
   --site-max-content-width: 1200px;
+  --site-font-family: 'Sora', 'Inter', 'Segoe UI', sans-serif;
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: var(--site-font-family);
   font-size: var(--site-base-font-size);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
