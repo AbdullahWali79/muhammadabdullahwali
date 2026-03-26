@@ -168,6 +168,166 @@ export const THEME_PRESETS = {
       itemRadius: 14,
       itemShadowStrength: 26
     }
+  },
+  emeraldNoir: {
+    label: 'Emerald Noir',
+    theme: {
+      backgroundColor: '#0C1612',
+      surfaceColor: '#16251F',
+      textColor: '#ECFFF6',
+      accentColor: '#2ED39A',
+      sidebarBackgroundColor: '#0B1511',
+      sidebarBorderColor: '#27493D',
+      sidebarTextColor: '#F2FFF9',
+      sidebarMutedTextColor: '#9AC5B5',
+      sidebarItemBackgroundColor: '#1B312A',
+      backgroundMode: 'gradient',
+      gradientAngle: 132,
+      gradientColorOne: '#0A1410',
+      gradientColorTwo: '#153127',
+      gradientColorThree: '#245541',
+      patternOpacity: 0.1,
+      overlayColor: '#040806',
+      overlayOpacity: 0.26,
+      textureIntensity: 0.08,
+      backgroundMotionSpeed: 26,
+      motionEnabled: true
+    },
+    sidebar: {
+      style: 'glass',
+      activeItemStyle: 'glow',
+      hoverAnimation: 'glow',
+      itemRadius: 12,
+      itemShadowStrength: 32
+    }
+  },
+  royalBurgundy: {
+    label: 'Royal Burgundy',
+    theme: {
+      backgroundColor: '#1A1115',
+      surfaceColor: '#281922',
+      textColor: '#FFF3FA',
+      accentColor: '#D95C94',
+      sidebarBackgroundColor: '#170E12',
+      sidebarBorderColor: '#4A2739',
+      sidebarTextColor: '#FFEFF8',
+      sidebarMutedTextColor: '#CF9FB7',
+      sidebarItemBackgroundColor: '#36202D',
+      backgroundMode: 'pattern',
+      gradientAngle: 135,
+      gradientColorOne: '#170E12',
+      gradientColorTwo: '#2B1822',
+      gradientColorThree: '#4D273B',
+      patternOpacity: 0.14,
+      overlayColor: '#080406',
+      overlayOpacity: 0.24,
+      textureIntensity: 0.08,
+      backgroundMotionSpeed: 30,
+      motionEnabled: true
+    },
+    sidebar: {
+      style: 'floating',
+      activeItemStyle: 'left-bar',
+      hoverAnimation: 'slide',
+      itemRadius: 14,
+      itemShadowStrength: 36
+    }
+  },
+  arcticGlass: {
+    label: 'Arctic Glass',
+    theme: {
+      backgroundColor: '#0E1B25',
+      surfaceColor: '#1B2D3B',
+      textColor: '#EAF7FF',
+      accentColor: '#6DD3FF',
+      sidebarBackgroundColor: '#0D1820',
+      sidebarBorderColor: '#2F4D61',
+      sidebarTextColor: '#F2FAFF',
+      sidebarMutedTextColor: '#9CB9CB',
+      sidebarItemBackgroundColor: '#213746',
+      backgroundMode: 'mesh',
+      gradientAngle: 142,
+      gradientColorOne: '#0E1A24',
+      gradientColorTwo: '#1A3345',
+      gradientColorThree: '#29516B',
+      patternOpacity: 0.08,
+      overlayColor: '#04070A',
+      overlayOpacity: 0.22,
+      textureIntensity: 0.06,
+      backgroundMotionSpeed: 22,
+      motionEnabled: true
+    },
+    sidebar: {
+      style: 'glass',
+      activeItemStyle: 'pill',
+      hoverAnimation: 'lift',
+      itemRadius: 10,
+      itemShadowStrength: 28
+    }
+  },
+  sunsetCopper: {
+    label: 'Sunset Copper',
+    theme: {
+      backgroundColor: '#21130C',
+      surfaceColor: '#332016',
+      textColor: '#FFF4EB',
+      accentColor: '#FF965C',
+      sidebarBackgroundColor: '#1C110B',
+      sidebarBorderColor: '#5A3A28',
+      sidebarTextColor: '#FFF5EC',
+      sidebarMutedTextColor: '#D9B69D',
+      sidebarItemBackgroundColor: '#462B1E',
+      backgroundMode: 'gradient',
+      gradientAngle: 128,
+      gradientColorOne: '#1B100A',
+      gradientColorTwo: '#3A2418',
+      gradientColorThree: '#6A3F2B',
+      patternOpacity: 0.1,
+      overlayColor: '#090503',
+      overlayOpacity: 0.2,
+      textureIntensity: 0.08,
+      backgroundMotionSpeed: 28,
+      motionEnabled: true
+    },
+    sidebar: {
+      style: 'solid',
+      activeItemStyle: 'underline',
+      hoverAnimation: 'slide',
+      itemRadius: 12,
+      itemShadowStrength: 30
+    }
+  },
+  monoNeon: {
+    label: 'Mono Neon',
+    theme: {
+      backgroundColor: '#111214',
+      surfaceColor: '#1B1D22',
+      textColor: '#F5F8FF',
+      accentColor: '#00F0FF',
+      sidebarBackgroundColor: '#101114',
+      sidebarBorderColor: '#2D323D',
+      sidebarTextColor: '#F7FAFF',
+      sidebarMutedTextColor: '#A8B2C2',
+      sidebarItemBackgroundColor: '#21252D',
+      backgroundMode: 'mesh',
+      gradientAngle: 140,
+      gradientColorOne: '#101114',
+      gradientColorTwo: '#1D2430',
+      gradientColorThree: '#303D50',
+      patternOpacity: 0.08,
+      overlayColor: '#030406',
+      overlayOpacity: 0.26,
+      textureIntensity: 0.06,
+      backgroundMotionSpeed: 24,
+      motionEnabled: true
+    },
+    sidebar: {
+      style: 'floating',
+      activeItemStyle: 'glow',
+      hoverAnimation: 'glow',
+      itemRadius: 9,
+      itemShadowStrength: 42
+    }
   }
 };
 
