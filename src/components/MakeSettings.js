@@ -138,6 +138,22 @@ const MakeSettings = () => {
       return;
     }
 
+    const mergedSettings = {
+      ...settings,
+      theme: {
+        ...settings.theme,
+        ...preset.theme
+      },
+      sidebar: {
+        ...settings.sidebar,
+        ...preset.sidebar
+      }
+    };
+
+    const saved = saveSiteSettings(mergedSettings);
+    applyThemeSettings(saved);
+    window.dispatchEvent(new Event('site-settings-updated'));
+
     setSettings((prev) => ({
       ...prev,
       theme: {
@@ -151,7 +167,7 @@ const MakeSettings = () => {
     }));
 
     setError('');
-    setMessage(`${preset.label} preset applied. Save settings to make it permanent.`);
+    setMessage(`${preset.label} theme applied to full website.`);
     setTimeout(() => setMessage(''), 3000);
   };
 
@@ -751,3 +767,4 @@ const MakeSettings = () => {
 };
 
 export default MakeSettings;
+

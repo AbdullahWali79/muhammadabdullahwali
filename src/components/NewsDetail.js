@@ -234,7 +234,7 @@ Remember, a design system is a tool to help your team work better together, not 
     return (
       <div className="news-detail">
         <div className="news-detail-container">
-          <div className="loading" style={{ textAlign: 'center', padding: '40px', color: '#00CED1' }}>
+          <div className="loading" style={{ textAlign: 'center', padding: '40px', color: 'var(--site-accent-color)' }}>
             Loading article...
           </div>
         </div>
@@ -395,3 +395,4 @@ Remember, a design system is a tool to help your team work better together, not 
 };
 
 export default NewsDetail;
+

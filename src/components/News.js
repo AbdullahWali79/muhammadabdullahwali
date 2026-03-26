@@ -227,7 +227,7 @@ const News = () => {
     return (
       <div className="news">
         <div className="news-container">
-          <div className="loading" style={{ textAlign: 'center', padding: '40px', color: '#00CED1' }}>
+          <div className="loading" style={{ textAlign: 'center', padding: '40px', color: 'var(--site-accent-color)' }}>
             Loading news...
           </div>
         </div>
@@ -257,7 +257,7 @@ const News = () => {
         </div>
         
         {newsItems.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '40px', color: '#B0B0B0' }}>
+          <div style={{ textAlign: 'center', padding: '40px', color: 'var(--site-sidebar-muted-text-color)' }}>
             <p>No articles available yet. Check back soon!</p>
           </div>
         ) : (
@@ -355,4 +355,5 @@ const News = () => {
 };
 
 export default News;
+
 

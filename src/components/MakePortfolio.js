@@ -410,7 +410,7 @@ const MakePortfolio = () => {
                     className="form-textarea"
                     placeholder="Enter complete project description, blog content, or detailed information that will display on the project detail page..."
                   />
-                  <small style={{ color: '#B0B0B0', fontSize: '12px', marginTop: '5px', display: 'block' }}>
+                  <small style={{ color: 'var(--site-sidebar-muted-text-color)', fontSize: '12px', marginTop: '5px', display: 'block' }}>
                     This full description will be displayed on the project detail page when users click on a project.
                   </small>
                 </div>
@@ -584,3 +584,4 @@ const MakePortfolio = () => {
 };
 
 export default MakePortfolio;
+

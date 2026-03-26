@@ -46,7 +46,7 @@ const DigitalProducts = ({ userData }) => {
     return (
       <div className="digital-products-page">
         <div className="products-container">
-          <div className="loading" style={{ color: '#00CED1', textAlign: 'center', marginTop: '50px' }}>Loading...</div>
+          <div className="loading" style={{ color: 'var(--site-accent-color)', textAlign: 'center', marginTop: '50px' }}>Loading...</div>
         </div>
       </div>
     );
@@ -154,7 +154,7 @@ const DigitalProducts = ({ userData }) => {
             </div>
           </>
         ) : (
-          <div style={{ textAlign: 'center', color: '#B0B0B0', marginTop: '50px' }}>
+          <div style={{ textAlign: 'center', color: 'var(--site-sidebar-muted-text-color)', marginTop: '50px' }}>
             <p>No digital products available yet. Please check back later.</p>
           </div>
         )}
@@ -164,3 +164,4 @@ const DigitalProducts = ({ userData }) => {
 };
 
 export default DigitalProducts;
+

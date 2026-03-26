@@ -35,7 +35,7 @@ const PortfolioDetail = () => {
     return (
       <div className="portfolio-detail">
         <div className="portfolio-detail-container">
-          <div className="loading" style={{ textAlign: 'center', padding: '40px', color: '#00CED1' }}>
+          <div className="loading" style={{ textAlign: 'center', padding: '40px', color: 'var(--site-accent-color)' }}>
             Loading project...
           </div>
         </div>
@@ -218,3 +218,4 @@ const PortfolioDetail = () => {
 };
 
 export default PortfolioDetail;
+

@@ -237,7 +237,7 @@ const SecurityManager = () => {
           >
             <FaDatabase /> Initialize Demo Data
           </button>
-          <p style={{ fontSize: '14px', color: '#B0B0B0', marginTop: '10px' }}>
+          <p style={{ fontSize: '14px', color: 'var(--site-sidebar-muted-text-color)', marginTop: '10px' }}>
             This will add demo content to all pages (Services, About, Portfolio, News, Contact)
           </p>
         </div>
@@ -281,3 +281,4 @@ const SecurityManager = () => {
 };
 
 export default SecurityManager;
+

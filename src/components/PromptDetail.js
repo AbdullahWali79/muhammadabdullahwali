@@ -68,7 +68,7 @@ const PromptDetail = () => {
     return (
       <div className="prompt-detail-page">
         <div className="prompt-detail-container">
-          <div className="loading" style={{ color: '#00CED1', textAlign: 'center', marginTop: '50px' }}>Loading...</div>
+          <div className="loading" style={{ color: 'var(--site-accent-color)', textAlign: 'center', marginTop: '50px' }}>Loading...</div>
         </div>
       </div>
     );
@@ -134,3 +134,4 @@ const PromptDetail = () => {
 };
 
 export default PromptDetail;
+

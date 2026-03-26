@@ -74,3 +74,4 @@ const PasswordProtection = ({ children, pageName }) => {
 };
 
 export default PasswordProtection;
+

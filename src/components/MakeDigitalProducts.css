@@ -14,10 +14,10 @@
 }
 
 .modal-content {
-  background-color: #2A3B3E;
+  background-color: var(--site-surface-color);
   padding: 30px;
   border-radius: 12px;
-  border: 1px solid #3A4B4E;
+  border: 1px solid var(--site-sidebar-border-color);
   width: 90%;
   max-width: 600px;
   max-height: 90vh;
@@ -40,7 +40,7 @@
 }
 
 .nested-form::-webkit-scrollbar-thumb {
-  background: rgba(0, 206, 209, 0.45);
+  background: rgba(var(--site-accent-rgb, 0, 206, 209), 0.45);
   border-radius: 4px;
 }
 
@@ -59,7 +59,7 @@
 }
 
 .nested-form::-webkit-scrollbar-thumb {
-  background: rgba(0, 206, 209, 0.35);
+  background: rgba(var(--site-accent-rgb, 0, 206, 209), 0.35);
   border-radius: 5px;
 }
 
@@ -91,7 +91,7 @@
 }
 
 .fullscreen-btn:hover {
-  background: rgba(0, 206, 209, 0.22);
+  background: rgba(var(--site-accent-rgb, 0, 206, 209), 0.22);
 }
 
 @keyframes modalFadeIn {
@@ -106,11 +106,11 @@
 }
 
 .modal-content h4 {
-  color: #00CED1;
+  color: var(--site-accent-color);
   font-size: 22px;
   margin-top: 0;
   margin-bottom: 20px;
-  border-bottom: 1px solid #3A4B4E;
+  border-bottom: 1px solid var(--site-sidebar-border-color);
   padding-bottom: 10px;
 }
 
@@ -122,7 +122,7 @@
 }
 
 .save-item-btn {
-  background: linear-gradient(135deg, #00CED1, #008B8B);
+  background: linear-gradient(135deg, var(--site-accent-color), var(--site-accent-color));
   color: #ffffff;
   border: none;
   padding: 10px 20px;
@@ -133,15 +133,15 @@
 }
 
 .save-item-btn:hover {
-  background: linear-gradient(135deg, #008B8B, #006666);
+  background: linear-gradient(135deg, var(--site-accent-color), var(--site-accent-color));
   transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(0, 206, 209, 0.3);
+  box-shadow: 0 4px 10px rgba(var(--site-accent-rgb, 0, 206, 209), 0.3);
 }
 
 .cancel-btn {
   background: transparent;
-  color: #B0B0B0;
-  border: 1px solid #B0B0B0;
+  color: var(--site-sidebar-muted-text-color);
+  border: 1px solid var(--site-sidebar-muted-text-color);
   padding: 10px 20px;
   border-radius: 6px;
   font-weight: 600;
@@ -150,6 +150,8 @@
 }
 
 .cancel-btn:hover {
-  background: #3A4B4E;
+  background: var(--site-sidebar-border-color);
   color: #ffffff;
 }
+
+

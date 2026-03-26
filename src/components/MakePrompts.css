@@ -1,6 +1,6 @@
 .make-prompts {
   padding: 20px;
-  background-color: #1A2B2E;
+  background-color: var(--site-bg-color);
   min-height: 100vh;
 }
 
@@ -10,7 +10,7 @@
   align-items: center;
   margin-bottom: 30px;
   padding-bottom: 20px;
-  border-bottom: 2px solid #2A3B3E;
+  border-bottom: 2px solid var(--site-surface-color);
 }
 
 .editor-header h1 {
@@ -39,24 +39,24 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #00CED1, #008B8B);
+  background: linear-gradient(135deg, var(--site-accent-color), var(--site-accent-color));
   color: #ffffff;
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #008B8B, #006666);
+  background: linear-gradient(135deg, var(--site-accent-color), var(--site-accent-color));
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 206, 209, 0.3);
+  box-shadow: 0 5px 15px rgba(var(--site-accent-rgb, 0, 206, 209), 0.3);
 }
 
 .btn-secondary {
-  background: #2A3B3E;
+  background: var(--site-surface-color);
   color: #ffffff;
-  border: 1px solid #3A4B4E;
+  border: 1px solid var(--site-sidebar-border-color);
 }
 
 .btn-secondary:hover {
-  background: #3A4B4E;
+  background: var(--site-sidebar-border-color);
   transform: translateY(-2px);
 }
 
@@ -65,15 +65,15 @@
 }
 
 .form-section {
-  background: #2A3B3E;
+  background: var(--site-surface-color);
   border-radius: 12px;
   padding: 25px;
   margin-bottom: 25px;
-  border: 1px solid #3A4B4E;
+  border: 1px solid var(--site-sidebar-border-color);
 }
 
 .form-section h2 {
-  color: #00CED1;
+  color: var(--site-accent-color);
   font-size: 20px;
   margin-bottom: 20px;
   font-weight: 600;
@@ -94,8 +94,8 @@
 .form-input {
   width: 100%;
   padding: 12px 16px;
-  background: #1A2B2E;
-  border: 2px solid #3A4B4E;
+  background: var(--site-bg-color);
+  border: 2px solid var(--site-sidebar-border-color);
   border-radius: 8px;
   color: #ffffff;
   font-size: 14px;
@@ -104,15 +104,15 @@
 
 .form-input:focus {
   outline: none;
-  border-color: #00CED1;
-  box-shadow: 0 0 0 3px rgba(0, 206, 209, 0.1);
+  border-color: var(--site-accent-color);
+  box-shadow: 0 0 0 3px rgba(var(--site-accent-rgb, 0, 206, 209), 0.1);
 }
 
 .form-textarea {
   width: 100%;
   padding: 12px 16px;
-  background: #1A2B2E;
-  border: 2px solid #3A4B4E;
+  background: var(--site-bg-color);
+  border: 2px solid var(--site-sidebar-border-color);
   border-radius: 8px;
   color: #ffffff;
   font-size: 14px;
@@ -124,8 +124,8 @@
 
 .form-textarea:focus {
   outline: none;
-  border-color: #00CED1;
-  box-shadow: 0 0 0 3px rgba(0, 206, 209, 0.1);
+  border-color: var(--site-accent-color);
+  box-shadow: 0 0 0 3px rgba(var(--site-accent-rgb, 0, 206, 209), 0.1);
 }
 
 .form-row {
@@ -135,11 +135,11 @@
 }
 
 .prompt-item {
-  background: #1A2B2E;
+  background: var(--site-bg-color);
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 20px;
-  border: 1px solid #3A4B4E;
+  border: 1px solid var(--site-sidebar-border-color);
 }
 
 .prompt-header {
@@ -150,7 +150,7 @@
 }
 
 .prompt-header h3 {
-  color: #00CED1;
+  color: var(--site-accent-color);
   font-size: 16px;
   margin: 0;
 }
@@ -178,8 +178,8 @@
 }
 
 .add-prompt-btn {
-  background: #00CED1;
-  color: #1A2B2E;
+  background: var(--site-accent-color);
+  color: var(--site-bg-color);
   border: none;
   padding: 12px 24px;
   border-radius: 8px;
@@ -194,7 +194,7 @@
 }
 
 .add-prompt-btn:hover {
-  background: #008B8B;
+  background: var(--site-accent-color);
   color: #ffffff;
   transform: translateY(-1px);
 }
@@ -208,9 +208,9 @@
 }
 
 .message.success {
-  background: rgba(0, 206, 209, 0.1);
-  color: #00CED1;
-  border-left: 3px solid #00CED1;
+  background: rgba(var(--site-accent-rgb, 0, 206, 209), 0.1);
+  color: var(--site-accent-color);
+  border-left: 3px solid var(--site-accent-color);
 }
 
 .message.error {
@@ -222,7 +222,7 @@
 .loading {
   text-align: center;
   padding: 20px;
-  color: #00CED1;
+  color: var(--site-accent-color);
   font-size: 16px;
 }
 
@@ -246,3 +246,5 @@
     gap: 10px;
   }
 }
+
+

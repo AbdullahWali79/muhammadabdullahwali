@@ -1,8 +1,8 @@
 .github-image-picker {
-  background: #2A3B3E;
+  background: var(--site-surface-color);
   border-radius: 12px;
   padding: 20px;
-  border: 1px solid #3A4B4E;
+  border: 1px solid var(--site-sidebar-border-color);
   margin-bottom: 20px;
 }
 
@@ -14,7 +14,7 @@
 }
 
 .github-icon {
-  color: #00CED1;
+  color: var(--site-accent-color);
   font-size: 20px;
 }
 
@@ -34,7 +34,7 @@
   max-width: 200px;
   max-height: 150px;
   border-radius: 8px;
-  border: 2px solid #3A4B4E;
+  border: 2px solid var(--site-sidebar-border-color);
   margin-bottom: 10px;
 }
 
@@ -45,8 +45,8 @@
 }
 
 .copy-btn {
-  background: #00CED1;
-  color: #1A2B2E;
+  background: var(--site-accent-color);
+  color: var(--site-bg-color);
   border: none;
   padding: 8px 16px;
   border-radius: 6px;
@@ -60,7 +60,7 @@
 }
 
 .copy-btn:hover {
-  background: #008B8B;
+  background: var(--site-accent-color);
   color: #ffffff;
   transform: translateY(-1px);
 }
@@ -72,16 +72,16 @@
 .input-group {
   display: flex;
   align-items: center;
-  background: #1A2B2E;
-  border: 2px solid #3A4B4E;
+  background: var(--site-bg-color);
+  border: 2px solid var(--site-sidebar-border-color);
   border-radius: 8px;
   overflow: hidden;
   transition: all 0.3s ease;
 }
 
 .input-group:focus-within {
-  border-color: #00CED1;
-  box-shadow: 0 0 0 3px rgba(0, 206, 209, 0.1);
+  border-color: var(--site-accent-color);
+  box-shadow: 0 0 0 3px rgba(var(--site-accent-rgb, 0, 206, 209), 0.1);
 }
 
 .input-icon {
@@ -105,8 +105,8 @@
 }
 
 .search-btn {
-  background: #00CED1;
-  color: #1A2B2E;
+  background: var(--site-accent-color);
+  color: var(--site-bg-color);
   border: none;
   padding: 12px 16px;
   cursor: pointer;
@@ -118,7 +118,7 @@
 }
 
 .search-btn:hover:not(:disabled) {
-  background: #008B8B;
+  background: var(--site-accent-color);
   color: #ffffff;
 }
 
@@ -158,23 +158,23 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: #1A2B2E;
+  background: var(--site-bg-color);
   padding: 8px 12px;
   border-radius: 6px;
-  border: 1px solid #3A4B4E;
+  border: 1px solid var(--site-sidebar-border-color);
 }
 
 .example-item code {
   flex: 1;
-  color: #B0B0B0;
+  color: var(--site-sidebar-muted-text-color);
   font-size: 11px;
   font-family: 'Courier New', monospace;
   word-break: break-all;
 }
 
 .copy-example-btn {
-  background: #3A4B4E;
-  color: #B0B0B0;
+  background: var(--site-sidebar-border-color);
+  color: var(--site-sidebar-muted-text-color);
   border: none;
   padding: 4px 8px;
   border-radius: 4px;
@@ -184,26 +184,26 @@
 }
 
 .copy-example-btn:hover {
-  background: #00CED1;
-  color: #1A2B2E;
+  background: var(--site-accent-color);
+  color: var(--site-bg-color);
 }
 
 .instructions {
-  background: #1A2B2E;
+  background: var(--site-bg-color);
   padding: 15px;
   border-radius: 8px;
-  border: 1px solid #3A4B4E;
+  border: 1px solid var(--site-sidebar-border-color);
 }
 
 .instructions h4 {
-  color: #00CED1;
+  color: var(--site-accent-color);
   font-size: 14px;
   margin-bottom: 10px;
   font-weight: 600;
 }
 
 .instructions ol {
-  color: #B0B0B0;
+  color: var(--site-sidebar-muted-text-color);
   font-size: 12px;
   margin: 0;
   padding-left: 20px;
@@ -237,3 +237,5 @@
     margin-bottom: 8px;
   }
 }
+
+

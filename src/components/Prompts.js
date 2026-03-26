@@ -57,7 +57,7 @@ const Prompts = () => {
     return (
       <div className="prompts-page">
         <div className="prompts-container">
-          <div className="loading" style={{ color: '#00CED1', textAlign: 'center', marginTop: '50px' }}>Loading...</div>
+          <div className="loading" style={{ color: 'var(--site-accent-color)', textAlign: 'center', marginTop: '50px' }}>Loading...</div>
         </div>
       </div>
     );
@@ -137,7 +137,7 @@ const Prompts = () => {
             </div>
           </>
         ) : (
-          <div style={{ textAlign: 'center', color: '#B0B0B0', marginTop: '50px' }}>
+          <div style={{ textAlign: 'center', color: 'var(--site-sidebar-muted-text-color)', marginTop: '50px' }}>
             <p>No prompts available yet. Please check back later.</p>
           </div>
         )}
@@ -147,3 +147,4 @@ const Prompts = () => {
 };
 
 export default Prompts;
+

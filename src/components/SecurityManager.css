@@ -1,6 +1,6 @@
 .security-manager {
   padding: 20px;
-  background-color: #1A2B2E;
+  background-color: var(--site-bg-color);
   min-height: 100vh;
 }
 
@@ -16,12 +16,12 @@
   text-align: center;
   margin-bottom: 40px;
   padding-bottom: 20px;
-  border-bottom: 2px solid #2A3B3E;
+  border-bottom: 2px solid var(--site-surface-color);
 }
 
 .security-icon {
   font-size: 48px;
-  color: #00CED1;
+  color: var(--site-accent-color);
   margin-bottom: 20px;
 }
 
@@ -33,7 +33,7 @@
 }
 
 .security-header p {
-  color: #B0B0B0;
+  color: var(--site-sidebar-muted-text-color);
   font-size: 16px;
   margin: 0;
 }
@@ -46,9 +46,9 @@
 }
 
 .message.success {
-  background: rgba(0, 206, 209, 0.1);
-  color: #00CED1;
-  border: 1px solid rgba(0, 206, 209, 0.3);
+  background: rgba(var(--site-accent-rgb, 0, 206, 209), 0.1);
+  color: var(--site-accent-color);
+  border: 1px solid rgba(var(--site-accent-rgb, 0, 206, 209), 0.3);
 }
 
 .message.error {
@@ -63,15 +63,15 @@
 }
 
 .security-section {
-  background: #2A3B3E;
+  background: var(--site-surface-color);
   border-radius: 12px;
   padding: 30px;
   margin-bottom: 30px;
-  border: 1px solid #3A4B4E;
+  border: 1px solid var(--site-sidebar-border-color);
 }
 
 .security-section h2 {
-  color: #00CED1;
+  color: var(--site-accent-color);
   font-size: 24px;
   margin-bottom: 25px;
   font-weight: 600;
@@ -107,16 +107,16 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: #1A2B2E;
-  border: 2px solid #3A4B4E;
+  background: var(--site-bg-color);
+  border: 2px solid var(--site-sidebar-border-color);
   border-radius: 8px;
   overflow: hidden;
   transition: all 0.3s ease;
 }
 
 .password-input-group:focus-within {
-  border-color: #00CED1;
-  box-shadow: 0 0 0 3px rgba(0, 206, 209, 0.1);
+  border-color: var(--site-accent-color);
+  box-shadow: 0 0 0 3px rgba(var(--site-accent-rgb, 0, 206, 209), 0.1);
 }
 
 .form-input {
@@ -134,8 +134,8 @@
 }
 
 .password-toggle {
-  background: #3A4B4E;
-  color: #B0B0B0;
+  background: var(--site-sidebar-border-color);
+  color: var(--site-sidebar-muted-text-color);
   border: none;
   padding: 8px 12px;
   cursor: pointer;
@@ -144,8 +144,8 @@
 }
 
 .password-toggle:hover {
-  background: #00CED1;
-  color: #1A2B2E;
+  background: var(--site-accent-color);
+  color: var(--site-bg-color);
 }
 
 .btn {
@@ -163,18 +163,18 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #00CED1, #008B8B);
+  background: linear-gradient(135deg, var(--site-accent-color), var(--site-accent-color));
   color: #ffffff;
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #008B8B, #006666);
+  background: linear-gradient(135deg, var(--site-accent-color), var(--site-accent-color));
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 206, 209, 0.3);
+  box-shadow: 0 5px 15px rgba(var(--site-accent-rgb, 0, 206, 209), 0.3);
 }
 
 .btn-secondary {
-  background: #3A4B4E;
+  background: var(--site-sidebar-border-color);
   color: #ffffff;
   border: 1px solid #5A6B6E;
 }
@@ -191,15 +191,15 @@
 }
 
 .page-password-item {
-  background: #1A2B2E;
+  background: var(--site-bg-color);
   border-radius: 8px;
   padding: 20px;
-  border: 1px solid #3A4B4E;
+  border: 1px solid var(--site-sidebar-border-color);
 }
 
 .page-password-item label {
   display: block;
-  color: #00CED1;
+  color: var(--site-accent-color);
   font-size: 16px;
   font-weight: 600;
   margin-bottom: 10px;
@@ -232,3 +232,5 @@
     justify-content: center;
   }
 }
+
+

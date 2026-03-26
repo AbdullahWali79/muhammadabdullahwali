@@ -255,8 +255,8 @@ const MakeNews = () => {
                     className="form-textarea"
                   />
                   {article.link && (
-                    <small style={{ color: '#00CED1', fontSize: '12px', marginTop: '5px', display: 'block' }}>
-                      Source: <a href={article.link} target="_blank" rel="noopener noreferrer" style={{ color: '#00CED1' }}>
+                    <small style={{ color: 'var(--site-accent-color)', fontSize: '12px', marginTop: '5px', display: 'block' }}>
+                      Source: <a href={article.link} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--site-accent-color)' }}>
                         {article.link}
                       </a>
                     </small>
@@ -284,3 +284,4 @@ const MakeNews = () => {
 };
 
 export default MakeNews;
+

@@ -453,7 +453,7 @@ const MakeService = () => {
                   className="form-textarea"
                   placeholder="Enter complete service description, details, or information that will display on the service detail page..."
                 />
-                <small style={{ color: '#B0B0B0', fontSize: '12px', marginTop: '5px', display: 'block' }}>
+                <small style={{ color: 'var(--site-sidebar-muted-text-color)', fontSize: '12px', marginTop: '5px', display: 'block' }}>
                   This full description will be displayed on the service detail page when users click on a service.
                 </small>
               </div>
@@ -643,3 +643,4 @@ const MakeService = () => {
 };
 
 export default MakeService;
+
