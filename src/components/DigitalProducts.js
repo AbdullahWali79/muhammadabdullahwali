@@ -6,6 +6,7 @@ import './DigitalProducts.css';
 
 const DigitalProducts = ({ userData }) => {
   const [activeFilter, setActiveFilter] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
   const [productsData, setProductsData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [expandedProductId, setExpandedProductId] = useState(null);
@@ -48,6 +49,11 @@ const DigitalProducts = ({ userData }) => {
     setExpandedProductId(null);
   };
 
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+    setExpandedProductId(null);
+  };
+
   const handleToggleExpand = (productId) => {
     setExpandedProductId((prev) => (prev === productId ? null : productId));
   };
@@ -71,9 +77,19 @@ const DigitalProducts = ({ userData }) => {
   const categories = allCategories.length > 1 ? allCategories : ['All'];
 
   // Filter products based on active filter
-  const filteredProducts = activeFilter === 'All' 
-    ? products 
-    : products.filter(product => product.category === activeFilter);
+  const filteredProducts = products.filter((product) => {
+    const matchesCategory = activeFilter === 'All' || product.category === activeFilter;
+    const query = searchQuery.trim().toLowerCase();
+    const matchesSearch = !query || [
+      product.title,
+      product.category,
+      product.description
+    ]
+      .filter(Boolean)
+      .some((field) => String(field).toLowerCase().includes(query));
+
+    return matchesCategory && matchesSearch;
+  });
 
   // Helper to extract YouTube embed URL
   const getYouTubeEmbedUrl = (url) => {
@@ -109,74 +125,90 @@ const DigitalProducts = ({ userData }) => {
                 </button>
               ))}
             </div>
-            
-            <div className="products-grid">
-              {filteredProducts.map((product, index) => {
-                const embedUrl = getYouTubeEmbedUrl(product.videoUrl);
-                const formattedPrice = formatCurrency(product.price, 'digital-products', '');
-                const productKey = product.id || `${product.title}-${index}`;
-                const isHot = index === 0; // The first product gets a "HOT" badge
-                const isPremiumPrice = Boolean(formattedPrice && /\d/.test(formattedPrice));
-                const isPremium = index === 1 || isPremiumPrice; // Others might get Premium
-                const isExpanded = expandedProductId === productKey;
-                
-                return (
-                <div key={productKey} className="product-card" style={{ position: 'relative' }}>
-                  {isHot && <div className="product-badge">HOT</div>}
-                  {!isHot && isPremium && <div className="product-badge premium">PREMIUM</div>}
-                  <div className="product-image">
-                    {embedUrl ? (
-                      <iframe
-                        width="100%"
-                        height="100%"
-                        src={embedUrl}
-                        title={product.title}
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-                      ></iframe>
-                    ) : product.imageUrl ? (
-                      <img 
-                        src={product.imageUrl} 
-                        alt={product.title}
-                        loading="lazy"
-                        decoding="async"
-                        className="product-img"
-                      />
-                    ) : (
-                      <div className="product-default-bg">
-                        <h3>{product.title}</h3>
-                        <p>{product.category}</p>
-                      </div>
-                    )}
-                  </div>
-                  <div className="product-content">
-                    <div className="product-category">{product.category}</div>
-                    <div className="product-header-row">
-                      <h3 className="product-title">{product.title}</h3>
-                      {product.showPrice !== false && <div className="product-price">{formattedPrice}</div>}
-                    </div>
-                    <button
-                      className="expand-btn"
-                      onClick={() => handleToggleExpand(productKey)}
-                      type="button"
-                      aria-expanded={isExpanded}
-                    >
-                      {isExpanded ? 'Hide Details' : 'View Details'}
-                    </button>
 
-                    <div className={`product-expandable ${isExpanded ? 'open' : ''}`}>
-                      <p className="product-description">{product.description}</p>
-                      <button className="buy-btn" onClick={(e) => handleBuyClick(product, e)}>
-                        <FaWhatsapp className="btn-icon" /> Buy Now
+            <div className="products-search-wrap">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={handleSearchChange}
+                placeholder="Search products by title, category, or description..."
+                className="products-search-input"
+              />
+            </div>
+            
+            {filteredProducts.length > 0 ? (
+              <div className="products-grid">
+                {filteredProducts.map((product, index) => {
+                  const embedUrl = getYouTubeEmbedUrl(product.videoUrl);
+                  const formattedPrice = formatCurrency(product.price, 'digital-products', '');
+                  const productKey = product.id || `${product.title}-${index}`;
+                  const isHot = index === 0; // The first product gets a "HOT" badge
+                  const isPremiumPrice = Boolean(formattedPrice && /\d/.test(formattedPrice));
+                  const isPremium = index === 1 || isPremiumPrice; // Others might get Premium
+                  const isExpanded = expandedProductId === productKey;
+                  
+                  return (
+                  <div key={productKey} className="product-card" style={{ position: 'relative' }}>
+                    {isHot && <div className="product-badge">HOT</div>}
+                    {!isHot && isPremium && <div className="product-badge premium">PREMIUM</div>}
+                    <div className="product-image">
+                      {embedUrl ? (
+                        <iframe
+                          width="100%"
+                          height="100%"
+                          src={embedUrl}
+                          title={product.title}
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                        ></iframe>
+                      ) : product.imageUrl ? (
+                        <img 
+                          src={product.imageUrl} 
+                          alt={product.title}
+                          loading="lazy"
+                          decoding="async"
+                          className="product-img"
+                        />
+                      ) : (
+                        <div className="product-default-bg">
+                          <h3>{product.title}</h3>
+                          <p>{product.category}</p>
+                        </div>
+                      )}
+                    </div>
+                    <div className="product-content">
+                      <div className="product-category">{product.category}</div>
+                      <div className="product-header-row">
+                        <h3 className="product-title">{product.title}</h3>
+                        {product.showPrice !== false && <div className="product-price">{formattedPrice}</div>}
+                      </div>
+                      <button
+                        className="expand-btn"
+                        onClick={() => handleToggleExpand(productKey)}
+                        type="button"
+                        aria-expanded={isExpanded}
+                      >
+                        {isExpanded ? 'Hide Details' : 'View Details'}
                       </button>
+
+                      <div className={`product-expandable ${isExpanded ? 'open' : ''}`}>
+                        <p className="product-description">{product.description}</p>
+                        <button className="buy-btn" onClick={(e) => handleBuyClick(product, e)}>
+                          <FaWhatsapp className="btn-icon" /> Buy Now
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="products-no-results">
+                No products found for "{searchQuery.trim()}".
+              </div>
+            )}
           </>
         ) : (
           <div style={{ textAlign: 'center', color: 'var(--site-sidebar-muted-text-color)', marginTop: '50px' }}>
