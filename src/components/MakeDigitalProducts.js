@@ -21,6 +21,7 @@ const MakeDigitalProducts = () => {
     description: '',
     price: '',
     showPrice: true,
+    displayMode: 'image',
     imageUrl: '',
     videoUrl: '',
     sourceUrl: ''
@@ -146,6 +147,7 @@ const MakeDigitalProducts = () => {
       description: '',
       price: '',
       showPrice: true,
+      displayMode: 'image',
       imageUrl: '',
       videoUrl: '',
       sourceUrl: ''
@@ -181,6 +183,7 @@ const MakeDigitalProducts = () => {
       description: '',
       price: '',
       showPrice: true,
+      displayMode: 'image',
       imageUrl: '',
       videoUrl: '',
       sourceUrl: ''
@@ -200,6 +203,7 @@ const MakeDigitalProducts = () => {
       description: p.description || '',
       price: p.price || '',
       showPrice: p.showPrice !== false,
+      displayMode: p.displayMode || 'image',
       imageUrl: p.imageUrl || '',
       videoUrl: p.videoUrl || '',
       sourceUrl: p.sourceUrl || ''
@@ -227,6 +231,7 @@ const MakeDigitalProducts = () => {
       description: '',
       price: '',
       showPrice: true,
+      displayMode: 'image',
       imageUrl: '',
       videoUrl: '',
       sourceUrl: ''
@@ -422,6 +427,25 @@ const MakeDigitalProducts = () => {
                     </div>
                   </div>
 
+                  <div className="form-row">
+                    <div className="form-group half-width">
+                      <label htmlFor="productDisplayMode">Card Display Mode</label>
+                      <select
+                        id="productDisplayMode"
+                        name="displayMode"
+                        value={newProduct.displayMode || 'image'}
+                        onChange={handleProductChange}
+                        className="form-control form-select"
+                      >
+                        <option value="image">Image (if URL exists)</option>
+                        <option value="text">Text Only</option>
+                      </select>
+                      <small style={{ color: '#aaa' }}>
+                        Text mode selected ho to card image/video ke bajaye default text block show karega.
+                      </small>
+                    </div>
+                  </div>
+
                   <div className="form-group">
                     <label htmlFor="productImageUrl">Image URL (Optional)</label>
                     <input
@@ -508,6 +532,7 @@ const MakeDigitalProducts = () => {
                     </div>
                     <div className="item-details">
                       <p><strong>Price:</strong> {formatCurrency(product.price, 'digital-products')}</p>
+                      <p><strong>Display:</strong> {product.displayMode === 'text' ? 'Text' : 'Image'}</p>
                       <p className="item-desc">{product.description && product.description.substring(0, 100)}...</p>
                     </div>
                   </div>

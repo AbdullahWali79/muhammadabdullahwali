@@ -10,6 +10,7 @@ const DigitalProducts = ({ userData }) => {
   const [productsData, setProductsData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [expandedProductId, setExpandedProductId] = useState(null);
+  const [brokenImages, setBrokenImages] = useState({});
 
   useEffect(() => {
     const loadProductsData = async () => {
@@ -56,6 +57,10 @@ const DigitalProducts = ({ userData }) => {
 
   const handleToggleExpand = (productId) => {
     setExpandedProductId((prev) => (prev === productId ? null : productId));
+  };
+
+  const handleImageError = (productKey) => {
+    setBrokenImages((prev) => ({ ...prev, [productKey]: true }));
   };
 
   if (loading) {
@@ -142,6 +147,11 @@ const DigitalProducts = ({ userData }) => {
                   const embedUrl = getYouTubeEmbedUrl(product.videoUrl);
                   const formattedPrice = formatCurrency(product.price, 'digital-products', '');
                   const productKey = product.id || `${product.title}-${index}`;
+                  const showVisualMedia = product.displayMode !== 'text';
+                  const shouldShowImage =
+                    showVisualMedia &&
+                    Boolean(product.imageUrl) &&
+                    !brokenImages[productKey];
                   const isHot = index === 0; // The first product gets a "HOT" badge
                   const isPremiumPrice = Boolean(formattedPrice && /\d/.test(formattedPrice));
                   const isPremium = index === 1 || isPremiumPrice; // Others might get Premium
@@ -151,9 +161,9 @@ const DigitalProducts = ({ userData }) => {
                   <div key={productKey} className="product-card" style={{ position: 'relative' }}>
                     {isHot && <div className="product-badge">HOT</div>}
                     {!isHot && isPremium && <div className="product-badge premium">PREMIUM</div>}
-                    <div className="product-image">
-                      {embedUrl ? (
-                        <iframe
+                  <div className="product-image">
+                    {showVisualMedia && embedUrl ? (
+                      <iframe
                           width="100%"
                           height="100%"
                           src={embedUrl}
@@ -163,15 +173,16 @@ const DigitalProducts = ({ userData }) => {
                           allowFullScreen
                           style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
                         ></iframe>
-                      ) : product.imageUrl ? (
-                        <img 
-                          src={product.imageUrl} 
-                          alt={product.title}
-                          loading="lazy"
-                          decoding="async"
-                          className="product-img"
-                        />
-                      ) : (
+                    ) : shouldShowImage ? (
+                      <img 
+                        src={product.imageUrl} 
+                        alt={product.title}
+                        loading="lazy"
+                        decoding="async"
+                        onError={() => handleImageError(productKey)}
+                        className="product-img"
+                      />
+                    ) : (
                         <div className="product-default-bg">
                           <h3>{product.title}</h3>
                           <p>{product.category}</p>

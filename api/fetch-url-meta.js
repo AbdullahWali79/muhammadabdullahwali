@@ -65,15 +65,6 @@ const hostnameToTitle = (hostname = '') => {
     .join(' ');
 };
 
-const buildFallbackImageUrl = (pageUrl) => {
-  try {
-    const host = new URL(pageUrl).hostname;
-    return `https://logo.clearbit.com/${host}`;
-  } catch (e) {
-    return '';
-  }
-};
-
 const extractImageUrl = (html, pageUrl) => {
   let image = parseMetaTag(html, ['og:image', 'og:image:secure_url', 'twitter:image', 'image_src'], 'image');
   if (image) {
@@ -168,10 +159,8 @@ module.exports = async (req, res) => {
   }
 
   if (!image) {
-    image = buildFallbackImageUrl(url);
-    if (image) {
-      partial = true;
-    }
+    image = '';
+    partial = true;
   }
 
   return res.status(200).json({
