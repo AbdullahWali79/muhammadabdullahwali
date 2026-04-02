@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { getDigitalProductsData, saveDigitalProductsData } from '../services/supabaseService';
 import { formatCurrency } from '../utils/currency';
 import './MakePrompts.css'; // We can reuse the styling from MakePrompts for simplicity
@@ -28,6 +28,16 @@ const MakeDigitalProducts = () => {
 
   const [editingIndex, setEditingIndex] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const existingCategories = useMemo(
+    () =>
+      [...new Set((data.products || []).map((product) => String(product.category || '').trim()).filter(Boolean))],
+    [data.products]
+  );
+  const categorySelectValue = !newProduct.category
+    ? ''
+    : existingCategories.includes(newProduct.category)
+      ? newProduct.category
+      : '__custom__';
 
   const toggleFullscreen = () => {
     setIsFullscreen(prev => !prev);
@@ -60,6 +70,22 @@ const MakeDigitalProducts = () => {
   const handleProductChange = (e) => {
     const { name, value, type, checked } = e.target;
     setNewProduct(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+  };
+
+  const handleCategorySelectChange = (e) => {
+    const { value } = e.target;
+    if (value === '__custom__') {
+      setNewProduct((prev) => ({
+        ...prev,
+        category: existingCategories.includes(prev.category) ? '' : prev.category
+      }));
+      return;
+    }
+
+    setNewProduct((prev) => ({
+      ...prev,
+      category: value
+    }));
   };
 
   const fetchProductMetadata = async (url) => {
@@ -333,15 +359,31 @@ const MakeDigitalProducts = () => {
                   <div className="form-row">
                     <div className="form-group half-width">
                       <label htmlFor="productCategory">Category</label>
-                      <input
-                        type="text"
+                      <select
                         id="productCategory"
-                        name="category"
-                        value={newProduct.category}
-                        onChange={handleProductChange}
-                        placeholder="e.g. Marketing, Code, etc."
-                        className="form-control"
-                      />
+                        value={categorySelectValue}
+                        onChange={handleCategorySelectChange}
+                        className="form-control form-select"
+                      >
+                        <option value="">Select category</option>
+                        {existingCategories.map((category) => (
+                          <option key={category} value={category}>
+                            {category}
+                          </option>
+                        ))}
+                        <option value="__custom__">+ Add New Category</option>
+                      </select>
+                      {categorySelectValue === '__custom__' && (
+                        <input
+                          type="text"
+                          name="category"
+                          value={newProduct.category}
+                          onChange={handleProductChange}
+                          placeholder="Type new category"
+                          className="form-control"
+                          style={{ marginTop: '10px' }}
+                        />
+                      )}
                     </div>
                     <div className="form-group half-width" style={{display: 'flex', flexDirection: 'column'}}>
                       <label htmlFor="productPrice">Price</label>
