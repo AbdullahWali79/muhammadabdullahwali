@@ -28,16 +28,13 @@ const MakeDigitalProducts = () => {
 
   const [editingIndex, setEditingIndex] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isCustomCategory, setIsCustomCategory] = useState(false);
   const existingCategories = useMemo(
     () =>
       [...new Set((data.products || []).map((product) => String(product.category || '').trim()).filter(Boolean))],
     [data.products]
   );
-  const categorySelectValue = !newProduct.category
-    ? ''
-    : existingCategories.includes(newProduct.category)
-      ? newProduct.category
-      : '__custom__';
+  const categorySelectValue = isCustomCategory ? '__custom__' : (newProduct.category || '');
 
   const toggleFullscreen = () => {
     setIsFullscreen(prev => !prev);
@@ -75,6 +72,7 @@ const MakeDigitalProducts = () => {
   const handleCategorySelectChange = (e) => {
     const { value } = e.target;
     if (value === '__custom__') {
+      setIsCustomCategory(true);
       setNewProduct((prev) => ({
         ...prev,
         category: existingCategories.includes(prev.category) ? '' : prev.category
@@ -82,6 +80,7 @@ const MakeDigitalProducts = () => {
       return;
     }
 
+    setIsCustomCategory(false);
     setNewProduct((prev) => ({
       ...prev,
       category: value
@@ -143,6 +142,7 @@ const MakeDigitalProducts = () => {
       videoUrl: '',
       sourceUrl: ''
     });
+    setIsCustomCategory(false);
     setIsAddingProduct(false);
     setIsFullscreen(false);
     setMessage({ type: 'success', text: 'Product added locally. Don\'t forget to save!' });
@@ -177,6 +177,7 @@ const MakeDigitalProducts = () => {
       videoUrl: '',
       sourceUrl: ''
     });
+    setIsCustomCategory(false);
     setEditingIndex(null);
     setIsAddingProduct(false);
     setIsFullscreen(false);
@@ -195,6 +196,7 @@ const MakeDigitalProducts = () => {
       videoUrl: p.videoUrl || '',
       sourceUrl: p.sourceUrl || ''
     });
+    setIsCustomCategory(false);
     setEditingIndex(index);
     setIsAddingProduct(true);
   };
@@ -221,6 +223,7 @@ const MakeDigitalProducts = () => {
       videoUrl: '',
       sourceUrl: ''
     });
+    setIsCustomCategory(false);
   };
 
   const handleSubmit = async (e) => {
@@ -373,7 +376,7 @@ const MakeDigitalProducts = () => {
                         ))}
                         <option value="__custom__">+ Add New Category</option>
                       </select>
-                      {categorySelectValue === '__custom__' && (
+                      {isCustomCategory && (
                         <input
                           type="text"
                           name="category"
