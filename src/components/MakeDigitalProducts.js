@@ -101,6 +101,9 @@ const MakeDigitalProducts = () => {
       }
 
       const meta = await response.json();
+      if (!meta.success) {
+        throw new Error(meta.message || 'Metadata fetch failed');
+      }
       const updated = {
         ...newProduct,
         title: meta.title || newProduct.title,
@@ -109,7 +112,12 @@ const MakeDigitalProducts = () => {
         sourceUrl: url
       };
       setNewProduct(updated);
-      setMessage({ type: 'success', text: 'Metadata loaded. Review and save the product!' });
+      setMessage({
+        type: 'success',
+        text: meta.partial
+          ? 'Basic metadata loaded. Some websites block full preview, so fallback data was used.'
+          : 'Metadata loaded. Review and save the product!'
+      });
     } catch (error) {
       console.error('URL metadata fetch error', error);
       setMessage({ type: 'error', text: 'Could not fetch metadata from the URL. Please enter manually.' });

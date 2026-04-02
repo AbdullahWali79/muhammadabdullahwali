@@ -27,25 +27,67 @@ const parseMetaTag = (html, attributeNames = [], name) => {
   return '';
 };
 
-const extractImageUrl = (html, pageUrl) => {
-  let image = parseMetaTag(html, ['og:image', 'twitter:image', 'image_src'], 'image');
-  if (image) {
-    try {
-      const resolved = new URL(image, pageUrl).href;
-      return resolved;
-    } catch (e) {
-      return image;
+const parseLinkTag = (html, relNames = []) => {
+  for (const relName of relNames) {
+    const regex = new RegExp(`<link[^>]+rel\\s*=\\s*['\"][^'\"]*${relName}[^'\"]*['\"][^>]*href\\s*=\\s*['\"]([^'\"]+)['\"][^>]*>`, 'i');
+    const match = html.match(regex);
+    if (match && match[1]) {
+      return match[1].trim();
     }
+
+    // Support href before rel
+    const regexAlt = new RegExp(`<link[^>]+href\\s*=\\s*['\"]([^'\"]+)['\"][^>]*rel\\s*=\\s*['\"][^'\"]*${relName}[^'\"]*['\"][^>]*>`, 'i');
+    const matchAlt = html.match(regexAlt);
+    if (matchAlt && matchAlt[1]) {
+      return matchAlt[1].trim();
+    }
+  }
+
+  return '';
+};
+
+const resolveUrl = (input, pageUrl) => {
+  if (!input) return '';
+  try {
+    return new URL(input, pageUrl).href;
+  } catch (e) {
+    return input;
+  }
+};
+
+const hostnameToTitle = (hostname = '') => {
+  const cleanHost = String(hostname).replace(/^www\./i, '');
+  const firstPart = cleanHost.split('.')[0] || cleanHost;
+  return firstPart
+    .split(/[-_]+/)
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
+
+const buildFallbackImageUrl = (pageUrl) => {
+  try {
+    const host = new URL(pageUrl).hostname;
+    return `https://logo.clearbit.com/${host}`;
+  } catch (e) {
+    return '';
+  }
+};
+
+const extractImageUrl = (html, pageUrl) => {
+  let image = parseMetaTag(html, ['og:image', 'og:image:secure_url', 'twitter:image', 'image_src'], 'image');
+  if (image) {
+    return resolveUrl(image, pageUrl);
+  }
+
+  const icon = parseLinkTag(html, ['apple-touch-icon', 'icon', 'shortcut icon']);
+  if (icon) {
+    return resolveUrl(icon, pageUrl);
   }
 
   const imgMatch = html.match(/<img[^>]+src=['\"]([^'\"]+)['\"][^>]*>/i);
   if (imgMatch && imgMatch[1]) {
-    try {
-      const resolved = new URL(imgMatch[1], pageUrl).href;
-      return resolved;
-    } catch (e) {
-      return imgMatch[1];
-    }
+    return resolveUrl(imgMatch[1], pageUrl);
   }
 
   return '';
@@ -58,41 +100,87 @@ module.exports = async (req, res) => {
     return res.status(400).json({ success: false, message: 'Invalid URL provided.' });
   }
 
+  let response;
+  let html = '';
+  let partial = false;
+  let message = '';
+
   try {
-    const response = await fetch(url, {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+
+    response = await fetch(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; DigitalProductsMetadataBot/1.0; +https://github.com/)',
-        'Accept': 'text/html'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache'
       },
       redirect: 'follow',
-      timeout: 15000
+      signal: controller.signal
     });
 
-    if (!response.ok) {
-      return res.status(502).json({ success: false, message: `Unable to fetch the URL: ${response.statusText}` });
+    clearTimeout(timeout);
+
+    if (response.ok) {
+      html = await response.text();
+    } else {
+      partial = true;
+      message = `Remote site blocked metadata fetch with status ${response.status}.`;
     }
+  } catch (error) {
+    partial = true;
+    message = `Metadata fetch fallback used: ${error.message}`;
+    console.error('fetch-url-meta error:', error);
+  }
 
-    const html = await response.text();
+  let title = '';
+  let description = '';
+  let image = '';
 
-    let title = parseMetaTag(html, ['og:title', 'twitter:title'], null);
+  if (html) {
+    title = parseMetaTag(html, ['og:title', 'twitter:title'], null);
     if (!title) {
       const titleMatch = html.match(/<title>([^<]+)<\/title>/i);
       title = titleMatch ? titleMatch[1].trim() : '';
     }
 
-    let description = parseMetaTag(html, ['og:description', 'twitter:description'], 'description');
-
-    const image = extractImageUrl(html, url);
-
-    return res.status(200).json({
-      success: true,
-      url,
-      title: title || '',
-      description: description || '',
-      image: image || ''
-    });
-  } catch (error) {
-    console.error('fetch-url-meta error:', error);
-    return res.status(500).json({ success: false, message: 'Failed to fetch meta from URL.', error: error.message });
+    description = parseMetaTag(html, ['og:description', 'twitter:description'], 'description');
+    image = extractImageUrl(html, url);
   }
+
+  let hostTitle = '';
+  try {
+    hostTitle = hostnameToTitle(new URL(url).hostname);
+  } catch (e) {
+    hostTitle = '';
+  }
+
+  if (!title) {
+    title = hostTitle || 'Untitled Product';
+    partial = true;
+  }
+
+  if (!description) {
+    description = `Official page for ${hostTitle || 'this product'}.`;
+    partial = true;
+  }
+
+  if (!image) {
+    image = buildFallbackImageUrl(url);
+    if (image) {
+      partial = true;
+    }
+  }
+
+  return res.status(200).json({
+    success: true,
+    url,
+    title: title || '',
+    description: description || '',
+    image: image || '',
+    partial,
+    message
+  });
 };
