@@ -1,19 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FaDownload, FaEnvelope, FaPalette, FaUndo } from 'react-icons/fa';
+import { FaDownload, FaEnvelope, FaPalette } from 'react-icons/fa';
 import { generatePDF } from '../utils/pdfGenerator';
 import { getPortfolioData, getAboutData } from '../services/supabaseService';
 import { THEME_PRESETS, applyThemeSettings, getSiteSettings } from '../utils/siteSettings';
 import './Home.css';
 
+const QURAN_AYAH_API =
+  'https://api.alquran.cloud/v1/ayah/2:255/editions/quran-uthmani,en.asad';
+
+const FALLBACK_AYAH = {
+  arabic: 'اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ',
+  translation: 'Allah, there is no god but He, the Living, the Self-Subsisting Eternal.',
+  reference: 'Quran 2:255'
+};
+
 const Home = ({ userData }) => {
-  const navigate = useNavigate();
   const [isGenerating, setIsGenerating] = useState(false);
   const [displayedText, setDisplayedText] = useState('');
   const [isTyping, setIsTyping] = useState(true);
   const [localUserData, setLocalUserData] = useState(userData);
   const [temporaryThemeKey, setTemporaryThemeKey] = useState('');
   const [baseThemeSettings] = useState(() => getSiteSettings());
+  const [dailyAyah, setDailyAyah] = useState(FALLBACK_AYAH);
+  const [isAyahLoading, setIsAyahLoading] = useState(true);
+  const [ayahFallbackUsed, setAyahFallbackUsed] = useState(false);
 
   const handleDownloadCV = async () => {
     setIsGenerating(true);
@@ -71,6 +81,75 @@ const Home = ({ userData }) => {
     applyThemeSettings(baseThemeSettings);
     setTemporaryThemeKey('');
   };
+
+  const handleTemporaryThemeSelectChange = (event) => {
+    const selectedPresetKey = event.target.value;
+    if (!selectedPresetKey) {
+      handleTemporaryThemeReset();
+      return;
+    }
+    handleTemporaryThemeApply(selectedPresetKey);
+  };
+
+  useEffect(() => {
+    let mounted = true;
+
+    const loadAyah = async () => {
+      setIsAyahLoading(true);
+      setAyahFallbackUsed(false);
+
+      try {
+        const response = await fetch(QURAN_AYAH_API, {
+          headers: {
+            Accept: 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`Quran API request failed with status ${response.status}`);
+        }
+
+        const payload = await response.json();
+        const editions = Array.isArray(payload?.data) ? payload.data : [];
+        const arabicEdition = editions.find((item) => item?.edition?.language === 'ar');
+        const englishEdition = editions.find((item) => item?.edition?.language === 'en');
+        const selectedEdition = arabicEdition || editions[0];
+
+        const arabic = arabicEdition?.text?.trim();
+        const translation = englishEdition?.text?.trim();
+        const surahName = selectedEdition?.surah?.englishName || 'Quran';
+        const ayahNumber = selectedEdition?.numberInSurah || 255;
+
+        if (!arabic || !translation) {
+          throw new Error('Arabic or translation text missing in Quran API response');
+        }
+
+        if (mounted) {
+          setDailyAyah({
+            arabic,
+            translation,
+            reference: `${surahName} ${ayahNumber}`
+          });
+        }
+      } catch (error) {
+        console.error('Error loading Quran ayah:', error);
+        if (mounted) {
+          setDailyAyah(FALLBACK_AYAH);
+          setAyahFallbackUsed(true);
+        }
+      } finally {
+        if (mounted) {
+          setIsAyahLoading(false);
+        }
+      }
+    };
+
+    loadAyah();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   // Load social links from localStorage on mount and when storage changes
   useEffect(() => {
@@ -147,28 +226,40 @@ const Home = ({ userData }) => {
       <div className="home-container">
         <div className="hero-section">
           <div className="theme-preview-switcher">
-            <div className="theme-preview-header">
-              <FaPalette />
-              <span>Try Theme (Temporary)</span>
-            </div>
-            <div className="theme-preview-buttons">
-              {Object.entries(THEME_PRESETS).map(([presetKey, preset]) => (
-                <button
-                  key={presetKey}
-                  type="button"
-                  className={`theme-preview-btn ${temporaryThemeKey === presetKey ? 'active' : ''}`}
-                  onClick={() => handleTemporaryThemeApply(presetKey)}
+            <div className="theme-preview-row">
+              <div className="theme-preview-control">
+                <div className="theme-preview-header">
+                  <FaPalette />
+                  <span>Try Theme (Temporary)</span>
+                </div>
+                <select
+                  className="theme-preview-select"
+                  value={temporaryThemeKey}
+                  onChange={handleTemporaryThemeSelectChange}
+                  aria-label="Theme preview selector"
                 >
-                  {preset.label}
-                </button>
-              ))}
-              <button
-                type="button"
-                className="theme-preview-btn reset"
-                onClick={handleTemporaryThemeReset}
-              >
-                <FaUndo /> Default
-              </button>
+                  <option value="">Default (Saved)</option>
+                  {Object.entries(THEME_PRESETS).map(([presetKey, preset]) => (
+                    <option key={presetKey} value={presetKey}>
+                      {preset.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="ayah-preview-card">
+                <span className="ayah-label">Quran Reflection</span>
+                <p className="ayah-arabic" dir="rtl" lang="ar">
+                  {dailyAyah.arabic}
+                </p>
+                <p className="ayah-translation">
+                  {isAyahLoading ? 'Loading Arabic + translation...' : dailyAyah.translation}
+                </p>
+                <span className="ayah-reference">{dailyAyah.reference}</span>
+                {ayahFallbackUsed && (
+                  <span className="ayah-fallback-note">Fallback text shown (API unavailable).</span>
+                )}
+              </div>
             </div>
           </div>
 

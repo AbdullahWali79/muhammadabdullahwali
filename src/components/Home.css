@@ -24,6 +24,19 @@
   margin-bottom: 18px;
 }
 
+.theme-preview-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 320px) 1fr;
+  gap: 14px;
+  align-items: stretch;
+}
+
+.theme-preview-control {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .theme-preview-header {
   display: flex;
   align-items: center;
@@ -34,40 +47,66 @@
   margin-bottom: 10px;
 }
 
-.theme-preview-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  row-gap: 10px;
-}
-
-.theme-preview-btn {
+.theme-preview-select {
+  width: 100%;
   border: 1px solid rgba(var(--site-accent-rgb, 0, 206, 209), 0.35);
-  background: transparent;
+  background: var(--site-surface-color);
   color: var(--site-text-color);
-  border-radius: 999px;
-  padding: 7px 12px;
-  font-size: 12px;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 13px;
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.22s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
 }
 
-.theme-preview-btn:hover {
+.theme-preview-select:focus {
+  outline: 2px solid rgba(var(--site-accent-rgb, 0, 206, 209), 0.5);
+  outline-offset: 1px;
   border-color: var(--site-accent-color);
-  transform: translateY(-1px);
 }
 
-.theme-preview-btn.active {
-  background: var(--site-accent-color);
-  color: var(--site-sidebar-bg-color);
+.ayah-preview-card {
+  border: 1px solid rgba(var(--site-accent-rgb, 0, 206, 209), 0.22);
+  background: rgba(0, 0, 0, 0.16);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
 }
 
-.theme-preview-btn.reset {
-  border-color: rgba(255, 255, 255, 0.24);
+.ayah-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--site-accent-color);
+}
+
+.ayah-arabic {
+  margin: 0;
+  font-size: 21px;
+  line-height: 1.65;
+  color: var(--site-text-color);
+  text-align: right;
+}
+
+.ayah-translation {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--site-sidebar-muted-text-color);
+}
+
+.ayah-reference {
+  font-size: 12px;
+  color: var(--site-accent-color);
+  font-weight: 600;
+}
+
+.ayah-fallback-note {
+  font-size: 11px;
+  color: var(--site-sidebar-muted-text-color);
 }
 
 .hello-badge {
@@ -202,13 +241,26 @@
     padding: 12px;
   }
 
-  .theme-preview-buttons {
-    gap: 7px;
+  .theme-preview-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
 
-  .theme-preview-btn {
-    font-size: 11px;
-    padding: 7px 10px;
+  .theme-preview-select {
+    font-size: 12px;
+    padding: 9px 10px;
+  }
+
+  .ayah-preview-card {
+    padding: 10px 11px;
+  }
+
+  .ayah-arabic {
+    font-size: 18px;
+  }
+
+  .ayah-translation {
+    font-size: 13px;
   }
 
   .hero-summary {
