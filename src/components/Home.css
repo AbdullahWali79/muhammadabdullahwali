@@ -27,8 +27,8 @@
 .theme-preview-row {
   display: grid;
   grid-template-columns: minmax(220px, 320px) 1fr;
-  gap: 14px;
-  align-items: stretch;
+  gap: 18px;
+  align-items: start;
 }
 
 .theme-preview-control {
@@ -71,8 +71,18 @@
   padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 8px;
+  justify-content: flex-start;
+  gap: 10px;
+  width: 100%;
+  max-width: 760px;
+  margin-left: auto;
+}
+
+.ayah-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 20px;
 }
 
 .ayah-label {
@@ -83,10 +93,18 @@
   color: var(--site-accent-color);
 }
 
+.ayah-content-wrap {
+  width: min(100%, 560px);
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .ayah-one-line {
   margin: 0;
-  font-size: 17px;
-  line-height: 1.45;
+  font-size: 19px;
+  line-height: 1.5;
   color: var(--site-text-color);
   text-align: right;
   white-space: nowrap;
@@ -96,6 +114,7 @@
 
 .ayah-urdu-line {
   font-size: 14px;
+  line-height: 1.45;
   color: var(--site-sidebar-muted-text-color);
 }
 
@@ -243,6 +262,13 @@
 
   .ayah-preview-card {
     padding: 10px 11px;
+    max-width: 100%;
+    margin-left: 0;
+  }
+
+  .ayah-content-wrap {
+    width: 100%;
+    margin-left: 0;
   }
 
   .ayah-one-line {

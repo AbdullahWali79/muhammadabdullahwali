@@ -221,13 +221,17 @@ const Home = ({ userData }) => {
               </div>
 
               <div className="ayah-preview-card">
-                <span className="ayah-label">Quran Reflection</span>
-                <p className="ayah-one-line" dir="rtl" lang="ar">
-                  {isAyahLoading ? '...' : dailyAyah.arabic}
-                </p>
-                <p className="ayah-one-line ayah-urdu-line" dir="rtl" lang="ur">
-                  {isAyahLoading ? '...' : dailyAyah.urdu}
-                </p>
+                <div className="ayah-card-header">
+                  <span className="ayah-label">Quran Reflection</span>
+                </div>
+                <div className="ayah-content-wrap">
+                  <p className="ayah-one-line" dir="rtl" lang="ar">
+                    {isAyahLoading ? '...' : dailyAyah.arabic}
+                  </p>
+                  <p className="ayah-one-line ayah-urdu-line" dir="rtl" lang="ur">
+                    {isAyahLoading ? '...' : dailyAyah.urdu}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
