@@ -5,15 +5,51 @@ import { getPortfolioData, getAboutData } from '../services/supabaseService';
 import { THEME_PRESETS, applyThemeSettings, getSiteSettings } from '../utils/siteSettings';
 import './Home.css';
 
-const QURAN_AYAH_API =
-  'https://api.alquran.cloud/v1/ayah/97:1/editions/quran-uthmani,ur.jalandhry';
+const AYAH_ROTATION_MS = 5000;
+const AYAH_REFERENCES = ['97:1', '94:6', '93:5', '65:3'];
+const AYAH_EDITIONS = 'quran-uthmani,ur.jalandhry';
 
-const FALLBACK_AYAH = {
-  arabic: 'إِنَّا أَنْزَلْنَاهُ فِي لَيْلَةِ الْقَدْرِ',
-  urdu: 'بے شک ہم نے اسے شب قدر میں نازل کیا۔'
+const FALLBACK_AYAHS = [
+  {
+    arabic: 'إِنَّ مَعَ الْعُسْرِ يُسْرًا',
+    urdu: 'بے شک تنگی کے ساتھ آسانی ہے۔'
+  },
+  {
+    arabic: 'فَاذْكُرُونِي أَذْكُرْكُمْ',
+    urdu: 'پس تم مجھے یاد کرو، میں تمہیں یاد کروں گا۔'
+  },
+  {
+    arabic: 'وَرَبَّكَ فَكَبِّرْ',
+    urdu: 'اور اپنے رب کی بڑائی بیان کرو۔'
+  }
+];
+
+const getAyahApiUrl = (reference) =>
+  `https://api.alquran.cloud/v1/ayah/${reference}/editions/${AYAH_EDITIONS}`;
+
+const trimArabicLetters = (text = '', maxLetters = 20) => {
+  const normalized = text.replace(/\s+/g, ' ').trim();
+  if (!normalized) {
+    return '';
+  }
+
+  let result = '';
+  let letters = 0;
+
+  for (const char of normalized) {
+    if (/\s/u.test(char)) {
+      result += char;
+      continue;
+    }
+    if (letters >= maxLetters) {
+      break;
+    }
+    result += char;
+    letters += 1;
+  }
+
+  return result.trim();
 };
-
-const trimArabicWords = (text = '') => text.split(/\s+/).filter(Boolean).slice(0, 30).join(' ').trim();
 
 const Home = ({ userData }) => {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -22,8 +58,11 @@ const Home = ({ userData }) => {
   const [localUserData, setLocalUserData] = useState(userData);
   const [temporaryThemeKey, setTemporaryThemeKey] = useState('');
   const [baseThemeSettings] = useState(() => getSiteSettings());
-  const [dailyAyah, setDailyAyah] = useState(FALLBACK_AYAH);
+  const [ayahItems, setAyahItems] = useState(FALLBACK_AYAHS);
+  const [currentAyahIndex, setCurrentAyahIndex] = useState(0);
   const [isAyahLoading, setIsAyahLoading] = useState(true);
+
+  const dailyAyah = ayahItems[currentAyahIndex] || FALLBACK_AYAHS[0];
 
   const handleDownloadCV = async () => {
     setIsGenerating(true);
@@ -42,8 +81,7 @@ const Home = ({ userData }) => {
   };
 
   const handleContactMe = () => {
-    const whatsappUrl = 'https://wa.me/923046983794';
-    window.open(whatsappUrl, '_blank');
+    window.open('https://wa.me/923046983794', '_blank');
   };
 
   const handleTemporaryThemeApply = (presetKey) => {
@@ -85,38 +123,50 @@ const Home = ({ userData }) => {
   useEffect(() => {
     let mounted = true;
 
-    const loadAyah = async () => {
+    const loadAyahs = async () => {
       setIsAyahLoading(true);
       try {
-        const response = await fetch(QURAN_AYAH_API, {
-          headers: {
-            Accept: 'application/json'
-          }
-        });
+        const responses = await Promise.allSettled(
+          AYAH_REFERENCES.map(async (reference) => {
+            const response = await fetch(getAyahApiUrl(reference), {
+              headers: {
+                Accept: 'application/json'
+              }
+            });
 
-        if (!response.ok) {
-          throw new Error(`Quran API request failed with status ${response.status}`);
-        }
+            if (!response.ok) {
+              throw new Error(`Quran API failed for ${reference}`);
+            }
 
-        const payload = await response.json();
-        const editions = Array.isArray(payload?.data) ? payload.data : [];
-        const arabicEdition = editions.find((item) => item?.edition?.language === 'ar');
-        const urduEdition = editions.find((item) => item?.edition?.language === 'ur');
+            const payload = await response.json();
+            const editions = Array.isArray(payload?.data) ? payload.data : [];
+            const arabicEdition = editions.find((item) => item?.edition?.language === 'ar');
+            const urduEdition = editions.find((item) => item?.edition?.language === 'ur');
 
-        const arabic = trimArabicWords(arabicEdition?.text?.trim() || '');
-        const urdu = urduEdition?.text?.trim() || '';
+            const arabic = trimArabicLetters(arabicEdition?.text?.trim() || '');
+            const urdu = urduEdition?.text?.trim() || '';
 
-        if (!arabic || !urdu) {
-          throw new Error('Arabic or Urdu text missing in Quran API response');
-        }
+            if (!arabic || !urdu) {
+              throw new Error(`Invalid ayah payload for ${reference}`);
+            }
+
+            return { arabic, urdu };
+          })
+        );
+
+        const loadedAyahs = responses
+          .filter((result) => result.status === 'fulfilled')
+          .map((result) => result.value);
 
         if (mounted) {
-          setDailyAyah({ arabic, urdu });
+          setAyahItems(loadedAyahs.length > 0 ? loadedAyahs : FALLBACK_AYAHS);
+          setCurrentAyahIndex(0);
         }
       } catch (error) {
-        console.error('Error loading Quran ayah:', error);
+        console.error('Error loading Quran ayahs:', error);
         if (mounted) {
-          setDailyAyah(FALLBACK_AYAH);
+          setAyahItems(FALLBACK_AYAHS);
+          setCurrentAyahIndex(0);
         }
       } finally {
         if (mounted) {
@@ -125,11 +175,25 @@ const Home = ({ userData }) => {
       }
     };
 
-    loadAyah();
+    loadAyahs();
     return () => {
       mounted = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (ayahItems.length < 2) {
+      return undefined;
+    }
+
+    const intervalId = window.setInterval(() => {
+      setCurrentAyahIndex((prev) => (prev + 1) % ayahItems.length);
+    }, AYAH_ROTATION_MS);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [ayahItems]);
 
   useEffect(() => {
     const loadLocalData = () => {
