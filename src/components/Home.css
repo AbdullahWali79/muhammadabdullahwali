@@ -83,30 +83,15 @@
   color: var(--site-accent-color);
 }
 
-.ayah-arabic {
+.ayah-one-line {
   margin: 0;
-  font-size: 21px;
-  line-height: 1.65;
+  font-size: 17px;
+  line-height: 1.45;
   color: var(--site-text-color);
   text-align: right;
-}
-
-.ayah-translation {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.5;
-  color: var(--site-sidebar-muted-text-color);
-}
-
-.ayah-reference {
-  font-size: 12px;
-  color: var(--site-accent-color);
-  font-weight: 600;
-}
-
-.ayah-fallback-note {
-  font-size: 11px;
-  color: var(--site-sidebar-muted-text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .hello-badge {
@@ -255,12 +240,8 @@
     padding: 10px 11px;
   }
 
-  .ayah-arabic {
-    font-size: 18px;
-  }
-
-  .ayah-translation {
-    font-size: 13px;
+  .ayah-one-line {
+    font-size: 14px;
   }
 
   .hero-summary {

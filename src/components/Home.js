@@ -9,9 +9,7 @@ const QURAN_AYAH_API =
   'https://api.alquran.cloud/v1/ayah/2:255/editions/quran-uthmani,en.asad';
 
 const FALLBACK_AYAH = {
-  arabic: 'اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ',
-  translation: 'Allah, there is no god but He, the Living, the Self-Subsisting Eternal.',
-  reference: 'Quran 2:255'
+  text: 'اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ'
 };
 
 const Home = ({ userData }) => {
@@ -23,7 +21,6 @@ const Home = ({ userData }) => {
   const [baseThemeSettings] = useState(() => getSiteSettings());
   const [dailyAyah, setDailyAyah] = useState(FALLBACK_AYAH);
   const [isAyahLoading, setIsAyahLoading] = useState(true);
-  const [ayahFallbackUsed, setAyahFallbackUsed] = useState(false);
 
   const handleDownloadCV = async () => {
     setIsGenerating(true);
@@ -96,7 +93,6 @@ const Home = ({ userData }) => {
 
     const loadAyah = async () => {
       setIsAyahLoading(true);
-      setAyahFallbackUsed(false);
 
       try {
         const response = await fetch(QURAN_AYAH_API, {
@@ -116,26 +112,21 @@ const Home = ({ userData }) => {
         const selectedEdition = arabicEdition || editions[0];
 
         const arabic = arabicEdition?.text?.trim();
-        const translation = englishEdition?.text?.trim();
-        const surahName = selectedEdition?.surah?.englishName || 'Quran';
-        const ayahNumber = selectedEdition?.numberInSurah || 255;
+        const shortAyah = arabic?.split('ۚ')?.[0]?.trim() || arabic;
 
-        if (!arabic || !translation) {
-          throw new Error('Arabic or translation text missing in Quran API response');
+        if (!shortAyah) {
+          throw new Error('Arabic text missing in Quran API response');
         }
 
         if (mounted) {
           setDailyAyah({
-            arabic,
-            translation,
-            reference: `${surahName} ${ayahNumber}`
+            text: shortAyah
           });
         }
       } catch (error) {
         console.error('Error loading Quran ayah:', error);
         if (mounted) {
           setDailyAyah(FALLBACK_AYAH);
-          setAyahFallbackUsed(true);
         }
       } finally {
         if (mounted) {
@@ -249,16 +240,9 @@ const Home = ({ userData }) => {
 
               <div className="ayah-preview-card">
                 <span className="ayah-label">Quran Reflection</span>
-                <p className="ayah-arabic" dir="rtl" lang="ar">
-                  {dailyAyah.arabic}
+                <p className="ayah-one-line" dir="rtl" lang="ar">
+                  {isAyahLoading ? '...' : dailyAyah.text}
                 </p>
-                <p className="ayah-translation">
-                  {isAyahLoading ? 'Loading Arabic + translation...' : dailyAyah.translation}
-                </p>
-                <span className="ayah-reference">{dailyAyah.reference}</span>
-                {ayahFallbackUsed && (
-                  <span className="ayah-fallback-note">Fallback text shown (API unavailable).</span>
-                )}
               </div>
             </div>
           </div>
