@@ -6,10 +6,15 @@ import { THEME_PRESETS, applyThemeSettings, getSiteSettings } from '../utils/sit
 import './Home.css';
 
 const QURAN_AYAH_API =
-  'https://api.alquran.cloud/v1/ayah/2:255/editions/quran-uthmani,en.asad';
+  'https://api.alquran.cloud/v1/ayah/2:255/editions/quran-uthmani,ur.jalandhry';
 
 const FALLBACK_AYAH = {
   text: 'اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ'
+};
+
+const FALLBACK_AYAH_TEXT = {
+  arabic: 'اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ',
+  urdu: 'اللہ وہ ہے جس کے سوا کوئی معبود نہیں، وہ زندہ ہے، سب کو سنبھالنے والا ہے۔'
 };
 
 const Home = ({ userData }) => {
@@ -19,7 +24,7 @@ const Home = ({ userData }) => {
   const [localUserData, setLocalUserData] = useState(userData);
   const [temporaryThemeKey, setTemporaryThemeKey] = useState('');
   const [baseThemeSettings] = useState(() => getSiteSettings());
-  const [dailyAyah, setDailyAyah] = useState(FALLBACK_AYAH);
+  const [dailyAyah, setDailyAyah] = useState(FALLBACK_AYAH_TEXT);
   const [isAyahLoading, setIsAyahLoading] = useState(true);
 
   const handleDownloadCV = async () => {
@@ -108,25 +113,25 @@ const Home = ({ userData }) => {
         const payload = await response.json();
         const editions = Array.isArray(payload?.data) ? payload.data : [];
         const arabicEdition = editions.find((item) => item?.edition?.language === 'ar');
-        const englishEdition = editions.find((item) => item?.edition?.language === 'en');
-        const selectedEdition = arabicEdition || editions[0];
-
+        const urduEdition = editions.find((item) => item?.edition?.language === 'ur');
         const arabic = arabicEdition?.text?.trim();
+        const shortArabic = arabic?.split('ۚ')?.[0]?.trim() || shortAyah;
         const shortAyah = arabic?.split('ۚ')?.[0]?.trim() || arabic;
 
-        if (!shortAyah) {
-          throw new Error('Arabic text missing in Quran API response');
+        if (!shortArabic || !urduEdition?.text?.trim()) {
+          throw new Error('Arabic or Urdu text missing in Quran API response');
         }
 
         if (mounted) {
           setDailyAyah({
-            text: shortAyah
+            arabic: shortArabic,
+            urdu: urduEdition?.text?.trim() || FALLBACK_AYAH_TEXT.urdu
           });
         }
       } catch (error) {
         console.error('Error loading Quran ayah:', error);
         if (mounted) {
-          setDailyAyah(FALLBACK_AYAH);
+          setDailyAyah(FALLBACK_AYAH_TEXT);
         }
       } finally {
         if (mounted) {
@@ -241,7 +246,10 @@ const Home = ({ userData }) => {
               <div className="ayah-preview-card">
                 <span className="ayah-label">Quran Reflection</span>
                 <p className="ayah-one-line" dir="rtl" lang="ar">
-                  {isAyahLoading ? '...' : dailyAyah.text}
+                  {isAyahLoading ? '...' : dailyAyah.arabic}
+                </p>
+                <p className="ayah-one-line ayah-urdu-line" dir="rtl" lang="ur">
+                  {isAyahLoading ? '...' : dailyAyah.urdu}
                 </p>
               </div>
             </div>

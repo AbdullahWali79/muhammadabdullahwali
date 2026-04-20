@@ -94,6 +94,11 @@
   text-overflow: ellipsis;
 }
 
+.ayah-urdu-line {
+  font-size: 14px;
+  color: var(--site-sidebar-muted-text-color);
+}
+
 .hello-badge {
   display: inline-block;
   background-color: var(--site-accent-color);
@@ -242,6 +247,10 @@
 
   .ayah-one-line {
     font-size: 14px;
+  }
+
+  .ayah-urdu-line {
+    font-size: 12px;
   }
 
   .hero-summary {
