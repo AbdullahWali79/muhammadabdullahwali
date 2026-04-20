@@ -6,15 +6,11 @@ import { THEME_PRESETS, applyThemeSettings, getSiteSettings } from '../utils/sit
 import './Home.css';
 
 const QURAN_AYAH_API =
-  'https://api.alquran.cloud/v1/ayah/2:255/editions/quran-uthmani,ur.jalandhry';
-
-const FALLBACK_AYAH = {
-  text: 'اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ'
-};
+  'https://api.alquran.cloud/v1/ayah/97:1/editions/quran-uthmani,ur.jalandhry';
 
 const FALLBACK_AYAH_TEXT = {
-  arabic: 'اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ',
-  urdu: 'اللہ وہ ہے جس کے سوا کوئی معبود نہیں، وہ زندہ ہے، سب کو سنبھالنے والا ہے۔'
+  arabic: 'إِنَّا أَنْزَلْنَاهُ فِي لَيْلَةِ الْقَدْرِ',
+  urdu: 'بے شک ہم نے اسے شبِ قدر میں نازل کیا۔'
 };
 
 const Home = ({ userData }) => {
@@ -30,16 +26,11 @@ const Home = ({ userData }) => {
   const handleDownloadCV = async () => {
     setIsGenerating(true);
     try {
-      // Fetch portfolio and skills data
-      const [portfolioResult, aboutResult] = await Promise.all([
-        getPortfolioData(),
-        getAboutData()
-      ]);
+      const [portfolioResult, aboutResult] = await Promise.all([getPortfolioData(), getAboutData()]);
 
       const portfolioData = portfolioResult.success ? portfolioResult.data : null;
       const aboutData = aboutResult.success ? aboutResult.data : null;
 
-      // Generate PDF with all data
       await generatePDF(userData, portfolioData, aboutData);
     } catch (error) {
       console.error('Error fetching data for PDF:', error);
@@ -51,7 +42,6 @@ const Home = ({ userData }) => {
   };
 
   const handleContactMe = () => {
-    // Redirect to WhatsApp
     const whatsappNumber = '923046983794';
     const whatsappUrl = `https://wa.me/${whatsappNumber}`;
     window.open(whatsappUrl, '_blank');
@@ -114,18 +104,19 @@ const Home = ({ userData }) => {
         const editions = Array.isArray(payload?.data) ? payload.data : [];
         const arabicEdition = editions.find((item) => item?.edition?.language === 'ar');
         const urduEdition = editions.find((item) => item?.edition?.language === 'ur');
-        const arabic = arabicEdition?.text?.trim();
-        const shortArabic = arabic?.split('ۚ')?.[0]?.trim() || shortAyah;
-        const shortAyah = arabic?.split('ۚ')?.[0]?.trim() || arabic;
 
-        if (!shortArabic || !urduEdition?.text?.trim()) {
+        const arabic = arabicEdition?.text?.trim() || '';
+        const shortArabic = arabic.split(/\s+/).filter(Boolean).slice(0, 30).join(' ').trim();
+        const urdu = urduEdition?.text?.trim() || '';
+
+        if (!shortArabic || !urdu) {
           throw new Error('Arabic or Urdu text missing in Quran API response');
         }
 
         if (mounted) {
           setDailyAyah({
             arabic: shortArabic,
-            urdu: urduEdition?.text?.trim() || FALLBACK_AYAH_TEXT.urdu
+            urdu
           });
         }
       } catch (error) {
@@ -147,14 +138,13 @@ const Home = ({ userData }) => {
     };
   }, []);
 
-  // Load social links from localStorage on mount and when storage changes
   useEffect(() => {
     const loadLocalData = () => {
       const savedSocialLinks = localStorage.getItem('socialLinks');
       const savedHelloText = localStorage.getItem('helloText');
-      
+
       if (savedSocialLinks || savedHelloText) {
-        setLocalUserData(prev => ({
+        setLocalUserData((prev) => ({
           ...prev,
           socialLinks: savedSocialLinks ? JSON.parse(savedSocialLinks) : prev.socialLinks,
           helloText: savedHelloText || prev.helloText
@@ -162,26 +152,23 @@ const Home = ({ userData }) => {
       }
     };
 
-    // Load on mount
     loadLocalData();
-
-    // Listen for storage changes
     window.addEventListener('storage', loadLocalData);
-    
+
     return () => {
       window.removeEventListener('storage', loadLocalData);
     };
   }, []);
 
-  // Update localUserData when userData prop changes
   useEffect(() => {
     setLocalUserData(userData);
   }, [userData]);
 
-  // Typing animation effect with loop
   useEffect(() => {
-    const fullText = localUserData.summary?.replace(/ - /g, ' \u2013 ') || '';
-    if (!fullText) return;
+    const fullText = localUserData.summary?.replace(/ - /g, ' - ') || '';
+    if (!fullText) {
+      return undefined;
+    }
 
     let currentIndex = 0;
     let typingInterval = null;
@@ -195,27 +182,30 @@ const Home = ({ userData }) => {
       typingInterval = setInterval(() => {
         if (currentIndex < fullText.length) {
           setDisplayedText(fullText.substring(0, currentIndex + 1));
-          currentIndex++;
-        } else {
-          setIsTyping(false);
-          clearInterval(typingInterval);
-          
-          // Wait 2 seconds before restarting
-          pauseTimeout = setTimeout(() => {
-            startTyping();
-          }, 2000);
+          currentIndex += 1;
+          return;
         }
-      }, 50); // Adjust speed here (lower = faster)
+
+        setIsTyping(false);
+        clearInterval(typingInterval);
+
+        pauseTimeout = setTimeout(() => {
+          startTyping();
+        }, 2000);
+      }, 50);
     };
 
     startTyping();
 
     return () => {
-      if (typingInterval) clearInterval(typingInterval);
-      if (pauseTimeout) clearTimeout(pauseTimeout);
+      if (typingInterval) {
+        clearInterval(typingInterval);
+      }
+      if (pauseTimeout) {
+        clearTimeout(pauseTimeout);
+      }
     };
   }, [localUserData.summary]);
-
 
   return (
     <div className="home">
@@ -262,12 +252,15 @@ const Home = ({ userData }) => {
                 <img src={localUserData.profileImage} alt="Profile" />
               ) : (
                 <div className="default-hero-avatar">
-                  {localUserData.firstName.charAt(0)}{localUserData.lastName.charAt(0)}
+                  {localUserData.firstName.charAt(0)}
+                  {localUserData.lastName.charAt(0)}
                 </div>
               )}
             </div>
             <div className="hero-text">
-              <h1 className="hero-title">{localUserData.firstName} {localUserData.lastName}</h1>
+              <h1 className="hero-title">
+                {localUserData.firstName} {localUserData.lastName}
+              </h1>
               <p className="hero-summary">
                 {displayedText}
                 {isTyping && <span className="typing-cursor">|</span>}
@@ -286,7 +279,9 @@ const Home = ({ userData }) => {
                     <span className="info-label">Full Name:</span>
                   </td>
                   <td className="info-cell">
-                    <span className="info-value">{localUserData.firstName} {localUserData.lastName}</span>
+                    <span className="info-value">
+                      {localUserData.firstName} {localUserData.lastName}
+                    </span>
                   </td>
                 </tr>
                 <tr className="info-row">
@@ -373,37 +368,37 @@ const Home = ({ userData }) => {
           </button>
         </div>
 
-        {/* Social Media Links Section */}
         {localUserData.socialLinks && localUserData.socialLinks.length > 0 && (
           <div className="social-links-section">
             <h3>Follow Me</h3>
             <div className="social-grid">
-              {localUserData.socialLinks.map((link) => (
-                link.url && (
-                  <a 
-                    key={link.id} 
-                    href={link.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="social-link"
-                  >
-                    <i className={link.icon} style={{ color: link.color }}></i>
-                    {link.platform}
-                  </a>
-                )
-              ))}
+              {localUserData.socialLinks.map(
+                (link) =>
+                  link.url && (
+                    <a
+                      key={link.id}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="social-link"
+                    >
+                      <i className={link.icon} style={{ color: link.color }} />
+                      {link.platform}
+                    </a>
+                  )
+              )}
             </div>
           </div>
         )}
       </div>
-      
+
       <footer className="footer">
-        <p>© 2026 {localUserData.firstName} {localUserData.lastName}. All Rights Reserved.</p>
+        <p>
+          © 2026 {localUserData.firstName} {localUserData.lastName}. All Rights Reserved.
+        </p>
       </footer>
     </div>
   );
 };
 
 export default Home;
-
-

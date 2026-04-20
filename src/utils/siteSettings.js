@@ -1,4 +1,5 @@
 const SETTINGS_STORAGE_KEY = 'siteSettings.v1';
+const MIDNIGHT_DEFAULT_MIGRATION_KEY = 'siteSettings.midnightDefault.v1';
 
 export const CURRENCY_CONFIG = {
   PKR: { code: 'PKR', label: 'Rupee (Rs)', symbol: 'Rs', spaceAfterSymbol: true },
@@ -602,6 +603,29 @@ const convertHexToRgb = (hexColor, fallback = '0,0,0') => {
   return `${red},${green},${blue}`;
 };
 
+const applyMidnightDefaultMigration = (parsedSettings) => {
+  if (!parsedSettings || typeof parsedSettings !== 'object') {
+    return parsedSettings;
+  }
+
+  const midnightPreset = THEME_PRESETS.midnightSlate;
+  if (!midnightPreset) {
+    return parsedSettings;
+  }
+
+  return {
+    ...parsedSettings,
+    theme: {
+      ...(parsedSettings.theme || {}),
+      ...midnightPreset.theme
+    },
+    sidebar: {
+      ...(parsedSettings.sidebar || {}),
+      ...midnightPreset.sidebar
+    }
+  };
+};
+
 export const getSiteSettings = () => {
   if (typeof window === 'undefined') {
     return getDefaultSiteSettings();
@@ -613,7 +637,16 @@ export const getSiteSettings = () => {
       return getDefaultSiteSettings();
     }
     const parsed = JSON.parse(raw);
-    return sanitizeSettings(parsed);
+    const migrationApplied = window.localStorage.getItem(MIDNIGHT_DEFAULT_MIGRATION_KEY) === '1';
+    const migrated = migrationApplied ? parsed : applyMidnightDefaultMigration(parsed);
+    const sanitized = sanitizeSettings(migrated);
+
+    if (!migrationApplied) {
+      window.localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(sanitized));
+      window.localStorage.setItem(MIDNIGHT_DEFAULT_MIGRATION_KEY, '1');
+    }
+
+    return sanitized;
   } catch (error) {
     console.error('Error loading site settings:', error);
     return getDefaultSiteSettings();
