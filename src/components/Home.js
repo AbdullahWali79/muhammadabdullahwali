@@ -1,33 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { FaDownload, FaEnvelope, FaPalette, FaPause, FaPlay } from 'react-icons/fa';
+import React, { useEffect, useState } from 'react';
+import { FaDownload, FaEnvelope, FaPalette } from 'react-icons/fa';
 import { generatePDF } from '../utils/pdfGenerator';
 import { getPortfolioData, getAboutData } from '../services/supabaseService';
 import { THEME_PRESETS, applyThemeSettings, getSiteSettings } from '../utils/siteSettings';
 import './Home.css';
 
-const AYAH_ROTATION_MS = 10000;
-const AYAH_ROTATION_REFERENCES = ['97:1', '94:6', '93:5', '65:3', '55:13'];
-const AYAH_EDITIONS = 'quran-uthmani,ur.jalandhry';
+const QURAN_AYAH_API =
+  'https://api.alquran.cloud/v1/ayah/97:1/editions/quran-uthmani,ur.jalandhry';
 
-const FALLBACK_AYAH_TEXT = {
+const FALLBACK_AYAH = {
   arabic: 'إِنَّا أَنْزَلْنَاهُ فِي لَيْلَةِ الْقَدْرِ',
-  urdu: 'بے شک ہم نے اسے شبِ قدر میں نازل کیا۔'
+  urdu: 'بے شک ہم نے اسے شب قدر میں نازل کیا۔'
 };
-
-const FALLBACK_AYAHS = [
-  FALLBACK_AYAH_TEXT,
-  {
-    arabic: 'إِنَّ مَعَ الْعُسْرِ يُسْرًا',
-    urdu: 'بے شک تنگی کے ساتھ آسانی ہے۔'
-  },
-  {
-    arabic: 'وَلَسَوْفَ يُعْطِيكَ رَبُّكَ فَتَرْضَى',
-    urdu: 'اور عنقریب آپ کا رب آپ کو اتنا دے گا کہ آپ راضی ہو جائیں گے۔'
-  }
-];
-
-const getAyahApiUrl = (reference) =>
-  `https://api.alquran.cloud/v1/ayah/${reference}/editions/${AYAH_EDITIONS}`;
 
 const trimArabicWords = (text = '') => text.split(/\s+/).filter(Boolean).slice(0, 30).join(' ').trim();
 
@@ -38,20 +22,15 @@ const Home = ({ userData }) => {
   const [localUserData, setLocalUserData] = useState(userData);
   const [temporaryThemeKey, setTemporaryThemeKey] = useState('');
   const [baseThemeSettings] = useState(() => getSiteSettings());
-  const [ayahItems, setAyahItems] = useState(FALLBACK_AYAHS);
-  const [currentAyahIndex, setCurrentAyahIndex] = useState(0);
-  const [isAyahPaused, setIsAyahPaused] = useState(false);
+  const [dailyAyah, setDailyAyah] = useState(FALLBACK_AYAH);
   const [isAyahLoading, setIsAyahLoading] = useState(true);
-  const dailyAyah = ayahItems[currentAyahIndex] || FALLBACK_AYAHS[0];
 
   const handleDownloadCV = async () => {
     setIsGenerating(true);
     try {
       const [portfolioResult, aboutResult] = await Promise.all([getPortfolioData(), getAboutData()]);
-
       const portfolioData = portfolioResult.success ? portfolioResult.data : null;
       const aboutData = aboutResult.success ? aboutResult.data : null;
-
       await generatePDF(userData, portfolioData, aboutData);
     } catch (error) {
       console.error('Error fetching data for PDF:', error);
@@ -63,8 +42,7 @@ const Home = ({ userData }) => {
   };
 
   const handleContactMe = () => {
-    const whatsappNumber = '923046983794';
-    const whatsappUrl = `https://wa.me/${whatsappNumber}`;
+    const whatsappUrl = 'https://wa.me/923046983794';
     window.open(whatsappUrl, '_blank');
   };
 
@@ -109,52 +87,36 @@ const Home = ({ userData }) => {
 
     const loadAyah = async () => {
       setIsAyahLoading(true);
-
       try {
-        const responses = await Promise.allSettled(
-          AYAH_ROTATION_REFERENCES.map(async (reference) => {
-            const response = await fetch(getAyahApiUrl(reference), {
-              headers: {
-                Accept: 'application/json'
-              }
-            });
+        const response = await fetch(QURAN_AYAH_API, {
+          headers: {
+            Accept: 'application/json'
+          }
+        });
 
-            if (!response.ok) {
-              throw new Error(`Quran API request failed for ${reference} with status ${response.status}`);
-            }
+        if (!response.ok) {
+          throw new Error(`Quran API request failed with status ${response.status}`);
+        }
 
-            const payload = await response.json();
-            const editions = Array.isArray(payload?.data) ? payload.data : [];
-            const arabicEdition = editions.find((item) => item?.edition?.language === 'ar');
-            const urduEdition = editions.find((item) => item?.edition?.language === 'ur');
-            const shortArabic = trimArabicWords(arabicEdition?.text?.trim() || '');
-            const urdu = urduEdition?.text?.trim() || '';
+        const payload = await response.json();
+        const editions = Array.isArray(payload?.data) ? payload.data : [];
+        const arabicEdition = editions.find((item) => item?.edition?.language === 'ar');
+        const urduEdition = editions.find((item) => item?.edition?.language === 'ur');
 
-            if (!shortArabic || !urdu) {
-              throw new Error(`Invalid ayah payload for ${reference}`);
-            }
+        const arabic = trimArabicWords(arabicEdition?.text?.trim() || '');
+        const urdu = urduEdition?.text?.trim() || '';
 
-            return {
-              arabic: shortArabic,
-              urdu
-            };
-          })
-        );
-
-        const loadedAyahs = responses
-          .filter((result) => result.status === 'fulfilled')
-          .map((result) => result.value);
+        if (!arabic || !urdu) {
+          throw new Error('Arabic or Urdu text missing in Quran API response');
+        }
 
         if (mounted) {
-          setAyahItems(loadedAyahs.length > 0 ? loadedAyahs : FALLBACK_AYAHS);
-          setCurrentAyahIndex(0);
-          setIsAyahPaused(false);
+          setDailyAyah({ arabic, urdu });
         }
       } catch (error) {
         console.error('Error loading Quran ayah:', error);
         if (mounted) {
-          setAyahItems(FALLBACK_AYAHS);
-          setCurrentAyahIndex(0);
+          setDailyAyah(FALLBACK_AYAH);
         }
       } finally {
         if (mounted) {
@@ -164,25 +126,10 @@ const Home = ({ userData }) => {
     };
 
     loadAyah();
-
     return () => {
       mounted = false;
     };
   }, []);
-
-  useEffect(() => {
-    if (isAyahPaused || ayahItems.length < 2) {
-      return undefined;
-    }
-
-    const intervalId = window.setInterval(() => {
-      setCurrentAyahIndex((prevIndex) => (prevIndex + 1) % ayahItems.length);
-    }, AYAH_ROTATION_MS);
-
-    return () => {
-      window.clearInterval(intervalId);
-    };
-  }, [isAyahPaused, ayahItems]);
 
   useEffect(() => {
     const loadLocalData = () => {
@@ -200,10 +147,7 @@ const Home = ({ userData }) => {
 
     loadLocalData();
     window.addEventListener('storage', loadLocalData);
-
-    return () => {
-      window.removeEventListener('storage', loadLocalData);
-    };
+    return () => window.removeEventListener('storage', loadLocalData);
   }, []);
 
   useEffect(() => {
@@ -234,10 +178,7 @@ const Home = ({ userData }) => {
 
         setIsTyping(false);
         clearInterval(typingInterval);
-
-        pauseTimeout = setTimeout(() => {
-          startTyping();
-        }, 2000);
+        pauseTimeout = setTimeout(() => startTyping(), 2000);
       }, 50);
     };
 
@@ -280,18 +221,7 @@ const Home = ({ userData }) => {
               </div>
 
               <div className="ayah-preview-card">
-                <div className="ayah-card-header">
-                  <span className="ayah-label">Quran Reflection</span>
-                  <button
-                    type="button"
-                    className="ayah-rotation-toggle"
-                    onClick={() => setIsAyahPaused((prev) => !prev)}
-                    aria-label={isAyahPaused ? 'Resume ayah rotation' : 'Pause ayah rotation'}
-                  >
-                    {isAyahPaused ? <FaPlay /> : <FaPause />}
-                    {isAyahPaused ? 'Resume' : 'Pause'}
-                  </button>
-                </div>
+                <span className="ayah-label">Quran Reflection</span>
                 <p className="ayah-one-line" dir="rtl" lang="ar">
                   {isAyahLoading ? '...' : dailyAyah.arabic}
                 </p>
