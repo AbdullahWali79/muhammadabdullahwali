@@ -94,7 +94,7 @@
 }
 
 .ayah-content-wrap {
-  width: min(100%, 560px);
+  width: 100%;
   margin-left: auto;
   display: flex;
   flex-direction: column;
@@ -107,9 +107,9 @@
   line-height: 1.5;
   color: var(--site-text-color);
   text-align: right;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow: visible;
+  word-wrap: break-word;
 }
 
 .ayah-urdu-line {

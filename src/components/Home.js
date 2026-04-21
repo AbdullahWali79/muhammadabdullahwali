@@ -27,7 +27,7 @@ const FALLBACK_AYAHS = [
 const getAyahApiUrl = (reference) =>
   `https://api.alquran.cloud/v1/ayah/${reference}/editions/${AYAH_EDITIONS}`;
 
-const trimArabicLetters = (text = '', maxLetters = 20) => {
+const trimArabicLetters = (text = '', maxLetters = 200) => {
   const normalized = text.replace(/\s+/g, ' ').trim();
   if (!normalized) {
     return '';
