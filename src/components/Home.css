@@ -65,32 +65,81 @@
 }
 
 .ayah-preview-card {
-  border: 1px solid rgba(var(--site-accent-rgb, 0, 206, 209), 0.22);
-  background: rgba(0, 0, 0, 0.16);
-  border-radius: 10px;
-  padding: 12px 14px;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 40%, #4a148c 100%);
+  border-radius: 16px;
+  padding: 18px 22px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  gap: 10px;
+  gap: 14px;
   width: 100%;
   max-width: 760px;
   margin-left: auto;
+  box-shadow:
+    0 8px 32px rgba(74, 20, 140, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset;
 }
 
-.ayah-card-header {
+.ayah-preview-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(103, 58, 183, 0.35) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.ayah-preview-card::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -10%;
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle, rgba(63, 81, 181, 0.25) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.ayah-card-badges {
   display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  min-height: 20px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
 }
 
-.ayah-label {
-  font-size: 11px;
+.ayah-badge-primary {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #e8d5f2;
+  font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.4px;
-  text-transform: uppercase;
-  color: var(--site-accent-color);
+  letter-spacing: 0.5px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.ayah-badge-secondary {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.25);
+  color: #c5b0e0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .ayah-content-wrap {
@@ -98,24 +147,34 @@
   margin-left: auto;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
 }
 
-.ayah-one-line {
+.ayah-arabic {
   margin: 0;
-  font-size: 19px;
-  line-height: 1.5;
-  color: var(--site-text-color);
+  font-size: 20px;
+  line-height: 1.6;
+  color: #ffffff;
   text-align: right;
   white-space: normal;
   overflow: visible;
   word-wrap: break-word;
+  font-weight: 500;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
 }
 
-.ayah-urdu-line {
-  font-size: 14px;
-  line-height: 1.45;
-  color: var(--site-sidebar-muted-text-color);
+.ayah-urdu {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.82);
+  text-align: right;
+  white-space: normal;
+  overflow: visible;
+  word-wrap: break-word;
+  font-weight: 400;
 }
 
 .hello-badge {
@@ -261,22 +320,41 @@
   }
 
   .ayah-preview-card {
-    padding: 10px 11px;
+    padding: 14px 16px;
     max-width: 100%;
     margin-left: 0;
+    gap: 10px;
+    border-radius: 14px;
+  }
+
+  .ayah-card-badges {
+    gap: 6px;
+  }
+
+  .ayah-badge-primary {
+    font-size: 11px;
+    padding: 5px 12px;
+  }
+
+  .ayah-badge-secondary {
+    font-size: 10px;
+    padding: 3px 10px;
   }
 
   .ayah-content-wrap {
     width: 100%;
     margin-left: 0;
+    gap: 8px;
   }
 
-  .ayah-one-line {
-    font-size: 14px;
+  .ayah-arabic {
+    font-size: 16px;
+    line-height: 1.5;
   }
 
-  .ayah-urdu-line {
-    font-size: 12px;
+  .ayah-urdu {
+    font-size: 13px;
+    line-height: 1.45;
   }
 
   .hero-summary {
