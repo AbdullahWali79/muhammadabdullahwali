@@ -118,8 +118,7 @@
   color: var(--site-text-color);
   text-align: right;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow: visible;
   word-wrap: normal;
   font-weight: 500;
 }
