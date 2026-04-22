@@ -338,14 +338,9 @@ const Home = ({ userData }) => {
                     <span className="ayah-badge-secondary">{dailyAyah.reference}</span>
                   )}
                 </div>
-                <div className="ayah-content-wrap">
-                  <p className="ayah-arabic" dir="rtl" lang="ar">
-                    {isAyahLoading ? '...' : dailyAyah.arabic}
-                  </p>
-                  <p className="ayah-urdu" dir="rtl" lang="ur">
-                    {isAyahLoading ? '...' : dailyAyah.urdu}
-                  </p>
-                </div>
+                <p className="ayah-one-line" dir="rtl" lang="ur">
+                  {isAyahLoading ? '...' : dailyAyah.urdu}
+                </p>
               </div>
             </div>
           </div>
