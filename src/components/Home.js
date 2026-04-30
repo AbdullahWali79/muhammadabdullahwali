@@ -95,6 +95,13 @@ const Home = ({ userData }) => {
   const [ayahItems, setAyahItems] = useState(FALLBACK_AYAHS);
   const [currentAyahIndex, setCurrentAyahIndex] = useState(0);
   const [isAyahLoading, setIsAyahLoading] = useState(true);
+  const [homePopup, setHomePopup] = useState({
+    enabled: false,
+    title: 'Announcement',
+    message: '',
+    buttonText: 'Close'
+  });
+  const [showHomePopup, setShowHomePopup] = useState(false);
 
   const dailyAyah = ayahItems[currentAyahIndex] || FALLBACK_AYAHS[0];
 
@@ -254,6 +261,7 @@ const Home = ({ userData }) => {
     const loadLocalData = () => {
       const savedSocialLinks = localStorage.getItem('socialLinks');
       const savedHelloText = localStorage.getItem('helloText');
+      const savedPopupSettings = localStorage.getItem('homePopupSettings');
 
       if (savedSocialLinks || savedHelloText) {
         setLocalUserData((prev) => ({
@@ -261,6 +269,23 @@ const Home = ({ userData }) => {
           socialLinks: savedSocialLinks ? JSON.parse(savedSocialLinks) : prev.socialLinks,
           helloText: savedHelloText || prev.helloText
         }));
+      }
+
+      if (savedPopupSettings) {
+        try {
+          const popupSettings = JSON.parse(savedPopupSettings);
+          const nextPopup = {
+            enabled: Boolean(popupSettings.enabled),
+            title: popupSettings.title || 'Announcement',
+            message: popupSettings.message || '',
+            buttonText: popupSettings.buttonText || 'Close'
+          };
+
+          setHomePopup(nextPopup);
+          setShowHomePopup(Boolean(nextPopup.enabled && nextPopup.message));
+        } catch (error) {
+          console.error('Error loading home popup settings:', error);
+        }
       }
     };
 
@@ -315,6 +340,31 @@ const Home = ({ userData }) => {
 
   return (
     <div className="home">
+      {showHomePopup && homePopup.enabled && homePopup.message && (
+        <div className="home-popup-overlay" role="dialog" aria-modal="true" aria-labelledby="home-popup-title">
+          <div className="home-popup-card">
+            <button
+              type="button"
+              className="home-popup-close"
+              onClick={() => setShowHomePopup(false)}
+              aria-label="Close popup"
+            >
+              ×
+            </button>
+            <div className="home-popup-label">Notice</div>
+            <h2 id="home-popup-title">{homePopup.title}</h2>
+            <p>{homePopup.message}</p>
+            <button
+              type="button"
+              className="btn btn-primary home-popup-action"
+              onClick={() => setShowHomePopup(false)}
+            >
+              {homePopup.buttonText || 'Close'}
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="home-container">
         <div className="hero-section">
           <div className="theme-preview-switcher">

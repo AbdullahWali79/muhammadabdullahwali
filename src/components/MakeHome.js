@@ -12,6 +12,10 @@ const MakeHome = () => {
     buttonText: 'Get Started',
     buttonLink: '#contact',
     helloText: 'AsslamuAlikum',
+    popupEnabled: false,
+    popupTitle: 'Announcement',
+    popupMessage: '',
+    popupButtonText: 'Close',
     socialLinks: [
       { id: 1, platform: 'LinkedIn', icon: 'fab fa-linkedin', url: 'https://linkedin.com/in/muhammadabdullah', color: '#0077B5' },
       { id: 2, platform: 'Twitter', icon: 'fab fa-twitter', url: 'https://twitter.com/muhammadabdullah', color: '#1DA1F2' },
@@ -58,6 +62,8 @@ const MakeHome = () => {
         // Load social links and helloText from localStorage
         const savedSocialLinks = localStorage.getItem('socialLinks');
         const savedHelloText = localStorage.getItem('helloText');
+        const savedPopupSettings = localStorage.getItem('homePopupSettings');
+        const popupSettings = savedPopupSettings ? JSON.parse(savedPopupSettings) : {};
         
         const defaultSocialLinks = [
           { id: 1, platform: 'LinkedIn', icon: 'fab fa-linkedin', url: 'https://linkedin.com/in/muhammadabdullah', color: '#0077B5' },
@@ -74,6 +80,10 @@ const MakeHome = () => {
             buttonText: result.data.button_text || 'Get Started',
             buttonLink: result.data.button_link || '#contact',
             helloText: savedHelloText || 'AsslamuAlikum',
+            popupEnabled: Boolean(popupSettings.enabled),
+            popupTitle: popupSettings.title || 'Announcement',
+            popupMessage: popupSettings.message || '',
+            popupButtonText: popupSettings.buttonText || 'Close',
             socialLinks: savedSocialLinks ? JSON.parse(savedSocialLinks) : defaultSocialLinks
           });
         } else {
@@ -81,6 +91,10 @@ const MakeHome = () => {
           setHomeData(prev => ({
             ...prev,
             helloText: savedHelloText || prev.helloText,
+            popupEnabled: Boolean(popupSettings.enabled),
+            popupTitle: popupSettings.title || prev.popupTitle,
+            popupMessage: popupSettings.message || prev.popupMessage,
+            popupButtonText: popupSettings.buttonText || prev.popupButtonText,
             socialLinks: savedSocialLinks ? JSON.parse(savedSocialLinks) : prev.socialLinks
           }));
         }
@@ -165,6 +179,12 @@ const MakeHome = () => {
         // Store social links and helloText in localStorage
         localStorage.setItem('socialLinks', JSON.stringify(homeData.socialLinks));
         localStorage.setItem('helloText', homeData.helloText);
+        localStorage.setItem('homePopupSettings', JSON.stringify({
+          enabled: homeData.popupEnabled,
+          title: homeData.popupTitle,
+          message: homeData.popupMessage,
+          buttonText: homeData.popupButtonText
+        }));
         
         // Trigger a storage event to notify other components
         window.dispatchEvent(new Event('storage'));
@@ -331,6 +351,57 @@ const MakeHome = () => {
           <button onClick={addSocialLink} className="add-social-btn" type="button">
             <FaPlus /> Add Social Link
           </button>
+        </div>
+
+        <div className="form-section popup-settings-section">
+          <h2>Home Page Popup</h2>
+          <p className="section-description">Show a custom popup every time the home page loads.</p>
+
+          <label className="popup-toggle">
+            <input
+              type="checkbox"
+              name="popupEnabled"
+              checked={homeData.popupEnabled}
+              onChange={(e) => setHomeData(prev => ({ ...prev, popupEnabled: e.target.checked }))}
+            />
+            <span>Enable popup on home page</span>
+          </label>
+
+          <div className="form-group">
+            <label>Popup Title</label>
+            <input
+              type="text"
+              name="popupTitle"
+              value={homeData.popupTitle}
+              onChange={handleInputChange}
+              className="form-input"
+              placeholder="Announcement"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Popup Message</label>
+            <textarea
+              name="popupMessage"
+              value={homeData.popupMessage}
+              onChange={handleInputChange}
+              rows="4"
+              className="form-textarea"
+              placeholder="Write the message you want visitors to see..."
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Button Text</label>
+            <input
+              type="text"
+              name="popupButtonText"
+              value={homeData.popupButtonText}
+              onChange={handleInputChange}
+              className="form-input"
+              placeholder="Close"
+            />
+          </div>
         </div>
       </div>
     </div>

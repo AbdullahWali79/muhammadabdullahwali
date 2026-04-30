@@ -173,6 +173,31 @@
   line-height: 1.6;
 }
 
+.popup-settings-section {
+  border-color: rgba(var(--site-accent-rgb, 0, 206, 209), 0.35);
+}
+
+.popup-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--site-bg-color);
+  border: 1px solid var(--site-sidebar-border-color);
+  border-radius: 8px;
+  color: var(--site-text-color);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  padding: 14px 16px;
+}
+
+.popup-toggle input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--site-accent-color);
+}
+
 .form-group label i {
   font-size: 16px;
   vertical-align: middle;
