@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import GitHubImagePicker from './GitHubImagePicker';
-import { saveUserData } from '../services/supabaseService';
+import { saveUserData, getPortfolioData, getAboutData } from '../services/supabaseService';
 import { FaSave, FaEye, FaDownload, FaDatabase } from 'react-icons/fa';
-import { generatePDF } from '../utils/pdfGenerator';
+import { generatePDF, generateTablePDF } from '../utils/pdfGenerator';
 import { initializeDataDirectly, testDatabaseConnection } from '../utils/directDataInit';
 import './CVForm.css';
 
@@ -64,8 +64,41 @@ const CVForm = ({ userData, setUserData }) => {
     setIsPreview(!isPreview);
   };
 
-  const handleDownload = () => {
-    generatePDF(formData);
+  const getPdfData = async () => {
+    const [portfolioResult, aboutResult] = await Promise.all([
+      getPortfolioData(),
+      getAboutData()
+    ]);
+
+    return {
+      portfolioData: portfolioResult.success ? portfolioResult.data : null,
+      aboutData: aboutResult.success ? aboutResult.data : null
+    };
+  };
+
+  const handleDownload = async () => {
+    try {
+      const { portfolioData, aboutData } = await getPdfData();
+
+      await generatePDF(
+        formData,
+        portfolioData,
+        aboutData
+      );
+    } catch (error) {
+      console.error('Error preparing CV PDF:', error);
+      await generatePDF(formData);
+    }
+  };
+
+  const handleTableDownload = async () => {
+    try {
+      const { portfolioData, aboutData } = await getPdfData();
+      await generateTablePDF(formData, portfolioData, aboutData);
+    } catch (error) {
+      console.error('Error preparing table CV PDF:', error);
+      await generateTablePDF(formData);
+    }
   };
 
   const handleTestConnection = async () => {
@@ -107,6 +140,9 @@ const CVForm = ({ userData, setUserData }) => {
             </button>
             <button className="btn btn-primary" onClick={handleDownload}>
               <FaDownload /> Download PDF
+            </button>
+            <button className="btn btn-secondary" onClick={handleTableDownload}>
+              <FaDownload /> Table PDF
             </button>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FaDownload, FaEnvelope, FaPalette } from 'react-icons/fa';
-import { generatePDF } from '../utils/pdfGenerator';
+import { generatePDF, generateTablePDF } from '../utils/pdfGenerator';
 import { getPortfolioData, getAboutData } from '../services/supabaseService';
 import { THEME_PRESETS, applyThemeSettings, getSiteSettings } from '../utils/siteSettings';
 import './Home.css';
@@ -109,6 +109,22 @@ const Home = ({ userData }) => {
       console.error('Error fetching data for PDF:', error);
       alert('Error loading data. Generating PDF with available information...');
       await generatePDF(userData, null, null);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleDownloadTableCV = async () => {
+    setIsGenerating(true);
+    try {
+      const [portfolioResult, aboutResult] = await Promise.all([getPortfolioData(), getAboutData()]);
+      const portfolioData = portfolioResult.success ? portfolioResult.data : null;
+      const aboutData = aboutResult.success ? aboutResult.data : null;
+      await generateTablePDF(userData, portfolioData, aboutData);
+    } catch (error) {
+      console.error('Error fetching data for table PDF:', error);
+      alert('Error loading data. Generating table PDF with available information...');
+      await generateTablePDF(userData, null, null);
     } finally {
       setIsGenerating(false);
     }
@@ -453,6 +469,10 @@ const Home = ({ userData }) => {
           <button className="btn btn-secondary" onClick={handleDownloadCV} disabled={isGenerating}>
             <FaDownload className="btn-icon" />
             {isGenerating ? 'Generating PDF...' : 'Download Resume'}
+          </button>
+          <button className="btn btn-secondary" onClick={handleDownloadTableCV} disabled={isGenerating}>
+            <FaDownload className="btn-icon" />
+            {isGenerating ? 'Generating PDF...' : 'Table Resume'}
           </button>
           <button className="btn btn-primary" onClick={handleContactMe}>
             <FaEnvelope className="btn-icon" />
