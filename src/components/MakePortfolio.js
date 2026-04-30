@@ -30,6 +30,10 @@ const PORTFOLIO_CATEGORIES = [
   'Other'
 ];
 
+const sortProjectsNewestFirst = (projects = []) => {
+  return [...projects].sort((a, b) => Number(b.id || 0) - Number(a.id || 0));
+};
+
 const MakePortfolio = () => {
   const [portfolioData, setPortfolioData] = useState({
     title: 'My Portfolio',
@@ -103,7 +107,7 @@ const MakePortfolio = () => {
           setPortfolioData({
             title: result.data.title || 'My Portfolio',
             subtitle: result.data.subtitle || 'Recent work and projects',
-            projects: result.data.projects || defaultProjects
+            projects: sortProjectsNewestFirst(result.data.projects || defaultProjects)
           });
         }
       } catch (error) {
@@ -203,7 +207,7 @@ const MakePortfolio = () => {
 
       const updatedPortfolioData = {
         ...portfolioData,
-        projects: [...portfolioData.projects, projectToAdd]
+        projects: [projectToAdd, ...portfolioData.projects]
       };
 
       const result = await savePortfolioData(updatedPortfolioData);

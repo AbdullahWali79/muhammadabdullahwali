@@ -4,6 +4,10 @@ import { FaExternalLinkAlt, FaGithub } from 'react-icons/fa';
 import { getPortfolioData } from '../services/supabaseService';
 import './Portfolio.css';
 
+const sortProjectsNewestFirst = (projects = []) => {
+  return [...projects].sort((a, b) => Number(b.id || 0) - Number(a.id || 0));
+};
+
 const Portfolio = () => {
   const [activeFilter, setActiveFilter] = useState('All');
   const [portfolioData, setPortfolioData] = useState(null);
@@ -58,7 +62,7 @@ const Portfolio = () => {
 
   const displayTitle = portfolioData?.title || 'My Portfolio';
   const displaySubtitle = portfolioData?.subtitle || 'Showcasing my latest work and projects';
-  const projects = portfolioData?.projects || [
+  const projects = sortProjectsNewestFirst(portfolioData?.projects || [
     {
       id: 1,
       title: 'E-Commerce Platform',
@@ -119,7 +123,7 @@ const Portfolio = () => {
       liveUrl: '#',
       githubUrl: '#'
     }
-  ];
+  ]);
 
   // Extract unique categories from projects
   const allCategories = ['All', ...new Set(projects.map(p => p.category).filter(Boolean))];
