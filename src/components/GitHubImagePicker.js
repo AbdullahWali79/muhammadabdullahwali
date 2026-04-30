@@ -16,6 +16,24 @@ const GitHubImagePicker = ({ onImageSelect, currentImage, label = "Select Image"
     return url;
   };
 
+  const getGoogleDriveImageUrl = (url) => {
+    const patterns = [
+      /drive\.google\.com\/file\/d\/([^/]+)/,
+      /drive\.google\.com\/open\?id=([^&]+)/,
+      /drive\.google\.com\/uc\?(?:.*&)?id=([^&]+)/,
+      /drive\.google\.com\/thumbnail\?(?:.*&)?id=([^&]+)/
+    ];
+
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match && match[1]) {
+        return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1600`;
+      }
+    }
+
+    return null;
+  };
+
   // Extract YouTube video ID and get thumbnail
   const getYouTubeThumbnail = (url) => {
     let videoId = '';
@@ -41,6 +59,15 @@ const GitHubImagePicker = ({ onImageSelect, currentImage, label = "Select Image"
     return null;
   };
 
+  const testImageUrl = (url) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(true);
+      img.onerror = () => reject(new Error('Image could not be loaded'));
+      img.src = url;
+    });
+  };
+
   const handleUrlSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -49,6 +76,7 @@ const GitHubImagePicker = ({ onImageSelect, currentImage, label = "Select Image"
     try {
       let finalUrl = githubUrl;
       const isYouTube = githubUrl.includes('youtube.com') || githubUrl.includes('youtu.be');
+      const isGoogleDrive = githubUrl.includes('drive.google.com');
 
       if (isYouTube) {
         const thumbnailUrl = getYouTubeThumbnail(githubUrl);
@@ -57,33 +85,37 @@ const GitHubImagePicker = ({ onImageSelect, currentImage, label = "Select Image"
         } else {
           throw new Error('Invalid YouTube URL');
         }
+      } else if (isGoogleDrive) {
+        const driveImageUrl = getGoogleDriveImageUrl(githubUrl);
+        if (driveImageUrl) {
+          finalUrl = driveImageUrl;
+        } else {
+          throw new Error('Invalid Google Drive URL');
+        }
       } else {
         finalUrl = convertToRawUrl(githubUrl);
       }
 
       // Test if image exists
-      const response = await fetch(finalUrl, { method: 'HEAD' });
-
-      if (response.ok) {
+      try {
+        await testImageUrl(finalUrl);
         onImageSelect(finalUrl);
         setGithubUrl('');
         setError('');
-      } else if (isYouTube) {
+      } catch (imageError) {
+        if (isYouTube) {
         // Fallback for YouTube: sometimes maxresdefault doesn't exist, try hqdefault
-        const hqUrl = finalUrl.replace('maxresdefault.jpg', 'hqdefault.jpg');
-        const hqResponse = await fetch(hqUrl, { method: 'HEAD' });
-        if (hqResponse.ok) {
+          const hqUrl = finalUrl.replace('maxresdefault.jpg', 'hqdefault.jpg');
+          await testImageUrl(hqUrl);
           onImageSelect(hqUrl);
           setGithubUrl('');
           setError('');
         } else {
-          setError('YouTube video thumbnail not found');
+          setError('Image not found or URL is invalid');
         }
-      } else {
-        setError('Image not found or URL is invalid');
       }
     } catch (err) {
-      setError('Failed to load image. Please check the URL.');
+      setError(err.message || 'Failed to load image. Please check the URL.');
     } finally {
       setIsLoading(false);
     }
@@ -98,7 +130,8 @@ const GitHubImagePicker = ({ onImageSelect, currentImage, label = "Select Image"
   const exampleUrls = [
     'https://github.com/username/repo/blob/main/images/image.jpg',
     'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    'https://youtu.be/dQw4w9WgXcQ'
+    'https://youtu.be/dQw4w9WgXcQ',
+    'https://drive.google.com/file/d/1yQtyqcrbkDdxp4en_sRaixAyZbDoLp-k/view?usp=sharing'
   ];
 
   return (
@@ -130,7 +163,7 @@ const GitHubImagePicker = ({ onImageSelect, currentImage, label = "Select Image"
             type="text"
             value={githubUrl}
             onChange={(e) => setGithubUrl(e.target.value)}
-            placeholder="Paste GitHub image URL or YouTube video link..."
+            placeholder="Paste GitHub image URL, YouTube video link, or Google Drive image link..."
             className="url-input"
             required
           />
@@ -168,6 +201,7 @@ const GitHubImagePicker = ({ onImageSelect, currentImage, label = "Select Image"
         <ol>
           <li><strong>GitHub:</strong> Copy image URL from repo and paste above</li>
           <li><strong>YouTube:</strong> Paste any YouTube video link to use its thumbnail</li>
+          <li><strong>Google Drive:</strong> Paste a public image share link with Anyone with the link can view</li>
           <li>Click the search button to load the image/thumbnail</li>
         </ol>
       </div>
