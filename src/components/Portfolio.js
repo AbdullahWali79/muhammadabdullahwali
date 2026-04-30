@@ -8,6 +8,31 @@ const sortProjectsNewestFirst = (projects = []) => {
   return [...projects].sort((a, b) => Number(b.id || 0) - Number(a.id || 0));
 };
 
+const getProjectBadges = (project) => {
+  const text = [
+    project.title,
+    project.category,
+    project.description,
+    ...(Array.isArray(project.technologies) ? project.technologies : [])
+  ].filter(Boolean).join(' ').toLowerCase();
+
+  const badges = Array.isArray(project.badges) ? [...project.badges] : [];
+  const addBadge = (label, condition) => {
+    if (condition && !badges.includes(label)) {
+      badges.push(label);
+    }
+  };
+
+  addBadge('Live Demo', Boolean(project.liveUrl || (project.link && project.link !== '#')));
+  addBadge('Client Project', text.includes('client') || text.includes('management') || text.includes('crm'));
+  addBadge('Automation', text.includes('automation') || text.includes('workflow') || text.includes('task'));
+  addBadge('Dashboard', text.includes('dashboard') || text.includes('admin') || text.includes('report'));
+  addBadge('Desktop App', text.includes('desktop') || text.includes('electron'));
+  addBadge('AI Workflow', text.includes('ai') || text.includes('assistant') || text.includes('openai'));
+
+  return badges.slice(0, 4);
+};
+
 const Portfolio = () => {
   const [activeFilter, setActiveFilter] = useState('All');
   const [portfolioData, setPortfolioData] = useState(null);
@@ -192,6 +217,11 @@ const Portfolio = () => {
               </div>
               <div className="portfolio-content">
                 <div className="portfolio-category">{project.category}</div>
+                <div className="project-badges">
+                  {getProjectBadges(project).map((badge) => (
+                    <span key={badge} className="project-badge">{badge}</span>
+                  ))}
+                </div>
                 <h3 className="portfolio-title">{project.title}</h3>
                 <p className="portfolio-description">{project.description}</p>
                 <div className="portfolio-technologies">
