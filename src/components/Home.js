@@ -366,6 +366,38 @@ const Home = ({ userData }) => {
                     e.currentTarget.parentElement.style.display = 'none';
                   }}
                 />
+                <button
+                  type="button"
+                  className="home-popup-download-btn"
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    try {
+                      const response = await fetch(homePopup.imageUrl);
+                      const blob = await response.blob();
+                      const url = window.URL.createObjectURL(blob);
+                      const link = document.createElement('a');
+                      link.href = url;
+                      link.download = 'business-card.png';
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                      window.URL.revokeObjectURL(url);
+                    } catch (error) {
+                      console.error('Error downloading image:', error);
+                      const a = document.createElement('a');
+                      a.href = homePopup.imageUrl;
+                      a.download = 'business-card.png';
+                      a.target = '_blank';
+                      document.body.appendChild(a);
+                      a.click();
+                      document.body.removeChild(a);
+                    }
+                  }}
+                  title="Download Image"
+                  aria-label="Download Image"
+                >
+                  <FaDownload />
+                </button>
               </div>
             )}
             <div className="home-popup-message">
