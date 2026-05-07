@@ -532,7 +532,7 @@ const MakeHome = () => {
 
   return (
     <PasswordProtection pageName="Home">
-      <HomeEditor />
+      {HomeEditor()}
     </PasswordProtection>
   );
 };
