@@ -72,12 +72,36 @@
   margin: 0 40px 12px 0;
 }
 
-.home-popup-card p {
+.home-popup-image {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid rgba(var(--site-accent-rgb, 0, 206, 209), 0.25);
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  margin: 0 0 18px;
+  max-height: 280px;
+  overflow: hidden;
+}
+
+.home-popup-image img {
+  display: block;
+  max-height: 280px;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.home-popup-message {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 24px;
+}
+
+.home-popup-message p {
   color: var(--site-sidebar-muted-text-color);
   font-size: 16px;
   line-height: 1.65;
-  white-space: pre-line;
-  margin: 0 0 24px;
+  margin: 0;
 }
 
 .home-popup-action {
@@ -1009,6 +1033,4 @@
     font-size: 15px;
   }
 }
-
-
 

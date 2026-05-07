@@ -99,6 +99,7 @@ const Home = ({ userData }) => {
     enabled: false,
     title: 'Announcement',
     message: '',
+    imageUrl: '',
     buttonText: 'Close'
   });
   const [showHomePopup, setShowHomePopup] = useState(false);
@@ -277,12 +278,15 @@ const Home = ({ userData }) => {
           const nextPopup = {
             enabled: Boolean(popupSettings.enabled),
             title: popupSettings.title || 'Announcement',
-            message: popupSettings.message || '',
+            message: Array.isArray(popupSettings.sentences)
+              ? popupSettings.sentences.filter(Boolean).join('\n')
+              : popupSettings.message || '',
+            imageUrl: popupSettings.imageUrl || '',
             buttonText: popupSettings.buttonText || 'Close'
           };
 
           setHomePopup(nextPopup);
-          setShowHomePopup(Boolean(nextPopup.enabled && nextPopup.message));
+          setShowHomePopup(Boolean(nextPopup.enabled && (nextPopup.message || nextPopup.imageUrl)));
         } catch (error) {
           console.error('Error loading home popup settings:', error);
         }
@@ -340,7 +344,7 @@ const Home = ({ userData }) => {
 
   return (
     <div className="home">
-      {showHomePopup && homePopup.enabled && homePopup.message && (
+      {showHomePopup && homePopup.enabled && (homePopup.message || homePopup.imageUrl) && (
         <div className="home-popup-overlay" role="dialog" aria-modal="true" aria-labelledby="home-popup-title">
           <div className="home-popup-card">
             <button
@@ -353,7 +357,22 @@ const Home = ({ userData }) => {
             </button>
             <div className="home-popup-label">Notice</div>
             <h2 id="home-popup-title">{homePopup.title}</h2>
-            <p>{homePopup.message}</p>
+            {homePopup.imageUrl && (
+              <div className="home-popup-image">
+                <img
+                  src={homePopup.imageUrl}
+                  alt={homePopup.title || 'Popup'}
+                  onError={(e) => {
+                    e.currentTarget.parentElement.style.display = 'none';
+                  }}
+                />
+              </div>
+            )}
+            <div className="home-popup-message">
+              {homePopup.message.split('\n').filter(Boolean).map((sentence, index) => (
+                <p key={index}>{sentence}</p>
+              ))}
+            </div>
             <button
               type="button"
               className="btn btn-primary home-popup-action"

@@ -4,6 +4,37 @@ import { saveHomeData, getHomeData } from '../services/supabaseService';
 import { FaSave, FaEye, FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
 import './MakeHome.css';
 
+const getGoogleDriveImageUrl = (url = '') => {
+  const patterns = [
+    /drive\.google\.com\/file\/d\/([^/]+)/,
+    /drive\.google\.com\/open\?id=([^&]+)/,
+    /drive\.google\.com\/uc\?(?:.*&)?id=([^&]+)/,
+    /drive\.google\.com\/thumbnail\?(?:.*&)?id=([^&]+)/
+  ];
+
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match && match[1]) {
+      return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1600`;
+    }
+  }
+
+  return url;
+};
+
+const normalizePopupImageUrl = (url = '') => {
+  const trimmedUrl = url.trim();
+  if (!trimmedUrl) {
+    return '';
+  }
+
+  if (trimmedUrl.includes('drive.google.com')) {
+    return getGoogleDriveImageUrl(trimmedUrl);
+  }
+
+  return trimmedUrl;
+};
+
 const MakeHome = () => {
   const [homeData, setHomeData] = useState({
     title: 'Welcome to My Portfolio',
@@ -15,6 +46,8 @@ const MakeHome = () => {
     popupEnabled: false,
     popupTitle: 'Announcement',
     popupMessage: '',
+    popupSentences: [''],
+    popupImageUrl: '',
     popupButtonText: 'Close',
     socialLinks: [
       { id: 1, platform: 'LinkedIn', icon: 'fab fa-linkedin', url: 'https://linkedin.com/in/muhammadabdullah', color: '#0077B5' },
@@ -64,6 +97,9 @@ const MakeHome = () => {
         const savedHelloText = localStorage.getItem('helloText');
         const savedPopupSettings = localStorage.getItem('homePopupSettings');
         const popupSettings = savedPopupSettings ? JSON.parse(savedPopupSettings) : {};
+        const popupSentences = Array.isArray(popupSettings.sentences) && popupSettings.sentences.length > 0
+          ? popupSettings.sentences
+          : (popupSettings.message || '').split(/\n+/).filter(Boolean);
         
         const defaultSocialLinks = [
           { id: 1, platform: 'LinkedIn', icon: 'fab fa-linkedin', url: 'https://linkedin.com/in/muhammadabdullah', color: '#0077B5' },
@@ -82,7 +118,9 @@ const MakeHome = () => {
             helloText: savedHelloText || 'AsslamuAlikum',
             popupEnabled: Boolean(popupSettings.enabled),
             popupTitle: popupSettings.title || 'Announcement',
-            popupMessage: popupSettings.message || '',
+            popupMessage: popupSentences.join('\n'),
+            popupSentences: popupSentences.length > 0 ? popupSentences : [''],
+            popupImageUrl: popupSettings.imageUrl || '',
             popupButtonText: popupSettings.buttonText || 'Close',
             socialLinks: savedSocialLinks ? JSON.parse(savedSocialLinks) : defaultSocialLinks
           });
@@ -93,7 +131,9 @@ const MakeHome = () => {
             helloText: savedHelloText || prev.helloText,
             popupEnabled: Boolean(popupSettings.enabled),
             popupTitle: popupSettings.title || prev.popupTitle,
-            popupMessage: popupSettings.message || prev.popupMessage,
+            popupMessage: popupSentences.join('\n') || prev.popupMessage,
+            popupSentences: popupSentences.length > 0 ? popupSentences : prev.popupSentences,
+            popupImageUrl: popupSettings.imageUrl || prev.popupImageUrl,
             popupButtonText: popupSettings.buttonText || prev.popupButtonText,
             socialLinks: savedSocialLinks ? JSON.parse(savedSocialLinks) : prev.socialLinks
           }));
@@ -160,6 +200,39 @@ const MakeHome = () => {
     }
   };
 
+  const handlePopupSentenceChange = (index, value) => {
+    setHomeData(prev => {
+      const popupSentences = [...prev.popupSentences];
+      popupSentences[index] = value;
+
+      return {
+        ...prev,
+        popupSentences,
+        popupMessage: popupSentences.filter(sentence => sentence.trim()).join('\n')
+      };
+    });
+  };
+
+  const addPopupSentence = () => {
+    setHomeData(prev => ({
+      ...prev,
+      popupSentences: [...prev.popupSentences, '']
+    }));
+  };
+
+  const removePopupSentence = (index) => {
+    setHomeData(prev => {
+      const popupSentences = prev.popupSentences.filter((_, sentenceIndex) => sentenceIndex !== index);
+      const normalizedSentences = popupSentences.length > 0 ? popupSentences : [''];
+
+      return {
+        ...prev,
+        popupSentences: normalizedSentences,
+        popupMessage: normalizedSentences.filter(sentence => sentence.trim()).join('\n')
+      };
+    });
+  };
+
   const handleSave = async () => {
     setSaving(true);
     setMessage('');
@@ -182,7 +255,9 @@ const MakeHome = () => {
         localStorage.setItem('homePopupSettings', JSON.stringify({
           enabled: homeData.popupEnabled,
           title: homeData.popupTitle,
-          message: homeData.popupMessage,
+          message: homeData.popupSentences.filter(sentence => sentence.trim()).join('\n'),
+          sentences: homeData.popupSentences.filter(sentence => sentence.trim()),
+          imageUrl: normalizePopupImageUrl(homeData.popupImageUrl),
           buttonText: homeData.popupButtonText
         }));
         
@@ -380,15 +455,63 @@ const MakeHome = () => {
           </div>
 
           <div className="form-group">
-            <label>Popup Message</label>
-            <textarea
-              name="popupMessage"
-              value={homeData.popupMessage}
+            <label>Popup Message Sentences</label>
+            <div className="popup-sentence-list">
+              {homeData.popupSentences.map((sentence, index) => (
+                <div key={index} className="popup-sentence-row">
+                  <span className="popup-sentence-number">{index + 1}</span>
+                  <textarea
+                    value={sentence}
+                    onChange={(e) => handlePopupSentenceChange(index, e.target.value)}
+                    rows="2"
+                    className="form-textarea popup-sentence-input"
+                    placeholder={`Sentence ${index + 1}`}
+                  />
+                  <button
+                    type="button"
+                    className="remove-btn popup-sentence-remove"
+                    onClick={() => removePopupSentence(index)}
+                    disabled={homeData.popupSentences.length === 1}
+                    title="Remove sentence"
+                  >
+                    <FaTrash />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <button type="button" className="add-social-btn popup-add-sentence-btn" onClick={addPopupSentence}>
+              <FaPlus /> Add Sentence
+            </button>
+          </div>
+
+          <div className="form-group">
+            <label>Popup Image URL</label>
+            <input
+              type="text"
+              name="popupImageUrl"
+              value={homeData.popupImageUrl}
               onChange={handleInputChange}
-              rows="4"
-              className="form-textarea"
-              placeholder="Write the message you want visitors to see..."
+              onBlur={(e) => setHomeData(prev => ({
+                ...prev,
+                popupImageUrl: normalizePopupImageUrl(e.target.value)
+              }))}
+              className="form-input"
+              placeholder="Paste image URL or public Google Drive image link"
             />
+            <small className="form-help">
+              Google Drive public share links are converted automatically. Example: https://drive.google.com/file/d/.../view
+            </small>
+            {homeData.popupImageUrl && (
+              <div className="popup-image-preview">
+                <img
+                  src={normalizePopupImageUrl(homeData.popupImageUrl)}
+                  alt="Popup preview"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              </div>
+            )}
           </div>
 
           <div className="form-group">
