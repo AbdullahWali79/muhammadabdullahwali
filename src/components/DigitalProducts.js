@@ -25,6 +25,14 @@ const ACCESS_MODES = {
   PRIVATE: 'private'
 };
 
+const getProductAccessMode = (product = {}) => {
+  if (product.accessMode === ACCESS_MODES.SHARED || product.accessMode === ACCESS_MODES.PRIVATE) {
+    return product.accessMode;
+  }
+
+  return Number.parseInt(product.slotLimit, 10) > 0 ? ACCESS_MODES.SHARED : ACCESS_MODES.PRIVATE;
+};
+
 const DigitalProducts = ({ userData }) => {
   const [activeFilter, setActiveFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
@@ -134,11 +142,11 @@ const DigitalProducts = ({ userData }) => {
   };
 
   const sharedProducts = useMemo(
-    () => products.filter((product) => (product.accessMode || ACCESS_MODES.PRIVATE) === ACCESS_MODES.SHARED),
+    () => products.filter((product) => getProductAccessMode(product) === ACCESS_MODES.SHARED),
     [products]
   );
   const privateProducts = useMemo(
-    () => products.filter((product) => (product.accessMode || ACCESS_MODES.PRIVATE) !== ACCESS_MODES.SHARED),
+    () => products.filter((product) => getProductAccessMode(product) !== ACCESS_MODES.SHARED),
     [products]
   );
   const visibleProducts = activeAccess === ACCESS_MODES.SHARED ? sharedProducts : privateProducts;
@@ -500,7 +508,7 @@ const DigitalProducts = ({ userData }) => {
                   const isHot = index === 0;
                   const isPremiumPrice = Boolean(formattedPrice && /\d/.test(formattedPrice));
                   const isPremium = index === 1 || isPremiumPrice;
-                  const accessMode = product.accessMode || ACCESS_MODES.PRIVATE;
+                  const accessMode = getProductAccessMode(product);
                   const remainingSlots = accessMode === ACCESS_MODES.SHARED ? getRemainingSlots(product) : null;
                   const isExpanded = expandedProductId === productKey;
                   const cardClassName = `product-card ${accessMode === ACCESS_MODES.SHARED ? 'shared-card' : 'private-card'}`;

@@ -26,6 +26,14 @@ const ACCESS_MODES = {
   PRIVATE: 'private'
 };
 
+const getProductAccessMode = (product = {}) => {
+  if (product.accessMode === ACCESS_MODES.SHARED || product.accessMode === ACCESS_MODES.PRIVATE) {
+    return product.accessMode;
+  }
+
+  return Number.parseInt(product.slotLimit, 10) > 0 ? ACCESS_MODES.SHARED : ACCESS_MODES.PRIVATE;
+};
+
 const MakeDigitalProducts = () => {
   const [data, setData] = useState({
     title: 'Digital Products',
@@ -85,7 +93,13 @@ const MakeDigitalProducts = () => {
             ...DEFAULT_ACCESS_SETTINGS,
             ...(result.data.accessSettings || {})
           },
-          products: Array.isArray(result.data.products) ? result.data.products : []
+          products: Array.isArray(result.data.products)
+            ? result.data.products.map((product) => ({
+                ...product,
+                accessMode: getProductAccessMode(product),
+                slotLimit: Number.parseInt(product.slotLimit, 10) || 4
+              }))
+            : []
         });
       }
     } catch (error) {
@@ -268,7 +282,7 @@ const MakeDigitalProducts = () => {
       price: p.price || '',
       showPrice: p.showPrice !== false,
       displayMode: p.displayMode || 'image',
-      accessMode: p.accessMode || ACCESS_MODES.PRIVATE,
+      accessMode: getProductAccessMode(p),
       slotLimit: p.slotLimit || 4,
       imageUrl: p.imageUrl || '',
       videoUrl: p.videoUrl || '',
@@ -315,11 +329,8 @@ const MakeDigitalProducts = () => {
     try {
       const normalizedProducts = (data.products || []).map((product) => ({
         ...product,
-        accessMode: product.accessMode || ACCESS_MODES.PRIVATE,
-        slotLimit:
-          product.accessMode === ACCESS_MODES.SHARED
-            ? Number.parseInt(product.slotLimit, 10) || 4
-            : Number.parseInt(product.slotLimit, 10) || 4
+        accessMode: getProductAccessMode(product),
+        slotLimit: Number.parseInt(product.slotLimit, 10) || 4
       }));
       const payload = {
         ...data,
