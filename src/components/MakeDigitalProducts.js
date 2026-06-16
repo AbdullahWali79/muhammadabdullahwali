@@ -1,17 +1,37 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { getDigitalProductsData, saveDigitalProductsData } from '../services/supabaseService';
+import {
+  getDigitalProductsData,
+  getDigitalProductPaymentRequests,
+  saveDigitalProductsData,
+  updateDigitalProductPaymentRequest
+} from '../services/supabaseService';
 import { formatCurrency } from '../utils/currency';
 import './MakePrompts.css'; // We can reuse the styling from MakePrompts for simplicity
 import './MakeDigitalProducts.css'; // Specific styling for modal
+
+const DEFAULT_ACCESS_SETTINGS = {
+  enabled: false,
+  title: 'Premium Access',
+  description: 'Submit payment details and transaction ID to request a new slot.',
+  bankName: '',
+  ibanNumber: '',
+  accountHolderName: '',
+  whatsappNumber: '',
+  slotLimit: 4,
+  instructions: ''
+};
 
 const MakeDigitalProducts = () => {
   const [data, setData] = useState({
     title: 'Digital Products',
     subtitle: 'My Premium Collection of Digital Tools',
+    accessSettings: DEFAULT_ACCESS_SETTINGS,
     products: []
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [requestsLoading, setRequestsLoading] = useState(true);
+  const [paymentRequests, setPaymentRequests] = useState([]);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [isAddingProduct, setIsAddingProduct] = useState(false);
   
@@ -43,6 +63,7 @@ const MakeDigitalProducts = () => {
 
   useEffect(() => {
     loadData();
+    loadPaymentRequests();
   }, []);
 
   const loadData = async () => {
@@ -50,7 +71,15 @@ const MakeDigitalProducts = () => {
       const result = await getDigitalProductsData();
 
       if (result.success && result.data) {
-        setData(result.data);
+        setData({
+          title: result.data.title || 'Digital Products',
+          subtitle: result.data.subtitle || 'My Premium Collection of Digital Tools',
+          accessSettings: {
+            ...DEFAULT_ACCESS_SETTINGS,
+            ...(result.data.accessSettings || {})
+          },
+          products: Array.isArray(result.data.products) ? result.data.products : []
+        });
       }
     } catch (error) {
       console.error('Error loading digital products data:', error);
@@ -60,9 +89,33 @@ const MakeDigitalProducts = () => {
     }
   };
 
+  const loadPaymentRequests = async () => {
+    try {
+      const result = await getDigitalProductPaymentRequests();
+      if (result.success) {
+        setPaymentRequests(result.data);
+      }
+    } catch (error) {
+      console.error('Error loading payment requests:', error);
+    } finally {
+      setRequestsLoading(false);
+    }
+  };
+
   const handlePageInfoChange = (e) => {
     const { name, value } = e.target;
     setData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleAccessSettingsChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setData((prev) => ({
+      ...prev,
+      accessSettings: {
+        ...(prev.accessSettings || DEFAULT_ACCESS_SETTINGS),
+        [name]: type === 'checkbox' ? checked : value
+      }
+    }));
   };
 
   const handleProductChange = (e) => {
@@ -245,10 +298,18 @@ const MakeDigitalProducts = () => {
     setMessage({ type: '', text: '' });
 
     try {
-      const result = await saveDigitalProductsData(data);
+      const payload = {
+        ...data,
+        accessSettings: {
+          ...(data.accessSettings || DEFAULT_ACCESS_SETTINGS),
+          slotLimit: Number.parseInt(data.accessSettings?.slotLimit, 10) || DEFAULT_ACCESS_SETTINGS.slotLimit
+        }
+      };
+      const result = await saveDigitalProductsData(payload);
 
       if (result.success) {
         setMessage({ type: 'success', text: 'Digital Products data saved successfully!' });
+        loadPaymentRequests();
       } else {
         setMessage({ type: 'error', text: result.error || 'Failed to save data. Please try again.' });
       }
@@ -258,6 +319,23 @@ const MakeDigitalProducts = () => {
     } finally {
       setSaving(false);
       window.scrollTo(0, 0);
+    }
+  };
+
+  const handlePaymentRequestStatus = async (requestId, status) => {
+    try {
+      const result = await updateDigitalProductPaymentRequest(requestId, { status });
+      if (!result.success) {
+        throw new Error(result.error || 'Unable to update request.');
+      }
+
+      setPaymentRequests((prev) =>
+        prev.map((request) => (request.id === requestId ? { ...request, status } : request))
+      );
+      setMessage({ type: 'success', text: `Request marked as ${status}.` });
+    } catch (error) {
+      console.error('Error updating request status:', error);
+      setMessage({ type: 'error', text: error.message || 'Could not update the request.' });
     }
   };
 
@@ -318,6 +396,116 @@ const MakeDigitalProducts = () => {
                 placeholder="A collection of my premium digital products"
                 className="form-control"
               />
+            </div>
+          </div>
+
+          <div className="form-section">
+            <h3>Access & Payment Settings</h3>
+            <div className="form-group">
+              <label className="popup-toggle" style={{ marginBottom: '16px' }}>
+                <input
+                  type="checkbox"
+                  name="enabled"
+                  checked={Boolean(data.accessSettings?.enabled)}
+                  onChange={handleAccessSettingsChange}
+                />
+                <span>Show payment request panel on public page</span>
+              </label>
+            </div>
+
+            <div className="form-group">
+              <label>Panel Title</label>
+              <input
+                type="text"
+                name="title"
+                value={data.accessSettings?.title || ''}
+                onChange={handleAccessSettingsChange}
+                className="form-input"
+                placeholder="Premium Access"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Panel Description</label>
+              <textarea
+                name="description"
+                value={data.accessSettings?.description || ''}
+                onChange={handleAccessSettingsChange}
+                rows="3"
+                className="form-textarea"
+              />
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label>Bank Name</label>
+                <input
+                  type="text"
+                  name="bankName"
+                  value={data.accessSettings?.bankName || ''}
+                  onChange={handleAccessSettingsChange}
+                  className="form-input"
+                />
+              </div>
+              <div className="form-group">
+                <label>IBAN Number</label>
+                <input
+                  type="text"
+                  name="ibanNumber"
+                  value={data.accessSettings?.ibanNumber || ''}
+                  onChange={handleAccessSettingsChange}
+                  className="form-input"
+                />
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label>Account Holder Name</label>
+                <input
+                  type="text"
+                  name="accountHolderName"
+                  value={data.accessSettings?.accountHolderName || ''}
+                  onChange={handleAccessSettingsChange}
+                  className="form-input"
+                />
+              </div>
+              <div className="form-group">
+                <label>WhatsApp Number</label>
+                <input
+                  type="text"
+                  name="whatsappNumber"
+                  value={data.accessSettings?.whatsappNumber || ''}
+                  onChange={handleAccessSettingsChange}
+                  className="form-input"
+                  placeholder="+92..."
+                />
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label>Seat Limit</label>
+                <input
+                  type="number"
+                  name="slotLimit"
+                  min="1"
+                  value={data.accessSettings?.slotLimit || 4}
+                  onChange={handleAccessSettingsChange}
+                  className="form-input"
+                />
+              </div>
+              <div className="form-group">
+                <label>Instructions</label>
+                <textarea
+                  name="instructions"
+                  value={data.accessSettings?.instructions || ''}
+                  onChange={handleAccessSettingsChange}
+                  rows="3"
+                  className="form-textarea"
+                  placeholder="Tell users how to submit payment details."
+                />
+              </div>
             </div>
           </div>
 
@@ -539,6 +727,47 @@ const MakeDigitalProducts = () => {
                 ))
               )}
             </div>
+          </div>
+
+          <div className="form-section">
+            <div className="section-header-flex">
+              <h3>Payment Requests</h3>
+            </div>
+            {requestsLoading ? (
+              <div className="loading">Loading payment requests...</div>
+            ) : paymentRequests.length === 0 ? (
+              <p className="no-items">No payment requests submitted yet.</p>
+            ) : (
+              <div className="items-list">
+                {paymentRequests.map((request) => (
+                  <div key={request.id} className="list-item-card">
+                    <div className="item-header">
+                      <h4>
+                        {request.full_name}
+                        <span className="item-category-badge" style={{ marginLeft: '10px' }}>
+                          {request.status}
+                        </span>
+                      </h4>
+                      <div className="item-actions">
+                        <button type="button" className="edit-icon-btn" onClick={() => handlePaymentRequestStatus(request.id, 'approved')}>
+                          Approve
+                        </button>
+                        <button type="button" className="delete-icon-btn" onClick={() => handlePaymentRequestStatus(request.id, 'rejected')}>
+                          Reject
+                        </button>
+                      </div>
+                    </div>
+                    <div className="item-details">
+                      <p><strong>Product:</strong> {request.product_title || '-'}</p>
+                      <p><strong>Phone:</strong> {request.phone_number || '-'}</p>
+                      <p><strong>Transaction ID:</strong> {request.transaction_id || '-'}</p>
+                      <p><strong>Slots:</strong> {request.requested_slots || 1}</p>
+                      <p><strong>Amount:</strong> {request.amount || '-'}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
         </form>

@@ -427,3 +427,47 @@ export const getDigitalProductsData = async () => {
     return { success: false, error: error.message }
   }
 }
+
+export const getDigitalProductPaymentRequests = async () => {
+  try {
+    const { data, error } = await supabase
+      .from(TABLES.DIGITAL_PRODUCT_PAYMENT_REQUESTS)
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+    return { success: true, data: data || [] }
+  } catch (error) {
+    console.error('Error fetching digital product payment requests:', error)
+    return { success: false, error: error.message }
+  }
+}
+
+export const saveDigitalProductPaymentRequest = async (requestData) => {
+  try {
+    const { data, error } = await supabase
+      .from(TABLES.DIGITAL_PRODUCT_PAYMENT_REQUESTS)
+      .insert([requestData])
+
+    if (error) throw error
+    return { success: true, data }
+  } catch (error) {
+    console.error('Error saving digital product payment request:', error)
+    return { success: false, error: error.message }
+  }
+}
+
+export const updateDigitalProductPaymentRequest = async (id, requestData) => {
+  try {
+    const { data, error } = await supabase
+      .from(TABLES.DIGITAL_PRODUCT_PAYMENT_REQUESTS)
+      .update(requestData)
+      .eq('id', id)
+
+    if (error) throw error
+    return { success: true, data }
+  } catch (error) {
+    console.error('Error updating digital product payment request:', error)
+    return { success: false, error: error.message }
+  }
+}

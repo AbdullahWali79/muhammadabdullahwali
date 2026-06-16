@@ -17,5 +17,6 @@ export const TABLES = {
   CONTACT_DATA: 'contact_data',
   PROMPTS_DATA: 'prompts_data',
   DIGITAL_PRODUCTS_DATA: 'digital_products_data',
+  DIGITAL_PRODUCT_PAYMENT_REQUESTS: 'digital_product_payment_requests',
   FREELANCING_TASKS: 'freelancing_tasks'
 }

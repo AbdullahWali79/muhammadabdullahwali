@@ -30,6 +30,7 @@ import './components/Mobile.css';
 import './components/MobileTable.css';
 import PasswordProtection from './components/PasswordProtection';
 import { applyThemeSettings, getSiteSettings } from './utils/siteSettings';
+import { safeParseJSON } from './utils/storage';
 import './App.css';
 
 function AppContent() {
@@ -89,14 +90,14 @@ function AppContent() {
             profileImage: dbData.profile_image || 'https://raw.githubusercontent.com/AbdullahWali79/AbdullahImages/main/Professional.jpeg',
             summary: dbData.summary || 'Consistency Makes a Man Perfect in Their Skill Set. - M. Abdullah',
             helloText: savedHelloText || 'AsslamuAlikum',
-            socialLinks: savedSocialLinks ? JSON.parse(savedSocialLinks) : defaultSocialLinks
+            socialLinks: safeParseJSON(savedSocialLinks, defaultSocialLinks, 'social links') || defaultSocialLinks
           });
         } else {
           // Use localStorage data if available
           setUserData(prev => ({
             ...prev,
             helloText: savedHelloText || prev.helloText,
-            socialLinks: savedSocialLinks ? JSON.parse(savedSocialLinks) : prev.socialLinks
+            socialLinks: safeParseJSON(savedSocialLinks, prev.socialLinks, 'social links') || prev.socialLinks
           }));
         }
       } catch (error) {

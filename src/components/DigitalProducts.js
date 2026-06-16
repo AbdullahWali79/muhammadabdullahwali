@@ -1,8 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { getDigitalProductsData } from '../services/supabaseService';
+import { getDigitalProductsData, saveDigitalProductPaymentRequest } from '../services/supabaseService';
 import { FaWhatsapp } from 'react-icons/fa';
 import { formatCurrency } from '../utils/currency';
 import './DigitalProducts.css';
+
+const DEFAULT_ACCESS_SETTINGS = {
+  enabled: false,
+  title: 'Premium Access',
+  description: 'Choose a product, submit your payment details, and receive WhatsApp confirmation.',
+  bankName: '',
+  ibanNumber: '',
+  accountHolderName: '',
+  whatsappNumber: '',
+  slotLimit: 4,
+  instructions: ''
+};
 
 const DigitalProducts = ({ userData }) => {
   const [activeFilter, setActiveFilter] = useState('All');
@@ -11,6 +23,17 @@ const DigitalProducts = ({ userData }) => {
   const [loading, setLoading] = useState(true);
   const [expandedProductId, setExpandedProductId] = useState(null);
   const [brokenImages, setBrokenImages] = useState({});
+  const [selectedProductId, setSelectedProductId] = useState('');
+  const [paymentForm, setPaymentForm] = useState({
+    fullName: '',
+    phoneNumber: '',
+    transactionId: '',
+    requestedSlots: 1,
+    amount: '',
+    remarks: ''
+  });
+  const [submittingRequest, setSubmittingRequest] = useState(false);
+  const [requestMessage, setRequestMessage] = useState({ type: '', text: '' });
 
   useEffect(() => {
     const loadProductsData = async () => {
@@ -32,17 +55,13 @@ const DigitalProducts = ({ userData }) => {
   const handleBuyClick = (product, e) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    // Format the phone number (remove +, spaces, hyphens)
-    const phone = (userData?.phone || '+923046983794').replace(/[^0-9]/g, '');
-    const formattedPrice = formatCurrency(product.price, 'digital-products', 'price not listed');
-    
-    // Construct the message
-    const message = `Hello, I'm interested in buying your digital product: "${product.title}" listed for ${formattedPrice}.`;
-    const encodedMessage = encodeURIComponent(message);
-    
-    // Redirect to WhatsApp
-    window.open(`https://wa.me/${phone}?text=${encodedMessage}`, '_blank');
+    setSelectedProductId(product.id || product.title || '');
+    setRequestMessage({ type: '', text: '' });
+
+    const panel = document.getElementById('payment-request-panel');
+    if (panel) {
+      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
 
   const handleFilterClick = (category) => {
@@ -63,6 +82,128 @@ const DigitalProducts = ({ userData }) => {
     setBrokenImages((prev) => ({ ...prev, [productKey]: true }));
   };
 
+  const displayTitle = productsData?.title || 'Digital Products';
+  const displaySubtitle = productsData?.subtitle || 'Explore my collection of premium digital tools and assets';
+  const products = productsData?.products || [];
+  const accessSettings = {
+    ...DEFAULT_ACCESS_SETTINGS,
+    ...(productsData?.accessSettings || {})
+  };
+  const selectedProduct = products.find((product, index) => {
+    const productKey = product.id || `${product.title}-${index}`;
+    return String(productKey) === String(selectedProductId);
+  }) || products[0] || null;
+
+  const handlePaymentFormChange = (event) => {
+    const { name, value } = event.target;
+    setPaymentForm((prev) => ({
+      ...prev,
+      [name]: name === 'requestedSlots' ? value.replace(/[^\d]/g, '') : value
+    }));
+  };
+
+  useEffect(() => {
+    if (!selectedProduct && products.length > 0) {
+      setSelectedProductId(products[0].id || products[0].title || '');
+    }
+  }, [products, selectedProduct]);
+
+  useEffect(() => {
+    if (!selectedProduct) {
+      return;
+    }
+
+    setPaymentForm((prev) => ({
+      ...prev,
+      amount: prev.amount || String(selectedProduct.price || '').replace(/[^\d.]/g, ''),
+      requestedSlots: prev.requestedSlots || 1
+    }));
+  }, [selectedProduct]);
+
+  const handlePaymentSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!selectedProduct) {
+      setRequestMessage({ type: 'error', text: 'Please select a product first.' });
+      return;
+    }
+
+    const fullName = paymentForm.fullName.trim();
+    const phoneNumber = paymentForm.phoneNumber.trim();
+    const transactionId = paymentForm.transactionId.trim();
+    const requestedSlots = Math.max(1, Number.parseInt(paymentForm.requestedSlots, 10) || 1);
+    const parsedAmount = paymentForm.amount ? Number(String(paymentForm.amount).replace(/[^\d.]/g, '')) : null;
+    const amount = Number.isFinite(parsedAmount) ? parsedAmount : null;
+
+    if (!fullName || !phoneNumber || !transactionId) {
+      setRequestMessage({ type: 'error', text: 'Name, phone number, and transaction ID are required.' });
+      return;
+    }
+
+    const requestPayload = {
+      product_id: String(selectedProduct.id || selectedProduct.title || ''),
+      product_title: selectedProduct.title || '',
+      full_name: fullName,
+      phone_number: phoneNumber,
+      transaction_id: transactionId,
+      payment_method: 'bank_transfer',
+      requested_slots: requestedSlots,
+      amount,
+      iban_number: accessSettings.ibanNumber || '',
+      account_holder_name: accessSettings.accountHolderName || '',
+      remarks: paymentForm.remarks.trim(),
+      status: 'pending',
+      whatsapp_message_sent: false
+    };
+    const adminPhone = String(accessSettings.whatsappNumber || userData?.phone || '').replace(/[^0-9]/g, '');
+    const whatsappMessage = [
+      'Payment request submitted',
+      `Product: ${selectedProduct.title}`,
+      `Name: ${fullName}`,
+      `Phone: ${phoneNumber}`,
+      `Transaction ID: ${transactionId}`,
+      `Requested Slots: ${requestedSlots}`,
+      amount ? `Amount: ${amount}` : null
+    ].filter(Boolean).join('\n');
+    const whatsappUrl = adminPhone ? `https://wa.me/${adminPhone}?text=${encodeURIComponent(whatsappMessage)}` : '';
+    const whatsappWindow = whatsappUrl ? window.open('about:blank', '_blank') : null;
+
+    setSubmittingRequest(true);
+    setRequestMessage({ type: '', text: '' });
+
+    try {
+      const result = await saveDigitalProductPaymentRequest(requestPayload);
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to submit payment request.');
+      }
+
+      if (whatsappWindow && whatsappUrl) {
+        whatsappWindow.location.href = whatsappUrl;
+      }
+
+      setRequestMessage({
+        type: 'success',
+        text: 'Payment request submitted. WhatsApp confirmation opened if a number is configured.'
+      });
+      setPaymentForm({
+        fullName: '',
+        phoneNumber: '',
+        transactionId: '',
+        requestedSlots: 1,
+        amount: '',
+        remarks: ''
+      });
+    } catch (error) {
+      console.error('Error submitting payment request:', error);
+      if (whatsappWindow && !whatsappWindow.closed) {
+        whatsappWindow.close();
+      }
+      setRequestMessage({ type: 'error', text: error.message || 'Could not submit your request.' });
+    } finally {
+      setSubmittingRequest(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="digital-products-page">
@@ -72,10 +213,6 @@ const DigitalProducts = ({ userData }) => {
       </div>
     );
   }
-
-  const displayTitle = productsData?.title || 'Digital Products';
-  const displaySubtitle = productsData?.subtitle || 'Explore my collection of premium digital tools and assets';
-  const products = productsData?.products || [];
 
   // Extract unique categories from products
   const allCategories = ['All', ...new Set(products.map(p => p.category).filter(Boolean))];
@@ -116,6 +253,106 @@ const DigitalProducts = ({ userData }) => {
           <h1>{displayTitle}</h1>
           <p>{displaySubtitle}</p>
         </div>
+
+        {accessSettings.enabled && (
+          <div id="payment-request-panel" className="payment-panel">
+            <div className="payment-panel-copy">
+              <span className="payment-panel-tag">Access & Payments</span>
+              <h2>{accessSettings.title}</h2>
+              <p>{accessSettings.description}</p>
+              <div className="payment-info-grid">
+                {accessSettings.bankName && (
+                  <div className="payment-info-card">
+                    <span>Bank</span>
+                    <strong>{accessSettings.bankName}</strong>
+                  </div>
+                )}
+                {accessSettings.accountHolderName && (
+                  <div className="payment-info-card">
+                    <span>Account Holder</span>
+                    <strong>{accessSettings.accountHolderName}</strong>
+                  </div>
+                )}
+                {accessSettings.ibanNumber && (
+                  <div className="payment-info-card">
+                    <span>IBAN</span>
+                    <strong>{accessSettings.ibanNumber}</strong>
+                  </div>
+                )}
+                {accessSettings.slotLimit ? (
+                  <div className="payment-info-card">
+                    <span>Seat Limit</span>
+                    <strong>{accessSettings.slotLimit} slots</strong>
+                  </div>
+                ) : null}
+              </div>
+              {accessSettings.instructions && <p className="payment-instructions">{accessSettings.instructions}</p>}
+            </div>
+
+            <form className="payment-form" onSubmit={handlePaymentSubmit}>
+              <div className="payment-form-row">
+                <label>
+                  Product
+                  <select
+                    name="selectedProduct"
+                    value={selectedProduct?.id || selectedProduct?.title || ''}
+                    onChange={(event) => setSelectedProductId(event.target.value)}
+                  >
+                    {products.map((product, index) => {
+                      const productKey = product.id || `${product.title}-${index}`;
+                      return (
+                        <option key={productKey} value={productKey}>
+                          {product.title}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </label>
+                <label>
+                  Slots
+                  <input
+                    type="number"
+                    name="requestedSlots"
+                    min="1"
+                    value={paymentForm.requestedSlots}
+                    onChange={handlePaymentFormChange}
+                  />
+                </label>
+              </div>
+              <div className="payment-form-row">
+                <label>
+                  Full Name
+                  <input type="text" name="fullName" value={paymentForm.fullName} onChange={handlePaymentFormChange} />
+                </label>
+                <label>
+                  Phone Number
+                  <input type="text" name="phoneNumber" value={paymentForm.phoneNumber} onChange={handlePaymentFormChange} />
+                </label>
+              </div>
+              <div className="payment-form-row">
+                <label>
+                  Transaction ID
+                  <input type="text" name="transactionId" value={paymentForm.transactionId} onChange={handlePaymentFormChange} />
+                </label>
+                <label>
+                  Amount
+                  <input type="text" name="amount" value={paymentForm.amount} onChange={handlePaymentFormChange} />
+                </label>
+              </div>
+              <label className="payment-form-notes">
+                Remarks
+                <textarea name="remarks" rows="3" value={paymentForm.remarks} onChange={handlePaymentFormChange} />
+              </label>
+              {requestMessage.text && (
+                <div className={`payment-message ${requestMessage.type}`}>{requestMessage.text}</div>
+              )}
+              <button type="submit" className="buy-btn" disabled={submittingRequest}>
+                <FaWhatsapp className="btn-icon" />
+                {submittingRequest ? 'Submitting...' : 'Submit Payment & WhatsApp'}
+              </button>
+            </form>
+          </div>
+        )}
         
         {products.length > 0 ? (
           <>

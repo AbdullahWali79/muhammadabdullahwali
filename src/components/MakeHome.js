@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PasswordProtection from './PasswordProtection';
 import { saveHomeData, getHomeData } from '../services/supabaseService';
 import { FaSave, FaEye, FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
+import { safeParseJSON } from '../utils/storage';
 import './MakeHome.css';
 
 const getGoogleDriveImageUrl = (url = '') => {
@@ -96,7 +97,7 @@ const MakeHome = () => {
         const savedSocialLinks = localStorage.getItem('socialLinks');
         const savedHelloText = localStorage.getItem('helloText');
         const savedPopupSettings = localStorage.getItem('homePopupSettings');
-        const popupSettings = savedPopupSettings ? JSON.parse(savedPopupSettings) : {};
+        const popupSettings = safeParseJSON(savedPopupSettings, {}, 'home popup settings');
         const popupSentences = Array.isArray(popupSettings.sentences) && popupSettings.sentences.length > 0
           ? popupSettings.sentences
           : (popupSettings.message || '').split(/\n+/).filter(Boolean);
@@ -122,7 +123,7 @@ const MakeHome = () => {
             popupSentences: popupSentences.length > 0 ? popupSentences : [''],
             popupImageUrl: popupSettings.imageUrl || '',
             popupButtonText: popupSettings.buttonText || 'Close',
-            socialLinks: savedSocialLinks ? JSON.parse(savedSocialLinks) : defaultSocialLinks
+            socialLinks: safeParseJSON(savedSocialLinks, defaultSocialLinks, 'social links') || defaultSocialLinks
           });
         } else {
           // Use defaults if no data in database
@@ -135,7 +136,7 @@ const MakeHome = () => {
             popupSentences: popupSentences.length > 0 ? popupSentences : prev.popupSentences,
             popupImageUrl: popupSettings.imageUrl || prev.popupImageUrl,
             popupButtonText: popupSettings.buttonText || prev.popupButtonText,
-            socialLinks: savedSocialLinks ? JSON.parse(savedSocialLinks) : prev.socialLinks
+            socialLinks: safeParseJSON(savedSocialLinks, prev.socialLinks, 'social links') || prev.socialLinks
           }));
         }
       } catch (error) {

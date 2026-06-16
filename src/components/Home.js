@@ -3,6 +3,7 @@ import { FaDownload, FaEnvelope, FaPalette } from 'react-icons/fa';
 import { generatePDF, generateTablePDF } from '../utils/pdfGenerator';
 import { getPortfolioData, getAboutData } from '../services/supabaseService';
 import { THEME_PRESETS, applyThemeSettings, getSiteSettings } from '../utils/siteSettings';
+import { safeParseJSON } from '../utils/storage';
 import './Home.css';
 
 const AYAH_ROTATION_MS = 5000;
@@ -267,29 +268,25 @@ const Home = ({ userData }) => {
       if (savedSocialLinks || savedHelloText) {
         setLocalUserData((prev) => ({
           ...prev,
-          socialLinks: savedSocialLinks ? JSON.parse(savedSocialLinks) : prev.socialLinks,
+          socialLinks: safeParseJSON(savedSocialLinks, prev.socialLinks, 'social links') || prev.socialLinks,
           helloText: savedHelloText || prev.helloText
         }));
       }
 
       if (savedPopupSettings) {
-        try {
-          const popupSettings = JSON.parse(savedPopupSettings);
-          const nextPopup = {
-            enabled: Boolean(popupSettings.enabled),
-            title: popupSettings.title || 'Announcement',
-            message: Array.isArray(popupSettings.sentences)
-              ? popupSettings.sentences.filter(Boolean).join('\n')
-              : popupSettings.message || '',
-            imageUrl: popupSettings.imageUrl || '',
-            buttonText: popupSettings.buttonText || 'Close'
-          };
+        const popupSettings = safeParseJSON(savedPopupSettings, {}, 'home popup settings');
+        const nextPopup = {
+          enabled: Boolean(popupSettings.enabled),
+          title: popupSettings.title || 'Announcement',
+          message: Array.isArray(popupSettings.sentences)
+            ? popupSettings.sentences.filter(Boolean).join('\n')
+            : popupSettings.message || '',
+          imageUrl: popupSettings.imageUrl || '',
+          buttonText: popupSettings.buttonText || 'Close'
+        };
 
-          setHomePopup(nextPopup);
-          setShowHomePopup(Boolean(nextPopup.enabled && (nextPopup.message || nextPopup.imageUrl)));
-        } catch (error) {
-          console.error('Error loading home popup settings:', error);
-        }
+        setHomePopup(nextPopup);
+        setShowHomePopup(Boolean(nextPopup.enabled && (nextPopup.message || nextPopup.imageUrl)));
       }
     };
 
