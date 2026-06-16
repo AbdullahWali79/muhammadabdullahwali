@@ -254,105 +254,108 @@ const DigitalProducts = ({ userData }) => {
           <p>{displaySubtitle}</p>
         </div>
 
-        {accessSettings.enabled && (
-          <div id="payment-request-panel" className="payment-panel">
-            <div className="payment-panel-copy">
-              <span className="payment-panel-tag">Access & Payments</span>
-              <h2>{accessSettings.title}</h2>
-              <p>{accessSettings.description}</p>
-              <div className="payment-info-grid">
-                {accessSettings.bankName && (
-                  <div className="payment-info-card">
-                    <span>Bank</span>
-                    <strong>{accessSettings.bankName}</strong>
-                  </div>
-                )}
-                {accessSettings.accountHolderName && (
-                  <div className="payment-info-card">
-                    <span>Account Holder</span>
-                    <strong>{accessSettings.accountHolderName}</strong>
-                  </div>
-                )}
-                {accessSettings.ibanNumber && (
-                  <div className="payment-info-card">
-                    <span>IBAN</span>
-                    <strong>{accessSettings.ibanNumber}</strong>
-                  </div>
-                )}
-                {accessSettings.slotLimit ? (
-                  <div className="payment-info-card">
-                    <span>Seat Limit</span>
-                    <strong>{accessSettings.slotLimit} slots</strong>
-                  </div>
-                ) : null}
-              </div>
-              {accessSettings.instructions && <p className="payment-instructions">{accessSettings.instructions}</p>}
-            </div>
-
-            <form className="payment-form" onSubmit={handlePaymentSubmit}>
-              <div className="payment-form-row">
-                <label>
-                  Product
-                  <select
-                    name="selectedProduct"
-                    value={selectedProduct?.id || selectedProduct?.title || ''}
-                    onChange={(event) => setSelectedProductId(event.target.value)}
-                  >
-                    {products.map((product, index) => {
-                      const productKey = product.id || `${product.title}-${index}`;
-                      return (
-                        <option key={productKey} value={productKey}>
-                          {product.title}
-                        </option>
-                      );
-                    })}
-                  </select>
-                </label>
-                <label>
-                  Slots
-                  <input
-                    type="number"
-                    name="requestedSlots"
-                    min="1"
-                    value={paymentForm.requestedSlots}
-                    onChange={handlePaymentFormChange}
-                  />
-                </label>
-              </div>
-              <div className="payment-form-row">
-                <label>
-                  Full Name
-                  <input type="text" name="fullName" value={paymentForm.fullName} onChange={handlePaymentFormChange} />
-                </label>
-                <label>
-                  Phone Number
-                  <input type="text" name="phoneNumber" value={paymentForm.phoneNumber} onChange={handlePaymentFormChange} />
-                </label>
-              </div>
-              <div className="payment-form-row">
-                <label>
-                  Transaction ID
-                  <input type="text" name="transactionId" value={paymentForm.transactionId} onChange={handlePaymentFormChange} />
-                </label>
-                <label>
-                  Amount
-                  <input type="text" name="amount" value={paymentForm.amount} onChange={handlePaymentFormChange} />
-                </label>
-              </div>
-              <label className="payment-form-notes">
-                Remarks
-                <textarea name="remarks" rows="3" value={paymentForm.remarks} onChange={handlePaymentFormChange} />
-              </label>
-              {requestMessage.text && (
-                <div className={`payment-message ${requestMessage.type}`}>{requestMessage.text}</div>
+        <div id="payment-request-panel" className="payment-panel">
+          <div className="payment-panel-copy">
+            <span className="payment-panel-tag">Access & Payments</span>
+            <h2>{accessSettings.title}</h2>
+            <p>{accessSettings.description}</p>
+            {!accessSettings.enabled && (
+              <p className="payment-panel-note">
+                This section is visible now. Turn on the panel from the admin editor to start collecting requests.
+              </p>
+            )}
+            <div className="payment-info-grid">
+              {accessSettings.bankName && (
+                <div className="payment-info-card">
+                  <span>Bank</span>
+                  <strong>{accessSettings.bankName}</strong>
+                </div>
               )}
-              <button type="submit" className="buy-btn" disabled={submittingRequest}>
-                <FaWhatsapp className="btn-icon" />
-                {submittingRequest ? 'Submitting...' : 'Submit Payment & WhatsApp'}
-              </button>
-            </form>
+              {accessSettings.accountHolderName && (
+                <div className="payment-info-card">
+                  <span>Account Holder</span>
+                  <strong>{accessSettings.accountHolderName}</strong>
+                </div>
+              )}
+              {accessSettings.ibanNumber && (
+                <div className="payment-info-card">
+                  <span>IBAN</span>
+                  <strong>{accessSettings.ibanNumber}</strong>
+                </div>
+              )}
+              {accessSettings.slotLimit ? (
+                <div className="payment-info-card">
+                  <span>Seat Limit</span>
+                  <strong>{accessSettings.slotLimit} slots</strong>
+                </div>
+              ) : null}
+            </div>
+            {accessSettings.instructions && <p className="payment-instructions">{accessSettings.instructions}</p>}
           </div>
-        )}
+
+          <form className="payment-form" onSubmit={handlePaymentSubmit}>
+            <div className="payment-form-row">
+              <label>
+                Product
+                <select
+                  name="selectedProduct"
+                  value={selectedProduct?.id || selectedProduct?.title || ''}
+                  onChange={(event) => setSelectedProductId(event.target.value)}
+                >
+                  {products.map((product, index) => {
+                    const productKey = product.id || `${product.title}-${index}`;
+                    return (
+                      <option key={productKey} value={productKey}>
+                        {product.title}
+                      </option>
+                    );
+                  })}
+                </select>
+              </label>
+              <label>
+                Slots
+                <input
+                  type="number"
+                  name="requestedSlots"
+                  min="1"
+                  value={paymentForm.requestedSlots}
+                  onChange={handlePaymentFormChange}
+                />
+              </label>
+            </div>
+            <div className="payment-form-row">
+              <label>
+                Full Name
+                <input type="text" name="fullName" value={paymentForm.fullName} onChange={handlePaymentFormChange} />
+              </label>
+              <label>
+                Phone Number
+                <input type="text" name="phoneNumber" value={paymentForm.phoneNumber} onChange={handlePaymentFormChange} />
+              </label>
+            </div>
+            <div className="payment-form-row">
+              <label>
+                Transaction ID
+                <input type="text" name="transactionId" value={paymentForm.transactionId} onChange={handlePaymentFormChange} />
+              </label>
+              <label>
+                Amount
+                <input type="text" name="amount" value={paymentForm.amount} onChange={handlePaymentFormChange} />
+              </label>
+            </div>
+            <label className="payment-form-notes">
+              Remarks
+              <textarea name="remarks" rows="3" value={paymentForm.remarks} onChange={handlePaymentFormChange} />
+            </label>
+            {requestMessage.text && (
+              <div className={`payment-message ${requestMessage.type}`}>{requestMessage.text}</div>
+            )}
+            <button type="submit" className="buy-btn" disabled={submittingRequest}>
+              <FaWhatsapp className="btn-icon" />
+              {submittingRequest ? 'Submitting...' : 'Submit Payment & WhatsApp'}
+            </button>
+          </form>
+        </div>
         
         {products.length > 0 ? (
           <>
