@@ -28,7 +28,7 @@ const ACCESS_MODES = {
 const DigitalProducts = ({ userData }) => {
   const [activeFilter, setActiveFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeAccess, setActiveAccess] = useState(ACCESS_MODES.PRIVATE);
+  const [activeAccess, setActiveAccess] = useState(ACCESS_MODES.SHARED);
   const [productsData, setProductsData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [requestsLoading, setRequestsLoading] = useState(true);
