@@ -21,6 +21,11 @@ const DEFAULT_ACCESS_SETTINGS = {
   instructions: ''
 };
 
+const ACCESS_MODES = {
+  SHARED: 'shared',
+  PRIVATE: 'private'
+};
+
 const MakeDigitalProducts = () => {
   const [data, setData] = useState({
     title: 'Digital Products',
@@ -40,6 +45,8 @@ const MakeDigitalProducts = () => {
     category: '',
     description: '',
     price: '',
+    accessMode: ACCESS_MODES.PRIVATE,
+    slotLimit: 4,
     showPrice: true,
     displayMode: 'image',
     imageUrl: '',
@@ -201,6 +208,8 @@ const MakeDigitalProducts = () => {
       price: '',
       showPrice: true,
       displayMode: 'image',
+      accessMode: ACCESS_MODES.PRIVATE,
+      slotLimit: 4,
       imageUrl: '',
       videoUrl: '',
       sourceUrl: ''
@@ -237,6 +246,8 @@ const MakeDigitalProducts = () => {
       price: '',
       showPrice: true,
       displayMode: 'image',
+      accessMode: ACCESS_MODES.PRIVATE,
+      slotLimit: 4,
       imageUrl: '',
       videoUrl: '',
       sourceUrl: ''
@@ -257,6 +268,8 @@ const MakeDigitalProducts = () => {
       price: p.price || '',
       showPrice: p.showPrice !== false,
       displayMode: p.displayMode || 'image',
+      accessMode: p.accessMode || ACCESS_MODES.PRIVATE,
+      slotLimit: p.slotLimit || 4,
       imageUrl: p.imageUrl || '',
       videoUrl: p.videoUrl || '',
       sourceUrl: p.sourceUrl || ''
@@ -285,6 +298,8 @@ const MakeDigitalProducts = () => {
       price: '',
       showPrice: true,
       displayMode: 'image',
+      accessMode: ACCESS_MODES.PRIVATE,
+      slotLimit: 4,
       imageUrl: '',
       videoUrl: '',
       sourceUrl: ''
@@ -298,8 +313,17 @@ const MakeDigitalProducts = () => {
     setMessage({ type: '', text: '' });
 
     try {
+      const normalizedProducts = (data.products || []).map((product) => ({
+        ...product,
+        accessMode: product.accessMode || ACCESS_MODES.PRIVATE,
+        slotLimit:
+          product.accessMode === ACCESS_MODES.SHARED
+            ? Number.parseInt(product.slotLimit, 10) || 4
+            : Number.parseInt(product.slotLimit, 10) || 4
+      }));
       const payload = {
         ...data,
+        products: normalizedProducts,
         accessSettings: {
           ...(data.accessSettings || DEFAULT_ACCESS_SETTINGS),
           slotLimit: Number.parseInt(data.accessSettings?.slotLimit, 10) || DEFAULT_ACCESS_SETTINGS.slotLimit
@@ -634,6 +658,39 @@ const MakeDigitalProducts = () => {
                     </div>
                   </div>
 
+                  <div className="form-row">
+                    <div className="form-group half-width">
+                      <label htmlFor="productAccessMode">Access Type</label>
+                      <select
+                        id="productAccessMode"
+                        name="accessMode"
+                        value={newProduct.accessMode || ACCESS_MODES.PRIVATE}
+                        onChange={handleProductChange}
+                        className="form-control form-select"
+                      >
+                        <option value={ACCESS_MODES.PRIVATE}>Private Access</option>
+                        <option value={ACCESS_MODES.SHARED}>Shared Access</option>
+                      </select>
+                      <small style={{ color: '#aaa' }}>
+                        Private tools appear in the private tab. Shared tools show booking and slot details.
+                      </small>
+                    </div>
+                    {newProduct.accessMode === ACCESS_MODES.SHARED && (
+                      <div className="form-group half-width">
+                        <label htmlFor="productSlotLimit">Shared Slots</label>
+                        <input
+                          type="number"
+                          id="productSlotLimit"
+                          name="slotLimit"
+                          min="1"
+                          value={newProduct.slotLimit || 4}
+                          onChange={handleProductChange}
+                          className="form-control"
+                        />
+                      </div>
+                    )}
+                  </div>
+
                   <div className="form-group">
                     <label htmlFor="productImageUrl">Image URL (Optional)</label>
                     <input
@@ -708,7 +765,12 @@ const MakeDigitalProducts = () => {
                 data.products.map((product, index) => (
                   <div key={product.id || index} className="list-item-card">
                     <div className="item-header">
-                      <h4>{product.title} <span className="item-category-badge">{product.category}</span></h4>
+                      <h4>
+                        {product.title} <span className="item-category-badge">{product.category}</span>
+                        <span className={`item-category-badge access-${product.accessMode || ACCESS_MODES.PRIVATE}`} style={{ marginLeft: '8px' }}>
+                          {product.accessMode === ACCESS_MODES.SHARED ? 'Shared' : 'Private'}
+                        </span>
+                      </h4>
                       <div className="item-actions">
                         <button type="button" onClick={() => startEditProduct(index)} title="Edit" className="edit-icon-btn">
                           <i className="fas fa-edit"></i> Edit
@@ -721,6 +783,10 @@ const MakeDigitalProducts = () => {
                     <div className="item-details">
                       <p><strong>Price:</strong> {formatCurrency(product.price, 'digital-products')}</p>
                       <p><strong>Display:</strong> {product.displayMode === 'text' ? 'Text' : 'Image'}</p>
+                      <p><strong>Access:</strong> {product.accessMode === ACCESS_MODES.SHARED ? 'Shared' : 'Private'}</p>
+                      {product.accessMode === ACCESS_MODES.SHARED && (
+                        <p><strong>Slots:</strong> {product.slotLimit || 4}</p>
+                      )}
                       <p className="item-desc">{product.description && product.description.substring(0, 100)}...</p>
                     </div>
                   </div>

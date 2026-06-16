@@ -1,5 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { getDigitalProductsData, saveDigitalProductPaymentRequest } from '../services/supabaseService';
+import React, { useState, useEffect, useMemo } from 'react';
+import {
+  getDigitalProductsData,
+  getDigitalProductPaymentRequests,
+  saveDigitalProductPaymentRequest
+} from '../services/supabaseService';
 import { FaWhatsapp } from 'react-icons/fa';
 import { formatCurrency } from '../utils/currency';
 import './DigitalProducts.css';
@@ -16,11 +20,19 @@ const DEFAULT_ACCESS_SETTINGS = {
   instructions: ''
 };
 
+const ACCESS_MODES = {
+  SHARED: 'shared',
+  PRIVATE: 'private'
+};
+
 const DigitalProducts = ({ userData }) => {
   const [activeFilter, setActiveFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeAccess, setActiveAccess] = useState(ACCESS_MODES.PRIVATE);
   const [productsData, setProductsData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [requestsLoading, setRequestsLoading] = useState(true);
+  const [paymentRequests, setPaymentRequests] = useState([]);
   const [expandedProductId, setExpandedProductId] = useState(null);
   const [brokenImages, setBrokenImages] = useState({});
   const [selectedProductId, setSelectedProductId] = useState('');
@@ -52,21 +64,52 @@ const DigitalProducts = ({ userData }) => {
     loadProductsData();
   }, []);
 
-  const handleBuyClick = (product, e) => {
+  useEffect(() => {
+    const loadPaymentRequests = async () => {
+      try {
+        const result = await getDigitalProductPaymentRequests();
+        if (result.success) {
+          setPaymentRequests(result.data);
+        }
+      } catch (error) {
+        console.error('Error loading payment requests:', error);
+      } finally {
+        setRequestsLoading(false);
+      }
+    };
+
+    loadPaymentRequests();
+  }, []);
+
+  const handleCardAction = (product, accessMode, e) => {
     e.preventDefault();
     e.stopPropagation();
-    setSelectedProductId(product.id || product.title || '');
-    setRequestMessage({ type: '', text: '' });
 
-    const panel = document.getElementById('payment-request-panel');
-    if (panel) {
-      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (accessMode === ACCESS_MODES.SHARED) {
+      setSelectedProductId(product.id || product.title || '');
+      setRequestMessage({ type: '', text: '' });
+
+      const panel = document.getElementById('payment-request-panel');
+      if (panel) {
+        panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      return;
+    }
+
+    if (product.sourceUrl) {
+      window.open(product.sourceUrl, '_blank', 'noopener,noreferrer');
     }
   };
 
   const handleFilterClick = (category) => {
     setActiveFilter(category);
     setExpandedProductId(null);
+  };
+
+  const handleAccessModeChange = (mode) => {
+    setActiveAccess(mode);
+    setExpandedProductId(null);
+    setRequestMessage({ type: '', text: '' });
   };
 
   const handleSearchChange = (e) => {
@@ -89,10 +132,39 @@ const DigitalProducts = ({ userData }) => {
     ...DEFAULT_ACCESS_SETTINGS,
     ...(productsData?.accessSettings || {})
   };
-  const selectedProduct = products.find((product, index) => {
+
+  const sharedProducts = useMemo(
+    () => products.filter((product) => (product.accessMode || ACCESS_MODES.PRIVATE) === ACCESS_MODES.SHARED),
+    [products]
+  );
+  const privateProducts = useMemo(
+    () => products.filter((product) => (product.accessMode || ACCESS_MODES.PRIVATE) !== ACCESS_MODES.SHARED),
+    [products]
+  );
+  const visibleProducts = activeAccess === ACCESS_MODES.SHARED ? sharedProducts : privateProducts;
+  const selectedProduct = visibleProducts.find((product, index) => {
     const productKey = product.id || `${product.title}-${index}`;
     return String(productKey) === String(selectedProductId);
-  }) || products[0] || null;
+  }) || visibleProducts[0] || null;
+
+  const getReservedSlots = (product) => {
+    if (!product) {
+      return 0;
+    }
+
+    const productKey = String(product.id || product.title || '');
+    return paymentRequests
+      .filter((request) => {
+        const requestKey = String(request.product_id || request.product_title || '');
+        return requestKey === productKey && ['pending', 'approved'].includes(request.status);
+      })
+      .reduce((total, request) => total + (Number.parseInt(request.requested_slots, 10) || 1), 0);
+  };
+
+  const getRemainingSlots = (product) => {
+    const limit = Number.parseInt(product?.slotLimit, 10) || Number.parseInt(accessSettings.slotLimit, 10) || 0;
+    return Math.max(0, limit - getReservedSlots(product));
+  };
 
   const handlePaymentFormChange = (event) => {
     const { name, value } = event.target;
@@ -103,10 +175,10 @@ const DigitalProducts = ({ userData }) => {
   };
 
   useEffect(() => {
-    if (!selectedProduct && products.length > 0) {
-      setSelectedProductId(products[0].id || products[0].title || '');
+    if (!selectedProduct && visibleProducts.length > 0) {
+      setSelectedProductId(visibleProducts[0].id || visibleProducts[0].title || '');
     }
-  }, [products, selectedProduct]);
+  }, [visibleProducts, selectedProduct]);
 
   useEffect(() => {
     if (!selectedProduct) {
@@ -134,9 +206,18 @@ const DigitalProducts = ({ userData }) => {
     const requestedSlots = Math.max(1, Number.parseInt(paymentForm.requestedSlots, 10) || 1);
     const parsedAmount = paymentForm.amount ? Number(String(paymentForm.amount).replace(/[^\d.]/g, '')) : null;
     const amount = Number.isFinite(parsedAmount) ? parsedAmount : null;
+    const remainingSlots = getRemainingSlots(selectedProduct);
 
     if (!fullName || !phoneNumber || !transactionId) {
       setRequestMessage({ type: 'error', text: 'Name, phone number, and transaction ID are required.' });
+      return;
+    }
+
+    if (requestedSlots > remainingSlots) {
+      setRequestMessage({
+        type: 'error',
+        text: `Only ${remainingSlots} slot${remainingSlots === 1 ? '' : 's'} remaining for this product.`
+      });
       return;
     }
 
@@ -215,11 +296,11 @@ const DigitalProducts = ({ userData }) => {
   }
 
   // Extract unique categories from products
-  const allCategories = ['All', ...new Set(products.map(p => p.category).filter(Boolean))];
+  const allCategories = ['All', ...new Set(visibleProducts.map((p) => p.category).filter(Boolean))];
   const categories = allCategories.length > 1 ? allCategories : ['All'];
 
   // Filter products based on active filter
-  const filteredProducts = products.filter((product) => {
+  const filteredProducts = visibleProducts.filter((product) => {
     const matchesCategory = activeFilter === 'All' || product.category === activeFilter;
     const query = searchQuery.trim().toLowerCase();
     const matchesSearch = !query || [
@@ -254,14 +335,32 @@ const DigitalProducts = ({ userData }) => {
           <p>{displaySubtitle}</p>
         </div>
 
-        <div id="payment-request-panel" className="payment-panel">
+        <div className="access-mode-switcher" role="tablist" aria-label="Access modes">
+          <button
+            type="button"
+            className={`access-mode-btn ${activeAccess === ACCESS_MODES.PRIVATE ? 'active' : ''}`}
+            onClick={() => handleAccessModeChange(ACCESS_MODES.PRIVATE)}
+          >
+            Private Access
+          </button>
+          <button
+            type="button"
+            className={`access-mode-btn ${activeAccess === ACCESS_MODES.SHARED ? 'active' : ''}`}
+            onClick={() => handleAccessModeChange(ACCESS_MODES.SHARED)}
+          >
+            Shared Access
+          </button>
+        </div>
+
+        {activeAccess === ACCESS_MODES.SHARED && (
+          <div id="payment-request-panel" className="payment-panel">
           <div className="payment-panel-copy">
             <span className="payment-panel-tag">Access & Payments</span>
-            <h2>{accessSettings.title}</h2>
-            <p>{accessSettings.description}</p>
+            <h2>{accessSettings.title || 'Shared Access'}</h2>
+            <p>{accessSettings.description || 'Choose a shared product, submit payment details, and reserve your slot.'}</p>
             {!accessSettings.enabled && (
               <p className="payment-panel-note">
-                This section is visible now. Turn on the panel from the admin editor to start collecting requests.
+                Shared access is visible. Turn on the panel from the admin editor if you want to publish it.
               </p>
             )}
             <div className="payment-info-grid">
@@ -302,7 +401,7 @@ const DigitalProducts = ({ userData }) => {
                   value={selectedProduct?.id || selectedProduct?.title || ''}
                   onChange={(event) => setSelectedProductId(event.target.value)}
                 >
-                  {products.map((product, index) => {
+                  {sharedProducts.map((product, index) => {
                     const productKey = product.id || `${product.title}-${index}`;
                     return (
                       <option key={productKey} value={productKey}>
@@ -355,7 +454,13 @@ const DigitalProducts = ({ userData }) => {
               {submittingRequest ? 'Submitting...' : 'Submit Payment & WhatsApp'}
             </button>
           </form>
-        </div>
+          </div>
+        )}
+        {activeAccess === ACCESS_MODES.PRIVATE && (
+          <div className="private-access-banner">
+            Private tools are shown below. These do not require payment booking.
+          </div>
+        )}
         
         {products.length > 0 ? (
           <>
@@ -392,49 +497,69 @@ const DigitalProducts = ({ userData }) => {
                     showVisualMedia &&
                     Boolean(product.imageUrl) &&
                     !brokenImages[productKey];
-                  const isHot = index === 0; // The first product gets a "HOT" badge
+                  const isHot = index === 0;
                   const isPremiumPrice = Boolean(formattedPrice && /\d/.test(formattedPrice));
-                  const isPremium = index === 1 || isPremiumPrice; // Others might get Premium
+                  const isPremium = index === 1 || isPremiumPrice;
+                  const accessMode = product.accessMode || ACCESS_MODES.PRIVATE;
+                  const remainingSlots = accessMode === ACCESS_MODES.SHARED ? getRemainingSlots(product) : null;
                   const isExpanded = expandedProductId === productKey;
+                  const cardClassName = `product-card ${accessMode === ACCESS_MODES.SHARED ? 'shared-card' : 'private-card'}`;
+                  const productSummary =
+                    accessMode === ACCESS_MODES.SHARED
+                      ? `${remainingSlots > 0 ? `${remainingSlots} slots available` : 'Fully booked'}`
+                      : 'Private access tool';
                   
                   return (
-                  <div key={productKey} className="product-card" style={{ position: 'relative' }}>
+                  <div key={productKey} className={cardClassName} style={{ position: 'relative' }}>
+                    <div className={`product-access-badge ${accessMode}`}>
+                      {accessMode === ACCESS_MODES.SHARED ? 'Shared Access' : 'Private Access'}
+                    </div>
                     {isHot && <div className="product-badge">HOT</div>}
                     {!isHot && isPremium && <div className="product-badge premium">PREMIUM</div>}
-                  <div className="product-image">
-                    {showVisualMedia && embedUrl ? (
-                      <iframe
-                          width="100%"
-                          height="100%"
-                          src={embedUrl}
-                          title={product.title}
-                          frameBorder="0"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-                        ></iframe>
-                    ) : shouldShowImage ? (
-                      <img 
-                        src={product.imageUrl} 
-                        alt={product.title}
-                        loading="lazy"
-                        decoding="async"
-                        onError={() => handleImageError(productKey)}
-                        className="product-img"
-                      />
-                    ) : (
-                        <div className="product-default-bg">
-                          <h3>{product.title}</h3>
+                    <div className={`product-card-top ${accessMode === ACCESS_MODES.SHARED ? 'shared-top' : 'private-top'}`}>
+                      <div className="product-hero-copy">
+                        <div className="product-category">{product.category}</div>
+                        <h3 className="product-title">{product.title}</h3>
+                        <p className="product-summary">{productSummary}</p>
+                        {product.showPrice !== false && <div className="product-price">{formattedPrice}</div>}
+                      </div>
+                      {showVisualMedia && (embedUrl || shouldShowImage) ? (
+                        <div className="product-image">
+                          {embedUrl ? (
+                            <iframe
+                              width="100%"
+                              height="100%"
+                              src={embedUrl}
+                              title={product.title}
+                              frameBorder="0"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                              style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                            ></iframe>
+                          ) : (
+                            <img
+                              src={product.imageUrl}
+                              alt={product.title}
+                              loading="lazy"
+                              decoding="async"
+                              onError={() => handleImageError(productKey)}
+                              className="product-img"
+                            />
+                          )}
+                        </div>
+                      ) : (
+                        <div className="product-mini-fallback">
+                          <h4>{product.title}</h4>
                           <p>{product.category}</p>
                         </div>
                       )}
                     </div>
                     <div className="product-content">
-                      <div className="product-category">{product.category}</div>
-                      <div className="product-header-row">
-                        <h3 className="product-title">{product.title}</h3>
-                        {product.showPrice !== false && <div className="product-price">{formattedPrice}</div>}
-                      </div>
+                      {accessMode === ACCESS_MODES.SHARED && (
+                        <div className="product-slot-pill">
+                          {remainingSlots > 0 ? `${remainingSlots} slots available` : 'Fully booked'}
+                        </div>
+                      )}
                       <button
                         className="expand-btn"
                         onClick={() => handleToggleExpand(productKey)}
@@ -446,9 +571,25 @@ const DigitalProducts = ({ userData }) => {
 
                       <div className={`product-expandable ${isExpanded ? 'open' : ''}`}>
                         <p className="product-description">{product.description}</p>
-                        <button className="buy-btn" onClick={(e) => handleBuyClick(product, e)}>
-                          <FaWhatsapp className="btn-icon" /> Buy Now
-                        </button>
+                        {accessMode === ACCESS_MODES.SHARED ? (
+                          <button
+                            type="button"
+                            className="buy-btn"
+                            onClick={(e) => handleCardAction(product, accessMode, e)}
+                            disabled={remainingSlots === 0}
+                          >
+                            <FaWhatsapp className="btn-icon" />
+                            {remainingSlots === 0 ? 'Fully Booked' : 'Book Slot'}
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className="buy-btn private-btn"
+                            onClick={(e) => handleCardAction(product, accessMode, e)}
+                          >
+                            Open Tool
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
