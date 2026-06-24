@@ -47,6 +47,8 @@ const MakeDigitalProducts = () => {
   const [paymentRequests, setPaymentRequests] = useState([]);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [isAddingProduct, setIsAddingProduct] = useState(false);
+  const [productSearch, setProductSearch] = useState('');
+  const [productFilter, setProductFilter] = useState('all');
   
   const [newProduct, setNewProduct] = useState({
     title: '',
@@ -71,6 +73,40 @@ const MakeDigitalProducts = () => {
     [data.products]
   );
   const categorySelectValue = isCustomCategory ? '__custom__' : (newProduct.category || '');
+  const filteredProducts = useMemo(() => {
+    const query = productSearch.trim().toLowerCase();
+
+    return (data.products || [])
+      .map((product, originalIndex) => ({ product, originalIndex }))
+      .filter(({ product }) => {
+      const accessMode = getProductAccessMode(product);
+      const matchesFilter =
+        productFilter === 'all' ||
+        (productFilter === 'shared' && accessMode === ACCESS_MODES.SHARED) ||
+        (productFilter === 'private' && accessMode === ACCESS_MODES.PRIVATE);
+
+      const matchesQuery = !query || [
+        product.title,
+        product.category,
+        product.description,
+        product.price,
+        accessMode
+      ]
+        .filter(Boolean)
+        .some((field) => String(field).toLowerCase().includes(query));
+
+      return matchesFilter && matchesQuery;
+    });
+  }, [data.products, productSearch, productFilter]);
+  const productCounts = useMemo(() => {
+    const products = data.products || [];
+
+    return {
+      total: products.length,
+      shared: products.filter((product) => getProductAccessMode(product) === ACCESS_MODES.SHARED).length,
+      private: products.filter((product) => getProductAccessMode(product) === ACCESS_MODES.PRIVATE).length
+    };
+  }, [data.products]);
 
   const toggleFullscreen = () => {
     setIsFullscreen(prev => !prev);
@@ -357,6 +393,11 @@ const MakeDigitalProducts = () => {
     }
   };
 
+  const clearProductFilters = () => {
+    setProductSearch('');
+    setProductFilter('all');
+  };
+
   const handlePaymentRequestStatus = async (requestId, status) => {
     try {
       const result = await updateDigitalProductPaymentRequest(requestId, { status });
@@ -547,6 +588,49 @@ const MakeDigitalProducts = () => {
           <div className="form-section">
             <div className="section-header-flex">
               <h3>Products List</h3>
+              <div className="section-header-stats">
+                <span className="stat-pill">Total: {productCounts.total}</span>
+                <span className="stat-pill stat-shared">Shared: {productCounts.shared}</span>
+                <span className="stat-pill stat-private">Private: {productCounts.private}</span>
+              </div>
+            </div>
+
+            <div className="products-toolbar">
+              <input
+                type="text"
+                className="products-toolbar-search"
+                placeholder="Search products by title, category, description, price..."
+                value={productSearch}
+                onChange={(event) => setProductSearch(event.target.value)}
+              />
+              <div className="products-toolbar-filters" role="tablist" aria-label="Product filters">
+                <button
+                  type="button"
+                  className={`toolbar-filter-btn ${productFilter === 'all' ? 'active' : ''}`}
+                  onClick={() => setProductFilter('all')}
+                >
+                  All
+                </button>
+                <button
+                  type="button"
+                  className={`toolbar-filter-btn ${productFilter === 'shared' ? 'active' : ''}`}
+                  onClick={() => setProductFilter('shared')}
+                >
+                  Shared
+                </button>
+                <button
+                  type="button"
+                  className={`toolbar-filter-btn ${productFilter === 'private' ? 'active' : ''}`}
+                  onClick={() => setProductFilter('private')}
+                >
+                  Private
+                </button>
+                {(productSearch || productFilter !== 'all') && (
+                  <button type="button" className="toolbar-filter-btn ghost" onClick={clearProductFilters}>
+                    Reset
+                  </button>
+                )}
+              </div>
             </div>
 
             {isAddingProduct && (
@@ -769,36 +853,45 @@ const MakeDigitalProducts = () => {
               </div>
             )}
 
-            <div className="items-list">
+            <div className="items-list products-admin-grid">
               {(!data.products || data.products.length === 0) ? (
                 <p className="no-items">No products added yet.</p>
+              ) : filteredProducts.length === 0 ? (
+                <p className="no-items">
+                  No products match your current filters.
+                </p>
               ) : (
-                data.products.map((product, index) => (
-                  <div key={product.id || index} className="list-item-card">
+                filteredProducts.map(({ product, originalIndex }) => (
+                  <div key={product.id || originalIndex} className="list-item-card">
                     <div className="item-header">
-                      <h4>
-                        {product.title} <span className="item-category-badge">{product.category}</span>
-                        <span className={`item-category-badge access-${product.accessMode || ACCESS_MODES.PRIVATE}`} style={{ marginLeft: '8px' }}>
-                          {product.accessMode === ACCESS_MODES.SHARED ? 'Shared' : 'Private'}
-                        </span>
-                      </h4>
+                      <div className="item-header-copy">
+                        <h4>{product.title}</h4>
+                        <div className="item-badges">
+                          {product.category ? <span className="item-category-badge">{product.category}</span> : null}
+                          <span className={`item-category-badge access-${product.accessMode || ACCESS_MODES.PRIVATE}`}>
+                            {product.accessMode === ACCESS_MODES.SHARED ? 'Shared' : 'Private'}
+                          </span>
+                          <span className="item-category-badge item-price-badge">
+                            {formatCurrency(product.price, 'digital-products')}
+                          </span>
+                        </div>
+                      </div>
                       <div className="item-actions">
-                        <button type="button" onClick={() => startEditProduct(index)} title="Edit" className="edit-icon-btn">
+                        <button type="button" onClick={() => startEditProduct(originalIndex)} title="Edit" className="edit-icon-btn">
                           <i className="fas fa-edit"></i> Edit
                         </button>
-                        <button type="button" onClick={() => handleDeleteProduct(index)} title="Delete" className="delete-icon-btn">
+                        <button type="button" onClick={() => handleDeleteProduct(originalIndex)} title="Delete" className="delete-icon-btn">
                           <i className="fas fa-trash-alt"></i> Delete
                         </button>
                       </div>
                     </div>
                     <div className="item-details">
-                      <p><strong>Price:</strong> {formatCurrency(product.price, 'digital-products')}</p>
                       <p><strong>Display:</strong> {product.displayMode === 'text' ? 'Text' : 'Image'}</p>
                       <p><strong>Access:</strong> {product.accessMode === ACCESS_MODES.SHARED ? 'Shared' : 'Private'}</p>
                       {product.accessMode === ACCESS_MODES.SHARED && (
                         <p><strong>Slots:</strong> {product.slotLimit || 4}</p>
                       )}
-                      <p className="item-desc">{product.description && product.description.substring(0, 100)}...</p>
+                      <p className="item-desc">{product.description && product.description.substring(0, 140)}...</p>
                     </div>
                   </div>
                 ))
