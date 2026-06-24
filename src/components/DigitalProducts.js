@@ -493,8 +493,14 @@ const DigitalProducts = ({ userData }) => {
                 className="products-search-input"
               />
             </div>
-            
-            {filteredProducts.length > 0 ? (
+
+            {visibleProducts.length === 0 ? (
+              <div className="products-no-results">
+                {activeAccess === ACCESS_MODES.SHARED
+                  ? 'No shared products are published yet. Set the product Access Type to Shared in the admin editor and save.'
+                  : 'No private products are available yet.'}
+              </div>
+            ) : filteredProducts.length > 0 ? (
               <div className="products-grid">
                 {filteredProducts.map((product, index) => {
                   const embedUrl = getYouTubeEmbedUrl(product.videoUrl);

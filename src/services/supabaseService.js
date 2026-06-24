@@ -1,5 +1,33 @@
 import { supabase, TABLES } from '../config/supabase'
 
+const normalizeDigitalProductAccessMode = (product = {}) => {
+  const rawAccessMode = product.accessMode ?? product.access_mode ?? product.access_type;
+
+  if (rawAccessMode === 'shared' || rawAccessMode === 'private') {
+    return rawAccessMode;
+  }
+
+  return Number.parseInt(product.slotLimit ?? product.slot_limit, 10) > 0 ? 'shared' : 'private';
+};
+
+const normalizeDigitalProductRecord = (record = {}) => {
+  const accessSettings = record.accessSettings ?? record.access_settings ?? {};
+  const products = Array.isArray(record.products)
+    ? record.products.map((product) => ({
+        ...product,
+        accessMode: normalizeDigitalProductAccessMode(product),
+        slotLimit: Number.parseInt(product.slotLimit ?? product.slot_limit, 10) || 4
+      }))
+    : [];
+
+  return {
+    ...record,
+    accessSettings,
+    access_settings: accessSettings,
+    products
+  };
+};
+
 // User Data (CV Form)
 export const saveUserData = async (userData) => {
   try {
@@ -340,9 +368,26 @@ export const getPromptsData = async () => {
 // Digital Products Data
 export const saveDigitalProductsData = async (digitalProductsData) => {
   try {
+    const accessSettings = digitalProductsData?.accessSettings ?? digitalProductsData?.access_settings ?? {};
+    const normalizedProducts = Array.isArray(digitalProductsData?.products)
+      ? digitalProductsData.products.map((product) => ({
+          ...product,
+          accessMode: normalizeDigitalProductAccessMode(product),
+          slotLimit: Number.parseInt(product.slotLimit ?? product.slot_limit, 10) || 4
+        }))
+      : [];
+
+    const payload = {
+      id: 1,
+      title: digitalProductsData?.title,
+      subtitle: digitalProductsData?.subtitle,
+      access_settings: accessSettings,
+      products: normalizedProducts
+    };
+
     const { data, error } = await supabase
       .from(TABLES.DIGITAL_PRODUCTS_DATA)
-      .upsert([{ id: 1, ...digitalProductsData }], { onConflict: 'id' })
+      .upsert([payload], { onConflict: 'id' })
     
     if (error) throw error
     return { success: true, data }
@@ -421,7 +466,7 @@ export const getDigitalProductsData = async () => {
       .single()
     
     if (error && error.code !== 'PGRST116') throw error
-    return { success: true, data: data || null }
+    return { success: true, data: data ? normalizeDigitalProductRecord(data) : null }
   } catch (error) {
     console.error('Error fetching digital products data:', error)
     return { success: false, error: error.message }
