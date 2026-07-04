@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FaDownload, FaEnvelope, FaFileAlt, FaPalette } from 'react-icons/fa';
+import { FaDownload, FaEnvelope, FaPalette, FaRegFileAlt } from 'react-icons/fa';
 import { generatePDF, generateTablePDF } from '../utils/pdfGenerator';
 import { getPortfolioData, getAboutData } from '../services/supabaseService';
 import { THEME_PRESETS, applyThemeSettings, getSiteSettings } from '../utils/siteSettings';
@@ -578,7 +578,7 @@ const Home = ({ userData }) => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <FaFileAlt className="btn-icon" />
+            <FaRegFileAlt className="btn-icon" />
             Generic Resume
           </a>
           <button className="btn btn-primary" onClick={handleContactMe}>
