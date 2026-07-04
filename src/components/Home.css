@@ -514,7 +514,40 @@
 .action-buttons {
   display: flex;
   gap: 20px;
+  flex-wrap: wrap;
   margin-bottom: 50px;
+}
+
+.action-buttons .btn {
+  min-width: 180px;
+}
+
+.btn-generic-resume {
+  background: linear-gradient(135deg, var(--site-accent-color), #7dd3fc);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 10px 24px rgba(var(--site-accent-rgb, 0, 206, 209), 0.28);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-generic-resume::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.22) 50%, transparent 100%);
+  transform: translateX(-120%);
+  transition: transform 0.6s ease;
+}
+
+.btn-generic-resume:hover {
+  background: linear-gradient(135deg, #5fcde0, #9adcf7);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 14px 30px rgba(var(--site-accent-rgb, 0, 206, 209), 0.38);
+}
+
+.btn-generic-resume:hover::after {
+  transform: translateX(120%);
 }
 
 /* Social Media Links Section */

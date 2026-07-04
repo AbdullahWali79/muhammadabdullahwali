@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FaDownload, FaEnvelope, FaPalette } from 'react-icons/fa';
+import { FaDownload, FaEnvelope, FaFileAlt, FaPalette } from 'react-icons/fa';
 import { generatePDF, generateTablePDF } from '../utils/pdfGenerator';
 import { getPortfolioData, getAboutData } from '../services/supabaseService';
 import { THEME_PRESETS, applyThemeSettings, getSiteSettings } from '../utils/siteSettings';
@@ -572,6 +572,15 @@ const Home = ({ userData }) => {
             <FaDownload className="btn-icon" />
             {isGenerating ? 'Generating PDF...' : 'Table Resume'}
           </button>
+          <a
+            className="btn btn-secondary btn-generic-resume"
+            href="https://docs.google.com/document/d/1PnwmJI-nFWYevyHDlFH68VFxybnxeBgwr1530dk9B50/edit?usp=sharing"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <FaFileAlt className="btn-icon" />
+            Genric Resume
+          </a>
           <button className="btn btn-primary" onClick={handleContactMe}>
             <FaEnvelope className="btn-icon" />
             Contact Me
