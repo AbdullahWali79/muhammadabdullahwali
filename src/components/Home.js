@@ -579,7 +579,7 @@ const Home = ({ userData }) => {
             rel="noopener noreferrer"
           >
             <FaFileAlt className="btn-icon" />
-            Genric Resume
+            Generic Resume
           </a>
           <button className="btn btn-primary" onClick={handleContactMe}>
             <FaEnvelope className="btn-icon" />
