@@ -128,7 +128,7 @@ function AppContent() {
   const currentSettings = useMemo(() => getSiteSettings(), [settingsVersion]);
   const whatsappNumber = String(userData.phone || '+923046983794').replace(/\D/g, '');
   const whatsappMessage = encodeURIComponent(
-    'Assalam-o-Alaikum Muhammad Abdullah, mujhe aapke digital products/services ki price aur details chahiye.'
+    'Hello Muhammad Abdullah, I am interested in buying a digital product. Please share the available products, prices, and details.'
   );
   const backgroundModeClass = `app-bg-${currentSettings.theme.backgroundMode || 'solid'}`;
   const backgroundMotionClass = currentSettings.theme.motionEnabled ? 'app-bg-motion' : 'app-bg-static';
@@ -292,11 +292,11 @@ function AppContent() {
         href={`https://wa.me/${whatsappNumber}?text=${whatsappMessage}`}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="WhatsApp par price aur details poochain"
-        title="WhatsApp par rabta karein"
+        aria-label="Buy a digital product through WhatsApp"
+        title="Buy a digital product through WhatsApp"
       >
         <FaWhatsapp aria-hidden="true" />
-        <span>Price poochain</span>
+        <span>Buy Digital Product</span>
       </a>
     </div>
   );

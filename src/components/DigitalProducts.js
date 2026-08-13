@@ -140,6 +140,24 @@ const DigitalProducts = ({ userData }) => {
     ...DEFAULT_ACCESS_SETTINGS,
     ...(productsData?.accessSettings || {})
   };
+  const whatsappNumber = String(
+    accessSettings.whatsappNumber || userData?.phone || '+923046983794'
+  ).replace(/\D/g, '');
+
+  const getProductWhatsAppUrl = (product, formattedPrice) => {
+    const message = [
+      'Hello Muhammad Abdullah, I am interested in buying this digital product:',
+      '',
+      `Product: ${product.title || 'Digital Product'}`,
+      product.category ? `Category: ${product.category}` : null,
+      product.showPrice !== false && formattedPrice ? `Listed Price: ${formattedPrice}` : null,
+      product.description ? `Details: ${product.description}` : null,
+      '',
+      'Please share the purchase details and final price.'
+    ].filter((line) => line !== null).join('\n');
+
+    return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+  };
 
   const sharedProducts = useMemo(
     () => products.filter((product) => getProductAccessMode(product) === ACCESS_MODES.SHARED),
@@ -604,6 +622,16 @@ const DigitalProducts = ({ userData }) => {
                             Open Tool
                           </button>
                         )}
+                        <a
+                          className="buy-btn product-whatsapp-btn"
+                          href={getProductWhatsAppUrl(product, formattedPrice)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`Buy ${product.title || 'digital product'} through WhatsApp`}
+                        >
+                          <FaWhatsapp className="btn-icon" />
+                          Buy Digital Product
+                        </a>
                       </div>
                     </div>
                   </div>

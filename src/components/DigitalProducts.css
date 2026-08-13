@@ -582,7 +582,7 @@
 }
 
 .product-expandable.open {
-  max-height: 380px;
+  max-height: 560px;
   opacity: 1;
   margin-top: 14px;
 }
@@ -628,6 +628,11 @@
   color: var(--site-text-color);
   border: 1px solid rgba(var(--site-accent-rgb, 0, 206, 209), 0.3);
   animation: none;
+}
+
+.product-whatsapp-btn {
+  margin-top: 12px;
+  text-decoration: none;
 }
 
 .btn-icon {
