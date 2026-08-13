@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { FaWhatsapp } from 'react-icons/fa';
 import { getUserData } from './services/supabaseService';
 import Sidebar from './components/Sidebar';
 import Home from './components/Home';
@@ -125,6 +126,10 @@ function AppContent() {
 
   const location = useLocation();
   const currentSettings = useMemo(() => getSiteSettings(), [settingsVersion]);
+  const whatsappNumber = String(userData.phone || '+923046983794').replace(/\D/g, '');
+  const whatsappMessage = encodeURIComponent(
+    'Assalam-o-Alaikum Muhammad Abdullah, mujhe aapke digital products/services ki price aur details chahiye.'
+  );
   const backgroundModeClass = `app-bg-${currentSettings.theme.backgroundMode || 'solid'}`;
   const backgroundMotionClass = currentSettings.theme.motionEnabled ? 'app-bg-motion' : 'app-bg-static';
   const getActiveSection = () => {
@@ -282,6 +287,17 @@ function AppContent() {
           </Routes>
         </div>
       </main>
+      <a
+        className="whatsapp-contact-button"
+        href={`https://wa.me/${whatsappNumber}?text=${whatsappMessage}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="WhatsApp par price aur details poochain"
+        title="WhatsApp par rabta karein"
+      >
+        <FaWhatsapp aria-hidden="true" />
+        <span>Price poochain</span>
+      </a>
     </div>
   );
 }
