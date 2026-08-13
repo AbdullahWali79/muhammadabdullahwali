@@ -49,6 +49,8 @@ const MakeDigitalProducts = () => {
   const [isAddingProduct, setIsAddingProduct] = useState(false);
   const [productSearch, setProductSearch] = useState('');
   const [productFilter, setProductFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [sortOrder, setSortOrder] = useState('newest');
   
   const [newProduct, setNewProduct] = useState({
     title: '',
@@ -95,9 +97,20 @@ const MakeDigitalProducts = () => {
         .filter(Boolean)
         .some((field) => String(field).toLowerCase().includes(query));
 
-      return matchesFilter && matchesQuery;
-    });
-  }, [data.products, productSearch, productFilter]);
+      const matchesCategory = categoryFilter === 'all' || product.category === categoryFilter;
+
+      return matchesFilter && matchesQuery && matchesCategory;
+    })
+      .sort((a, b) => {
+        if (sortOrder === 'title') return String(a.product.title || '').localeCompare(String(b.product.title || ''));
+        if (sortOrder === 'price-high') {
+          const price = (value) => Number.parseFloat(String(value || '').replace(/[^\d.]/g, '')) || 0;
+          return price(b.product.price) - price(a.product.price);
+        }
+        if (sortOrder === 'oldest') return b.originalIndex - a.originalIndex;
+        return a.originalIndex - b.originalIndex;
+      });
+  }, [data.products, productSearch, productFilter, categoryFilter, sortOrder]);
   const productCounts = useMemo(() => {
     const products = data.products || [];
 
@@ -393,9 +406,22 @@ const MakeDigitalProducts = () => {
     }
   };
 
+  const handleDuplicateProduct = (index) => {
+    const source = data.products[index];
+    const duplicate = {
+      ...source,
+      id: `${Date.now()}-copy`,
+      title: `${source.title || 'Product'} (Copy)`
+    };
+    setData((prev) => ({ ...prev, products: [duplicate, ...(prev.products || [])] }));
+    setMessage({ type: 'success', text: 'Product duplicated locally. Review it and save changes.' });
+  };
+
   const clearProductFilters = () => {
     setProductSearch('');
     setProductFilter('all');
+    setCategoryFilter('all');
+    setSortOrder('newest');
   };
 
   const handlePaymentRequestStatus = async (requestId, status) => {
@@ -420,10 +446,14 @@ const MakeDigitalProducts = () => {
   }
 
   return (
-    <div className="make-page">
+    <div className="make-page digital-products-admin">
       <div className="form-container">
         <div className="editor-header">
-          <h1>Edit Digital Products Page</h1>
+          <div className="editor-title-block">
+            <span className="editor-eyebrow">Store management</span>
+            <h1>Digital Products</h1>
+            <p>Add, organize and publish products from one simple workspace.</p>
+          </div>
           <div className="editor-actions">
             <button type="button" className="btn btn-primary" onClick={() => setIsAddingProduct(true)}>
               <i className="fas fa-plus"></i> Add New Product
@@ -446,8 +476,16 @@ const MakeDigitalProducts = () => {
         )}
 
         <form onSubmit={handleSubmit} className="editor-form" id="digital-products-form">
+          <div className="admin-overview-grid">
+            <div className="overview-card"><span>Total products</span><strong>{productCounts.total}</strong></div>
+            <div className="overview-card shared"><span>Shared access</span><strong>{productCounts.shared}</strong></div>
+            <div className="overview-card private"><span>Private access</span><strong>{productCounts.private}</strong></div>
+            <div className="overview-card"><span>Payment requests</span><strong>{paymentRequests.length}</strong></div>
+          </div>
+
+          <div className="admin-settings-grid">
           <div className="form-section">
-            <h3>Page Header</h3>
+            <div className="section-heading"><div><span>Public page</span><h3>Page Header</h3></div></div>
             <div className="form-group">
               <label htmlFor="title">Page Title</label>
               <input
@@ -476,7 +514,7 @@ const MakeDigitalProducts = () => {
           </div>
 
           <div className="form-section">
-            <h3>Access & Payment Settings</h3>
+            <div className="section-heading"><div><span>Checkout</span><h3>Access & Payment</h3></div></div>
             <div className="form-group">
               <label className="popup-toggle" style={{ marginBottom: '16px' }}>
                 <input
@@ -584,6 +622,7 @@ const MakeDigitalProducts = () => {
               </div>
             </div>
           </div>
+          </div>
 
           <div className="form-section">
             <div className="section-header-flex">
@@ -596,13 +635,26 @@ const MakeDigitalProducts = () => {
             </div>
 
             <div className="products-toolbar">
-              <input
-                type="text"
-                className="products-toolbar-search"
-                placeholder="Search products by title, category, description, price..."
-                value={productSearch}
-                onChange={(event) => setProductSearch(event.target.value)}
-              />
+              <div className="products-search-box">
+                <i className="fas fa-search" aria-hidden="true"></i>
+                <input
+                  type="search"
+                  className="products-toolbar-search"
+                  placeholder="Search title, category, price..."
+                  value={productSearch}
+                  onChange={(event) => setProductSearch(event.target.value)}
+                />
+              </div>
+              <select className="toolbar-select" value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)} aria-label="Filter by category">
+                <option value="all">All categories</option>
+                {existingCategories.map((category) => <option key={category} value={category}>{category}</option>)}
+              </select>
+              <select className="toolbar-select" value={sortOrder} onChange={(event) => setSortOrder(event.target.value)} aria-label="Sort products">
+                <option value="newest">Newest first</option>
+                <option value="oldest">Oldest first</option>
+                <option value="title">Name A–Z</option>
+                <option value="price-high">Highest price</option>
+              </select>
               <div className="products-toolbar-filters" role="tablist" aria-label="Product filters">
                 <button
                   type="button"
@@ -625,7 +677,7 @@ const MakeDigitalProducts = () => {
                 >
                   Private
                 </button>
-                {(productSearch || productFilter !== 'all') && (
+                {(productSearch || productFilter !== 'all' || categoryFilter !== 'all' || sortOrder !== 'newest') && (
                   <button type="button" className="toolbar-filter-btn ghost" onClick={clearProductFilters}>
                     Reset
                   </button>
@@ -797,6 +849,16 @@ const MakeDigitalProducts = () => {
                       placeholder="URL for the product cover image"
                       className="form-control"
                     />
+                    <div className="image-preview-panel">
+                      {newProduct.imageUrl ? (
+                        <img src={newProduct.imageUrl} alt="Product preview" />
+                      ) : (
+                        <div className="image-preview-empty">
+                          <i className="fas fa-image"></i>
+                          <span>Paste an image URL to preview it here</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   <div className="form-group">
@@ -862,7 +924,14 @@ const MakeDigitalProducts = () => {
                 </p>
               ) : (
                 filteredProducts.map(({ product, originalIndex }) => (
-                  <div key={product.id || originalIndex} className="list-item-card">
+                  <div key={product.id || originalIndex} className="list-item-card product-admin-card">
+                    <div className="admin-product-media">
+                      {product.imageUrl && product.displayMode !== 'text' ? (
+                        <img src={product.imageUrl} alt="" loading="lazy" />
+                      ) : (
+                        <div className="admin-product-placeholder"><i className="fas fa-box-open"></i></div>
+                      )}
+                    </div>
                     <div className="item-header">
                       <div className="item-header-copy">
                         <h4>{product.title}</h4>
@@ -879,6 +948,9 @@ const MakeDigitalProducts = () => {
                       <div className="item-actions">
                         <button type="button" onClick={() => startEditProduct(originalIndex)} title="Edit" className="edit-icon-btn">
                           <i className="fas fa-edit"></i> Edit
+                        </button>
+                        <button type="button" onClick={() => handleDuplicateProduct(originalIndex)} title="Duplicate" className="duplicate-icon-btn">
+                          <i className="fas fa-copy"></i> Copy
                         </button>
                         <button type="button" onClick={() => handleDeleteProduct(originalIndex)} title="Delete" className="delete-icon-btn">
                           <i className="fas fa-trash-alt"></i> Delete
