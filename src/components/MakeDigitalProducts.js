@@ -945,17 +945,17 @@ const MakeDigitalProducts = () => {
                           </span>
                         </div>
                       </div>
-                      <div className="item-actions">
-                        <button type="button" onClick={() => startEditProduct(originalIndex)} title="Edit" className="edit-icon-btn">
-                          <i className="fas fa-edit"></i> Edit
-                        </button>
-                        <button type="button" onClick={() => handleDuplicateProduct(originalIndex)} title="Duplicate" className="duplicate-icon-btn">
-                          <i className="fas fa-copy"></i> Copy
-                        </button>
-                        <button type="button" onClick={() => handleDeleteProduct(originalIndex)} title="Delete" className="delete-icon-btn">
-                          <i className="fas fa-trash-alt"></i> Delete
-                        </button>
-                      </div>
+                    </div>
+                    <div className="item-actions">
+                      <button type="button" onClick={() => startEditProduct(originalIndex)} title="Edit" className="edit-icon-btn">
+                        <i className="fas fa-edit"></i> Edit
+                      </button>
+                      <button type="button" onClick={() => handleDuplicateProduct(originalIndex)} title="Duplicate" className="duplicate-icon-btn">
+                        <i className="fas fa-copy"></i> Copy
+                      </button>
+                      <button type="button" onClick={() => handleDeleteProduct(originalIndex)} title="Delete" className="delete-icon-btn">
+                        <i className="fas fa-trash-alt"></i> Delete
+                      </button>
                     </div>
                     <div className="item-details">
                       <p><strong>Display:</strong> {product.displayMode === 'text' ? 'Text' : 'Image'}</p>
