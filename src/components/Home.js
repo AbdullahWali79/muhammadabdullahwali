@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FaDownload, FaEnvelope, FaPalette, FaRegFileAlt } from 'react-icons/fa';
+import { FaDownload, FaEnvelope, FaPalette, FaRegFileAlt, FaExternalLinkAlt, FaGithub, FaGraduationCap } from 'react-icons/fa';
 import { generatePDF, generateTablePDF } from '../utils/pdfGenerator';
 import { getPortfolioData, getAboutData } from '../services/supabaseService';
 import { THEME_PRESETS, applyThemeSettings, getSiteSettings } from '../utils/siteSettings';
@@ -560,6 +560,73 @@ const Home = ({ userData }) => {
                 </tr>
               </tbody>
             </table>
+          </div>
+        </div>
+
+        {/* Featured Project Portfolios Showcase */}
+        <div className="featured-projects-section">
+          <div className="featured-projects-grid">
+            <a
+              href="https://abdullahstduenstprojects.lovable.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="featured-project-card featured-project-card-students"
+            >
+              <div className="project-card-top">
+                <span className="project-badge project-badge-students">
+                  <FaGraduationCap className="badge-icon" /> Mentored Students Archive
+                </span>
+                <span className="project-external-hint">
+                  <FaExternalLinkAlt />
+                </span>
+              </div>
+              <h3 className="project-card-title">
+                Students' GitHub Projects
+              </h3>
+              <p className="project-card-desc">
+                Comprehensive archive of real-world web apps, final year capstones &amp; GitHub repositories developed by students under my mentorship to date.
+              </p>
+              <div className="project-card-tags">
+                <span className="project-tag">Students' Work</span>
+                <span className="project-tag">GitHub Repos</span>
+                <span className="project-tag">Live Demos</span>
+              </div>
+              <div className="project-card-btn">
+                <span>Explore Students' Projects</span>
+                <FaExternalLinkAlt className="btn-inline-icon" />
+              </div>
+            </a>
+
+            <a
+              href="https://abdullahportfolioprojects.lovable.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="featured-project-card featured-project-card-personal"
+            >
+              <div className="project-card-top">
+                <span className="project-badge project-badge-personal">
+                  <FaGithub className="badge-icon" /> Developer Portfolio Hub
+                </span>
+                <span className="project-external-hint">
+                  <FaExternalLinkAlt />
+                </span>
+              </div>
+              <h3 className="project-card-title">
+                My GitHub Projects Portfolio
+              </h3>
+              <p className="project-card-desc">
+                Curated portfolio featuring my personal full-stack software, AI automation tools, custom systems &amp; open-source GitHub repositories.
+              </p>
+              <div className="project-card-tags">
+                <span className="project-tag">Personal Portfolio</span>
+                <span className="project-tag">AI &amp; Full-Stack</span>
+                <span className="project-tag">Source Code</span>
+              </div>
+              <div className="project-card-btn">
+                <span>Explore My GitHub Projects</span>
+                <FaExternalLinkAlt className="btn-inline-icon" />
+              </div>
+            </a>
           </div>
         </div>
 
