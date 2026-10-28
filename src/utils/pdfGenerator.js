@@ -104,7 +104,7 @@ const saveElementAsPDF = async (element, fileName, backgroundColor) => {
     const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF('p', 'mm', 'a4');
     const imgWidth = 210;
-    const pageHeight = 295;
+    const pageHeight = 297;
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
     let heightLeft = imgHeight;
     let position = 0;
@@ -112,7 +112,7 @@ const saveElementAsPDF = async (element, fileName, backgroundColor) => {
     pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
     heightLeft -= pageHeight;
 
-    while (heightLeft > 0) {
+    while (heightLeft > 10) {
       position = heightLeft - imgHeight;
       pdf.addPage();
       pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
@@ -130,143 +130,161 @@ export const generatePDF = async (userData, portfolioData = null, aboutData = nu
   cvContent.style.cssText = `
     width: 210mm;
     min-height: 297mm;
-    padding: 14mm;
-    background-color: #102024;
-    color: #ffffff;
-    font-family: Arial, sans-serif;
+    padding: 13mm 15mm;
+    background-color: #ffffff;
+    color: #1f2937;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     position: absolute;
     top: -9999px;
     left: -9999px;
     box-sizing: border-box;
+    line-height: 1.4;
   `;
 
-  const skills = toList(aboutData?.skills);
-  const groupedSkills = groupSkills(skills);
-  const projects = [...(portfolioData?.projects || [])]
-    .sort((a, b) => Number(b.id || 0) - Number(a.id || 0))
-    .slice(0, 4);
-  const whatsappUrl = getCleanPhone(userData.phone) ? `https://wa.me/${getCleanPhone(userData.phone)}` : '';
-  const portfolioUrl = getPortfolioUrl();
-  const contactItems = [
-    userData.email ? `Email: ${escapeHTML(userData.email)}` : '',
-    userData.phone ? `Phone: ${escapeHTML(userData.phone)}` : '',
-    whatsappUrl ? `WhatsApp: ${escapeHTML(whatsappUrl)}` : '',
-    portfolioUrl ? `Portfolio: ${escapeHTML(portfolioUrl)}` : '',
-    userData.address ? `Location: ${escapeHTML(userData.address)}` : ''
-  ].filter(Boolean);
+  const profileImg = userData?.profileImage || 'https://lh3.googleusercontent.com/aida-public/AB6AXuAKPwwOjpZTjQJnrH6G-XvW5FYdvkH5KOcVwBWQDEcmyemj8oD74QAOhVZURXU9i1kdCtmW_IIRLO_5tXRccZkSeIfzpwL6DkcOvb8yHhCwhSaXF3WS8OsR7rEcxranN1glfEEYJXOGFzDGVSkfv6TavN-8i_NRROPPviWm2WgGgJSrtJnZw6LvIyHBlhz-4PI7d_6_Hs_NmezPrYQ1lKAg3kfrB_2xtFPBe7YNNXmhTNFcT8iKweLI1BkD2AXVZdzRYKIdVen3Cw';
 
-  const summaryHTML = `
-    <section style="margin-bottom: 22px;">
-      ${createSectionTitle('Professional Summary')}
-      <ul style="margin: 0; padding-left: 18px; color: #DDE7EA; font-size: 13px; line-height: 1.55;">
-        ${getSummaryBullets(userData, aboutData).map(item => `<li style="margin-bottom: 5px;">${escapeHTML(item)}</li>`).join('')}
-      </ul>
-    </section>
+  const createSectionHeader = (title) => `
+    <div style="margin-top: 10px; margin-bottom: 5px;">
+      <div style="font-size: 12px; font-weight: 800; color: #111827; letter-spacing: 0.6px; text-transform: uppercase;">
+        ${title}
+      </div>
+      <div style="width: 100%; height: 2px; background: #6366f1; margin-top: 3px; margin-bottom: 5px;"></div>
+    </div>
   `;
-
-  const skillsHTML = groupedSkills.length > 0 ? `
-    <section style="margin-bottom: 22px; page-break-inside: avoid;">
-      ${createSectionTitle('Skills by Category')}
-      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-        ${groupedSkills.map(([groupName, groupSkills]) => `
-          <div style="background: #1A2B2E; border: 1px solid #2E474D; border-radius: 8px; padding: 12px;">
-            <h3 style="font-size: 13px; color: #00CED1; margin: 0 0 8px; text-transform: uppercase;">${escapeHTML(groupName)}</h3>
-            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-              ${groupSkills.map(skill => `
-                <span style="font-size: 11px; color: #DDE7EA; background: rgba(0, 206, 209, 0.12); border: 1px solid rgba(0, 206, 209, 0.35); border-radius: 999px; padding: 5px 8px;">
-                  ${escapeHTML(skill)}
-                </span>
-              `).join('')}
-            </div>
-          </div>
-        `).join('')}
-      </div>
-    </section>
-  ` : '';
-
-  const projectsHTML = projects.length > 0 ? `
-    <section style="margin-bottom: 22px;">
-      ${createSectionTitle('Selected Projects')}
-      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
-        ${projects.map(project => {
-          const projectUrl = getProjectUrl(project);
-          const technologies = toList(project.technologies).slice(0, 6);
-
-          return `
-            <div style="page-break-inside: avoid; background: #1A2B2E; border: 1px solid #2E474D; border-radius: 8px; overflow: hidden;">
-              ${project.image ? `
-                <div style="height: 105px; background: #ffffff; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-                  <img src="${escapeHTML(project.image)}" alt="${escapeHTML(project.title || 'Project')}" style="width: 100%; height: 100%; object-fit: contain;" onerror="this.style.display='none'" />
-                </div>
-              ` : ''}
-              <div style="padding: 12px;">
-                <div style="font-size: 10px; color: #00CED1; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 5px;">${escapeHTML(project.category || 'Project')}</div>
-                <h3 style="font-size: 14px; color: #ffffff; margin: 0 0 7px; line-height: 1.25;">${escapeHTML(project.title || 'Selected Project')}</h3>
-                ${project.description ? `<p style="font-size: 11px; color: #B9C9CD; line-height: 1.45; margin: 0 0 8px;">${escapeHTML(project.description)}</p>` : ''}
-                ${technologies.length > 0 ? `
-                  <div style="font-size: 10px; color: #DDE7EA; margin-bottom: 8px;">
-                    <strong style="color: #ffffff;">Tech:</strong> ${technologies.map(escapeHTML).join(', ')}
-                  </div>
-                ` : ''}
-                ${projectUrl ? `<div style="font-size: 10px; color: #80F4F6; word-break: break-all;">${escapeHTML(projectUrl)}</div>` : ''}
-              </div>
-            </div>
-          `;
-        }).join('')}
-      </div>
-    </section>
-  ` : '';
 
   cvContent.innerHTML = `
-    <header style="display: grid; grid-template-columns: 1fr 112px; gap: 18px; margin-bottom: 18px; align-items: center;">
-      <div>
-        <h1 style="font-size: 31px; font-weight: 700; color: #ffffff; margin: 0 0 6px;">
-          ${escapeHTML(userData.firstName || '')} ${escapeHTML(userData.lastName || '')}
+    <!-- Header Box -->
+    <header style="background: #1b232c; border-radius: 8px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 11px;">
+      <div style="flex: 1; padding-right: 14px;">
+        <h1 style="font-size: 23px; font-weight: 800; color: #ffffff; margin: 0 0 4px; letter-spacing: -0.2px;">
+          Muhammad Abdullah
         </h1>
-        <div style="font-size: 16px; color: #00CED1; font-weight: 600; margin-bottom: 12px;">${escapeHTML(userData.title || '')}</div>
-        <div style="display: flex; flex-wrap: wrap; gap: 7px;">
-          ${contactItems.map(item => `
-            <span style="font-size: 10.5px; color: #DDE7EA; background: #1A2B2E; border: 1px solid #2E474D; border-radius: 999px; padding: 6px 9px;">
-              ${item}
-            </span>
-          `).join('')}
+        <div style="font-size: 12px; font-weight: 700; color: #8b5cf6; margin-bottom: 5px;">
+          Mobile &amp; Web Developer | AI &amp; LLMs Specialist | SEO Specialist
+        </div>
+        <div style="font-size: 10.5px; color: #f3f4f6; margin-bottom: 3px; font-weight: 500;">
+          COMSATS University Islamabad (Vehari Campus) | Teaching since 2013
+        </div>
+        <div style="font-size: 10px; color: #d1d5db; margin-bottom: 2px;">
+          Aljannat Colony, Vehari, Punjab, Pakistan | 0304 6983794
+        </div>
+        <div style="font-size: 10px; color: #d1d5db;">
+          muhammadabdullah@cuivehari.edu.pk | muhammadabdullahwali.vercel.app
         </div>
       </div>
-      ${userData.profileImage ? `
-        <div style="width: 112px; height: 112px; border-radius: 50%; overflow: hidden; border: 3px solid #00CED1; background: #1A2B2E;">
-          <img src="${escapeHTML(userData.profileImage)}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'" />
-        </div>
-      ` : `
-        <div style="width: 112px; height: 112px; border-radius: 50%; background: linear-gradient(135deg, #00CED1, #008B8B); display: flex; align-items: center; justify-content: center; font-size: 34px; font-weight: bold; color: white;">
-          ${escapeHTML(userData.firstName?.charAt(0) || '')}${escapeHTML(userData.lastName?.charAt(0) || '')}
-        </div>
-      `}
+      <div style="width: 80px; height: 80px; border-radius: 50%; overflow: hidden; border: 2.5px solid #8b5cf6; flex-shrink: 0; background: #2d3748; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+        <img src="${escapeHTML(profileImg)}" alt="Muhammad Abdullah" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'" crossorigin="anonymous" />
+      </div>
     </header>
 
-    ${summaryHTML}
-    ${skillsHTML}
-    ${projectsHTML}
+    <!-- PROFILE Section -->
+    <section style="margin-bottom: 9px;">
+      ${createSectionHeader('PROFILE')}
+      <p style="margin: 0; font-size: 10px; line-height: 1.48; color: #374151; text-align: justify;">
+        Computer Science educator and versatile IT professional with over 12 years at COMSATS University Islamabad (Vehari Campus). Combines university teaching with real industry delivery across four areas: mobile app development (Flutter), web development, AI &amp; LLM-based solutions and SEO &amp; digital marketing. Has built and shipped client applications to the Google Play Store, delivered measurable SEO results for local and international clients, and conducted hands-on training programs for young learners during summer vacations.
+      </p>
+    </section>
 
-    <section style="margin-bottom: 18px; page-break-inside: avoid;">
-      ${createSectionTitle('Additional Details')}
-      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 14px; font-size: 11.5px; color: #DDE7EA;">
-        ${userData.languages ? `<div><strong style="color: #ffffff;">Languages:</strong> ${escapeHTML(userData.languages)}</div>` : ''}
-        ${userData.nationality ? `<div><strong style="color: #ffffff;">Nationality:</strong> ${escapeHTML(userData.nationality)}</div>` : ''}
-        ${aboutData?.experience ? `<div><strong style="color: #ffffff;">Experience:</strong> ${escapeHTML(aboutData.experience)}</div>` : ''}
-        ${portfolioUrl ? `<div><strong style="color: #ffffff;">Full Portfolio:</strong> ${escapeHTML(portfolioUrl)}</div>` : ''}
+    <!-- PROFESSIONAL EXPERIENCE Section -->
+    <section style="margin-bottom: 9px;">
+      ${createSectionHeader('PROFESSIONAL EXPERIENCE')}
+      
+      <!-- Role 1 -->
+      <div style="margin-bottom: 6px;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px;">
+          <span style="font-size: 10.5px; font-weight: 800; color: #111827;">
+            Lecturer — COMSATS University Islamabad, Vehari Campus
+          </span>
+          <span style="font-size: 10.5px; font-weight: 700; color: #6366f1;">
+            2013 – Present
+          </span>
+        </div>
+        <ul style="margin: 0; padding-left: 15px; font-size: 9.5px; line-height: 1.42; color: #374151;">
+          <li style="margin-bottom: 1.5px;">Teaching Computer Science subjects including Mobile Application Development (Flutter), with a practical, project-based approach.</li>
+          <li style="margin-bottom: 1.5px;">Integrated modern industry topics — AI and LLMs, web technologies, SEO and digital marketing — into student learning.</li>
+          <li style="margin-bottom: 1.5px;">Guiding students in practical AI and LLM applications — prompt engineering, building chatbots and AI-powered apps using LLM APIs.</li>
+          <li style="margin-bottom: 1.5px;">Supervising and mentoring student projects from idea to working, deployable products.</li>
+        </ul>
+      </div>
+
+      <!-- Role 2 -->
+      <div style="margin-bottom: 6px;">
+        <div style="margin-bottom: 2px;">
+          <span style="font-size: 10.5px; font-weight: 800; color: #111827;">
+            SEO Specialist — WeConnect Software House
+          </span>
+        </div>
+        <ul style="margin: 0; padding-left: 15px; font-size: 9.5px; line-height: 1.42; color: #374151;">
+          <li>Managed and optimized multiple client websites: doubled organic traffic for one client in three months, achieved +40% traffic and +30% search visibility gains for others, and handled local SEO (Google Business Profile) for several businesses.</li>
+        </ul>
+      </div>
+
+      <!-- Role 3 -->
+      <div style="margin-bottom: 2px;">
+        <div style="margin-bottom: 2px;">
+          <span style="font-size: 10.5px; font-weight: 800; color: #111827;">
+            Freelance Mobile &amp; Web Developer
+          </span>
+        </div>
+        <ul style="margin: 0; padding-left: 15px; font-size: 9.5px; line-height: 1.42; color: #374151;">
+          <li>Developed and delivered numerous applications for clients — including a complete inDrive-style ride-hailing app published on the Google Play Store — handling the full cycle from requirements to release.</li>
+        </ul>
       </div>
     </section>
 
-    <footer style="margin-top: 24px; text-align: center; color: #7F969C; font-size: 10px;">
-      ${escapeHTML(userData.firstName || '')} ${escapeHTML(userData.lastName || '')} - CV generated from portfolio website
-    </footer>
+    <!-- KEY SKILLS Section -->
+    <section style="margin-bottom: 9px;">
+      ${createSectionHeader('KEY SKILLS')}
+      <ul style="margin: 0; padding-left: 15px; font-size: 9.5px; line-height: 1.44; color: #374151;">
+        <li style="margin-bottom: 2px;"><strong style="color: #111827;">Mobile Development:</strong> Flutter, Dart, Firebase, Google Maps, state management, Play Store publishing</li>
+        <li style="margin-bottom: 2px;"><strong style="color: #111827;">Web Development:</strong> HTML, CSS, JavaScript, React, Node.js, WordPress, Git &amp; GitHub, deployment</li>
+        <li style="margin-bottom: 2px;"><strong style="color: #111827;">AI &amp; LLMs:</strong> Prompt engineering, LLM APIs (OpenAI, Claude, Gemini), RAG, AI agents, chatbot development, AI-assisted coding, integrating AI into web &amp; mobile apps</li>
+        <li style="margin-bottom: 2px;"><strong style="color: #111827;">SEO &amp; Digital Marketing:</strong> Technical &amp; local SEO, Google Business Profile, social media optimization, lead generation</li>
+        <li style="margin-bottom: 1.5px;"><strong style="color: #111827;">Teaching &amp; Management:</strong> Curriculum design, mentoring, training programs for all age groups, managing multiple projects</li>
+      </ul>
+    </section>
+
+    <!-- EDUCATION Section -->
+    <section style="margin-bottom: 9px;">
+      ${createSectionHeader('EDUCATION')}
+      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px;">
+        <span style="font-size: 10.5px; font-weight: 800; color: #111827;">
+          MSCS — Virtual University of Pakistan
+        </span>
+        <span style="font-size: 10.5px; font-weight: 700; color: #6366f1;">
+          2018
+        </span>
+      </div>
+      <div style="font-size: 9.5px; color: #374151;">
+        Master of Science in Computer Science, 1st Division.
+      </div>
+    </section>
+
+    <!-- HIGHLIGHTS Section -->
+    <section style="margin-bottom: 9px;">
+      ${createSectionHeader('HIGHLIGHTS')}
+      <ul style="margin: 0; padding-left: 15px; font-size: 9.5px; line-height: 1.42; color: #374151;">
+        <li style="margin-bottom: 1.5px;">12+ years of university teaching experience.</li>
+        <li style="margin-bottom: 1.5px;">Client apps live on the Google Play Store, including a full ride-hailing platform.</li>
+        <li style="margin-bottom: 1.5px;">Proven SEO results: organic traffic doubled in 3 months for one client; +40% and +30% improvements for others.</li>
+        <li style="margin-bottom: 1.5px;">Conducted AI and web development summer programs for young learners, with students requesting follow-up sessions.</li>
+      </ul>
+    </section>
+
+    <!-- LANGUAGES Section -->
+    <section style="margin-bottom: 2px;">
+      ${createSectionHeader('LANGUAGES')}
+      <div style="font-size: 10px; color: #374151; font-weight: 500;">
+        Urdu, English
+      </div>
+    </section>
   `;
 
   try {
     await saveElementAsPDF(
       cvContent,
-      `${userData.firstName || 'Portfolio'}_${userData.lastName || 'CV'}_CV.pdf`,
-      '#102024'
+      'Muhammad_Abdullah_Resume.pdf',
+      '#ffffff'
     );
   } catch (error) {
     console.error('Error generating PDF:', error);
