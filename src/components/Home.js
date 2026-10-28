@@ -630,6 +630,29 @@ const Home = ({ userData }) => {
           </div>
         </div>
 
+        {localUserData.socialLinks && localUserData.socialLinks.length > 0 && (
+          <div className="social-links-section">
+            <h3>Follow Me</h3>
+            <div className="social-grid">
+              {localUserData.socialLinks.map(
+                (link) =>
+                  link.url && (
+                    <a
+                      key={link.id}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="social-link"
+                    >
+                      <i className={link.icon} style={{ color: link.color }} />
+                      {link.platform}
+                    </a>
+                  )
+              )}
+            </div>
+          </div>
+        )}
+
         <div className="action-buttons">
           <button className="btn btn-secondary" onClick={handleDownloadCV} disabled={isGenerating}>
             <FaDownload className="btn-icon" />
@@ -653,29 +676,6 @@ const Home = ({ userData }) => {
             Contact Me
           </button>
         </div>
-
-        {localUserData.socialLinks && localUserData.socialLinks.length > 0 && (
-          <div className="social-links-section">
-            <h3>Follow Me</h3>
-            <div className="social-grid">
-              {localUserData.socialLinks.map(
-                (link) =>
-                  link.url && (
-                    <a
-                      key={link.id}
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="social-link"
-                    >
-                      <i className={link.icon} style={{ color: link.color }} />
-                      {link.platform}
-                    </a>
-                  )
-              )}
-            </div>
-          </div>
-        )}
       </div>
 
       <footer className="footer">
