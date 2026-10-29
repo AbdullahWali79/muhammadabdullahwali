@@ -603,6 +603,60 @@ const convertHexToRgb = (hexColor, fallback = '0,0,0') => {
   return `${red},${green},${blue}`;
 };
 
+const parseRgbString = (rgbString) => {
+  if (typeof rgbString !== 'string') {
+    return null;
+  }
+  const parts = rgbString.split(',').map((part) => Number(part.trim()));
+  if (parts.length !== 3 || parts.some((part) => !Number.isFinite(part))) {
+    return null;
+  }
+  return parts;
+};
+
+const getRelativeLuminance = (rgb) => {
+  const [red, green, blue] = rgb.map((channel) => {
+    const normalized = clamp(channel, 0, 255) / 255;
+    return normalized <= 0.03928
+      ? normalized / 12.92
+      : ((normalized + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+};
+
+const LIGHT_CONTRAST_COLOR = '#FFFFFF';
+const DARK_CONTRAST_COLOR = '#07131A';
+const DARK_CONTRAST_LUMINANCE = 0.006;
+
+// Picks whichever of white / near-black reads better on top of the accent fill.
+const getAccentContrastColor = (hexColor) => {
+  const rgb = parseRgbString(convertHexToRgb(hexColor, ''));
+  if (!rgb) {
+    return LIGHT_CONTRAST_COLOR;
+  }
+
+  const luminance = getRelativeLuminance(rgb);
+  const contrastWithLight = 1.05 / (luminance + 0.05);
+  const contrastWithDark = (luminance + 0.05) / (DARK_CONTRAST_LUMINANCE + 0.05);
+
+  return contrastWithLight >= contrastWithDark ? LIGHT_CONTRAST_COLOR : DARK_CONTRAST_COLOR;
+};
+
+// amount is a ratio: negative darkens, positive lightens.
+const adjustHexColor = (hexColor, amount) => {
+  const rgb = parseRgbString(convertHexToRgb(hexColor, ''));
+  if (!rgb) {
+    return hexColor;
+  }
+
+  const toHexChannel = (channel) =>
+    Math.round(clamp(channel * (1 + amount), 0, 255))
+      .toString(16)
+      .padStart(2, '0');
+
+  return `#${rgb.map(toHexChannel).join('')}`;
+};
+
 const applyMidnightDefaultMigration = (parsedSettings) => {
   if (!parsedSettings || typeof parsedSettings !== 'object') {
     return parsedSettings;
@@ -677,6 +731,9 @@ export const applyThemeSettings = (settings) => {
   const root = document.documentElement;
   const overlayRgb = convertHexToRgb(safeSettings.theme.overlayColor, '0,0,0');
   const accentRgb = convertHexToRgb(safeSettings.theme.accentColor, '0,206,209');
+  const accentContrastColor = getAccentContrastColor(safeSettings.theme.accentColor);
+  const accentStrongColor = adjustHexColor(safeSettings.theme.accentColor, -0.18);
+  const accentSoftColor = adjustHexColor(safeSettings.theme.accentColor, 0.16);
   const sidebarShadowOpacity = clamp(safeSettings.sidebar.itemShadowStrength / 100, 0, 1);
   const floatingOffset = safeSettings.sidebar.style === 'floating' ? 36 : 0;
 
@@ -685,6 +742,9 @@ export const applyThemeSettings = (settings) => {
   root.style.setProperty('--site-text-color', safeSettings.theme.textColor);
   root.style.setProperty('--site-accent-color', safeSettings.theme.accentColor);
   root.style.setProperty('--site-accent-rgb', accentRgb);
+  root.style.setProperty('--site-accent-contrast-color', accentContrastColor);
+  root.style.setProperty('--site-accent-strong-color', accentStrongColor);
+  root.style.setProperty('--site-accent-soft-color', accentSoftColor);
   root.style.setProperty('--site-sidebar-bg-color', safeSettings.theme.sidebarBackgroundColor);
   root.style.setProperty('--site-sidebar-border-color', safeSettings.theme.sidebarBorderColor);
   root.style.setProperty('--site-sidebar-text-color', safeSettings.theme.sidebarTextColor);
