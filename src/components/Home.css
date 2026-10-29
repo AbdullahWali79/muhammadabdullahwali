@@ -396,7 +396,6 @@
   border-radius: 10px;
   overflow: hidden;
   border: 1px solid var(--site-sidebar-border-color);
-  height: fit-content;
 }
 
 .info-row {

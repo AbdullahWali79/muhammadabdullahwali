@@ -492,29 +492,11 @@ const Home = ({ userData }) => {
                 </tr>
                 <tr className="info-row">
                   <td className="info-cell">
-                    <div className="info-icon">📅</div>
-                    <span className="info-label">Date of Birth:</span>
-                  </td>
-                  <td className="info-cell">
-                    <span className="info-value">{localUserData.dateOfBirth}</span>
-                  </td>
-                </tr>
-                <tr className="info-row">
-                  <td className="info-cell">
                     <div className="info-icon">📞</div>
                     <span className="info-label">Phone:</span>
                   </td>
                   <td className="info-cell">
                     <span className="info-value">{localUserData.phone}</span>
-                  </td>
-                </tr>
-                <tr className="info-row">
-                  <td className="info-cell">
-                    <div className="info-icon">📍</div>
-                    <span className="info-label">Address:</span>
-                  </td>
-                  <td className="info-cell">
-                    <span className="info-value">{localUserData.address}</span>
                   </td>
                 </tr>
               </tbody>
@@ -538,24 +520,6 @@ const Home = ({ userData }) => {
                   </td>
                   <td className="info-cell">
                     <span className="info-value">{localUserData.title}</span>
-                  </td>
-                </tr>
-                <tr className="info-row">
-                  <td className="info-cell">
-                    <div className="info-icon">🌐</div>
-                    <span className="info-label">Languages:</span>
-                  </td>
-                  <td className="info-cell">
-                    <span className="info-value">{localUserData.languages}</span>
-                  </td>
-                </tr>
-                <tr className="info-row">
-                  <td className="info-cell">
-                    <div className="info-icon">🏳️</div>
-                    <span className="info-label">Nationality:</span>
-                  </td>
-                  <td className="info-cell">
-                    <span className="info-value">{localUserData.nationality}</span>
                   </td>
                 </tr>
               </tbody>
